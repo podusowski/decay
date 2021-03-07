@@ -91,7 +91,7 @@ pub struct Body {
 }
 
 impl Body {
-    pub fn gravity_force(&self, rhs: &Body) -> Vector {
+    pub fn newtonian_gravity(&self, rhs: &Body) -> Vector {
         const G: f64 = 6.67408e-11f64;
         let offset = &self.position - &rhs.position;
         -G * ((self.mass * rhs.mass) / offset.length()) * offset.normalized()
@@ -116,7 +116,7 @@ impl Space {
         self.bodies
             .iter()
             .filter(|&other| !std::ptr::eq(body, other))
-            .map(|other| body.gravity_force(&other))
+            .map(|other| body.newtonian_gravity(&other))
             .fold(Vector::default(), std::ops::Add::add)
     }
 
