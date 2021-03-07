@@ -8,12 +8,18 @@ struct Vector {
 }
 
 impl Vector {
-    fn normalized(&self) -> Self {
+    pub fn normalized(&self) -> Self {
         self / self.length()
     }
 
-    fn length(&self) -> f64 {
+    pub fn length(&self) -> f64 {
         (self.x.powi(2) * self.y.powi(2)).sqrt()
+    }
+}
+
+impl Default for Vector {
+    fn default() -> Self {
+        Self { x: 0.0, y: 0.0 }
     }
 }
 
@@ -24,6 +30,39 @@ impl std::ops::Div<f64> for &Vector {
         Self::Output {
             x: self.x / rhs,
             y: self.y / rhs,
+        }
+    }
+}
+
+impl std::ops::Mul<Vector> for f64 {
+    type Output = Vector;
+
+    fn mul(self, rhs: Vector) -> Self::Output {
+        Self::Output {
+            x: self * rhs.x,
+            y: self * rhs.y,
+        }
+    }
+}
+
+impl std::ops::Add for Vector {
+    type Output = Vector;
+
+    fn add(self, rhs: Self) -> Self::Output {
+        Self::Output {
+            x: self.x + rhs.x,
+            y: self.y + rhs.y,
+        }
+    }
+}
+
+impl std::ops::Sub for &Vector {
+    type Output = Vector;
+
+    fn sub(self, rhs: Self) -> Self::Output {
+        Self::Output {
+            x: self.x - rhs.x,
+            y: self.y - rhs.y,
         }
     }
 }
@@ -67,15 +106,16 @@ fn newtonian_gravitation(m1: f64, m2: f64, distance: f64) -> f64 {
 }
 
 pub struct Body {
-    x: usize,
-    y: usize,
-    velocity: Velocity,
-    mass: usize,
+    position: Vector,
+    velocity: Vector,
+    mass: f64,
 }
 
 impl Body {
-    pub fn gravity_force(&self, rhs: &Body) -> ForceVector {
-        ForceVector { x: 0, y: 0 }
+    pub fn gravity_force(&self, rhs: &Body) -> Vector {
+        const G: f64 = 6.67408e-11f64;
+        let offset = &rhs.position - &self.position;
+        -G * ((self.mass * rhs.mass) / offset.length()) * offset.normalized()
     }
 }
 
@@ -95,11 +135,11 @@ impl Space {
     pub fn tick(&mut self, delta_time: std::time::Duration) {
         println!("Tick!");
         for body in &self.bodies {
-            let cumulative_force: ForceVector = self
+            let cumulative_force: Vector = self
                 .bodies
                 .iter()
                 .map(|other| body.gravity_force(&other))
-                .fold(ForceVector::default(), std::ops::Add::add);
+                .fold(Vector::default(), std::ops::Add::add);
         }
     }
 }
