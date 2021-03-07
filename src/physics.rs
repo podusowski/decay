@@ -83,44 +83,6 @@ impl std::ops::Sub for &Vector {
     }
 }
 
-pub struct ForceVector {
-    x: usize,
-    y: usize,
-}
-
-pub struct Velocity {
-    x: usize,
-    y: usize,
-}
-
-impl Default for Velocity {
-    fn default() -> Self {
-        Self { x: 0, y: 0 }
-    }
-}
-
-impl std::ops::Add for ForceVector {
-    type Output = Self;
-
-    fn add(self, rhs: Self) -> Self::Output {
-        Self {
-            x: self.x + rhs.x,
-            y: self.y + rhs.y,
-        }
-    }
-}
-
-impl Default for ForceVector {
-    fn default() -> Self {
-        Self { x: 0, y: 0 }
-    }
-}
-
-fn newtonian_gravitation(m1: f64, m2: f64, distance: f64) -> f64 {
-    const G: f64 = 6.67408e-11f64;
-    G * (m1 + m2) / distance.powf(2.0)
-}
-
 #[derive(Debug)]
 pub struct Body {
     pub position: Vector,
