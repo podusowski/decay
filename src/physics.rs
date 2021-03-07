@@ -1,4 +1,4 @@
-use std::{iter::Sum, time, usize};
+use std::{borrow::Borrow, iter::Sum, time, usize};
 
 struct Newton(usize);
 
@@ -35,11 +35,22 @@ impl std::ops::Div<f64> for &Vector {
     }
 }
 
-impl std::ops::Mul for Vector {
+impl std::ops::Mul<f64> for Vector {
     type Output = Vector;
 
-    fn mul(self, rhs: Self) -> Self::Output {
+    fn mul(self, rhs: f64) -> Self::Output {
         rhs * self
+    }
+}
+
+impl std::ops::Mul<f64> for &Vector {
+    type Output = Vector;
+
+    fn mul(self, rhs: f64) -> Self::Output {
+        Self::Output {
+            x: self.x * rhs,
+            y: self.y * rhs,
+        }
     }
 }
 
@@ -145,13 +156,13 @@ impl Default for Space {
 impl Space {
     pub fn tick(&mut self, delta_time: std::time::Duration) {
         for body in &self.bodies {
-            let cumulative_force: Vector = self
+            let cumulative_force: &Vector = &self
                 .bodies
                 .iter()
                 .map(|other| body.gravity_force(&other))
                 .fold(Vector::default(), std::ops::Add::add);
 
-            body.velocity += cumulative_force * delta_time.as_secs_f64();
+            body.velocity = body.velocity + cumulative_force * delta_time.as_secs_f64();
         }
     }
 }
