@@ -1,7 +1,3 @@
-use std::{borrow::Borrow, iter::Sum, time, usize};
-
-struct Newton(usize);
-
 #[derive(Debug, Clone, Copy)]
 pub struct Vector {
     pub x: f64,
@@ -135,7 +131,7 @@ pub struct Body {
 impl Body {
     pub fn gravity_force(&self, rhs: &Body) -> Vector {
         const G: f64 = 6.67408e-11f64;
-        let offset = &rhs.position - &self.position;
+        let offset = &self.position - &rhs.position ;
         -G * ((self.mass * rhs.mass) / offset.length()) * offset.normalized()
     }
 }
