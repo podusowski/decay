@@ -2,6 +2,7 @@ use std::{iter::Sum, time, usize};
 
 struct Newton(usize);
 
+#[derive(Debug)]
 struct Vector {
     x: f64,
     y: f64,
@@ -105,6 +106,7 @@ fn newtonian_gravitation(m1: f64, m2: f64, distance: f64) -> f64 {
     G * (m1 + m2) / distance.powf(2.0)
 }
 
+#[derive(Debug)]
 pub struct Body {
     position: Vector,
     velocity: Vector,
@@ -119,6 +121,7 @@ impl Body {
     }
 }
 
+#[derive(Debug)]
 pub struct Space /* perhaps time some day... */ {
     bodies: Vec<Body>,
 }

@@ -5,5 +5,6 @@ fn main() {
     let mut space = physics::Space::default();
     loop {
         space.tick(std::time::Duration::from_secs(1));
+        println!("{:?}", space);
     }
 }
