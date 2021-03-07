@@ -12,6 +12,12 @@ fn main() {
         mass: 100.0,
     });
 
+    space.bodies.push(Body {
+        position: Vector { x: 0.0, y: 100.0 },
+        velocity: Vector { x: 0.0, y: 0.0 },
+        mass: 100.0,
+    });
+
     loop {
         space.tick(std::time::Duration::from_secs(1));
         println!("{:?}", space);
