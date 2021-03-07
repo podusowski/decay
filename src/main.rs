@@ -18,8 +18,8 @@ fn main() {
         mass: 100.0,
     });
 
-    loop {
-        space.tick(std::time::Duration::from_secs(1));
+    for _ in 0..50{
         println!("{:?}", space);
+        space.tick(std::time::Duration::from_secs(1));
     }
 }

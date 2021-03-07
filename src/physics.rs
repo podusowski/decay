@@ -2,7 +2,7 @@ use std::{borrow::Borrow, iter::Sum, time, usize};
 
 struct Newton(usize);
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub struct Vector {
     pub x: f64,
     pub y: f64,
@@ -14,7 +14,7 @@ impl Vector {
     }
 
     pub fn length(&self) -> f64 {
-        (self.x.powi(2) * self.y.powi(2)).sqrt()
+        (self.x.powi(2) + self.y.powi(2)).sqrt()
     }
 }
 
@@ -154,15 +154,24 @@ impl Default for Space {
 }
 
 impl Space {
-    pub fn tick(&mut self, delta_time: std::time::Duration) {
-        for body in &self.bodies {
-            let cumulative_force: &Vector = &self
-                .bodies
-                .iter()
-                .map(|other| body.gravity_force(&other))
-                .fold(Vector::default(), std::ops::Add::add);
+    fn cumulative_force(&self, body: &Body) -> Vector {
+        self.bodies
+            .iter()
+            .filter(|&other| !std::ptr::eq(body, other))
+            .map(|other| body.gravity_force(&other))
+            .fold(Vector::default(), std::ops::Add::add)
+    }
 
-            body.velocity = body.velocity + cumulative_force * delta_time.as_secs_f64();
+    pub fn tick(&mut self, delta_time: std::time::Duration) {
+        for i in 0..self.bodies.len() - 1 {
+            // A hack to trick the borrow checker.
+            let body = &self.bodies[i];
+            let force = self.cumulative_force(body);
+            let body = &mut self.bodies[i];
+            body.velocity = body.velocity + force * delta_time.as_secs_f64();
+
+            // Pretty sure the World doesn't do it in a single loop
+            body.position = body.position + body.velocity * delta_time.as_secs_f64();
         }
     }
 }
