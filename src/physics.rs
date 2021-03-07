@@ -2,6 +2,32 @@ use std::{iter::Sum, time, usize};
 
 struct Newton(usize);
 
+struct Vector {
+    x: f64,
+    y: f64,
+}
+
+impl Vector {
+    fn normalized(&self) -> Self {
+        self / self.length()
+    }
+
+    fn length(&self) -> f64 {
+        (self.x.powi(2) * self.y.powi(2)).sqrt()
+    }
+}
+
+impl std::ops::Div<f64> for &Vector {
+    type Output = Vector;
+
+    fn div(self, rhs: f64) -> Self::Output {
+        Self::Output {
+            x: self.x / rhs,
+            y: self.y / rhs,
+        }
+    }
+}
+
 pub struct ForceVector {
     x: usize,
     y: usize,
