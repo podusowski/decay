@@ -35,6 +35,11 @@ impl Default for ForceVector {
     }
 }
 
+fn newtonian_gravitation(m1: f64, m2: f64, distance: f64) -> f64 {
+    const G: f64 = 6.67408e-11f64;
+    G * (m1 + m2) / distance.powf(2.0)
+}
+
 pub struct Body {
     x: usize,
     y: usize,
@@ -43,11 +48,8 @@ pub struct Body {
 }
 
 impl Body {
-    pub fn gravity_force(&self, other: &Body) -> ForceVector {
-        ForceVector {
-            x: 0,
-            y: 0,
-        }
+    pub fn gravity_force(&self, rhs: &Body) -> ForceVector {
+        ForceVector { x: 0, y: 0 }
     }
 }
 
