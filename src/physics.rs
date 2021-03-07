@@ -3,9 +3,9 @@ use std::{iter::Sum, time, usize};
 struct Newton(usize);
 
 #[derive(Debug)]
-struct Vector {
-    x: f64,
-    y: f64,
+pub struct Vector {
+    pub x: f64,
+    pub y: f64,
 }
 
 impl Vector {
@@ -108,9 +108,9 @@ fn newtonian_gravitation(m1: f64, m2: f64, distance: f64) -> f64 {
 
 #[derive(Debug)]
 pub struct Body {
-    position: Vector,
-    velocity: Vector,
-    mass: f64,
+    pub position: Vector,
+    pub velocity: Vector,
+    pub mass: f64,
 }
 
 impl Body {
@@ -123,7 +123,7 @@ impl Body {
 
 #[derive(Debug)]
 pub struct Space /* perhaps time some day... */ {
-    bodies: Vec<Body>,
+    pub bodies: Vec<Body>,
 }
 
 impl Default for Space {
@@ -136,7 +136,6 @@ impl Default for Space {
 
 impl Space {
     pub fn tick(&mut self, delta_time: std::time::Duration) {
-        println!("Tick!");
         for body in &self.bodies {
             let cumulative_force: Vector = self
                 .bodies
