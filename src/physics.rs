@@ -35,6 +35,14 @@ impl std::ops::Div<f64> for &Vector {
     }
 }
 
+impl std::ops::Mul for Vector {
+    type Output = Vector;
+
+    fn mul(self, rhs: Self) -> Self::Output {
+        rhs * self
+    }
+}
+
 impl std::ops::Mul<Vector> for f64 {
     type Output = Vector;
 
@@ -142,6 +150,8 @@ impl Space {
                 .iter()
                 .map(|other| body.gravity_force(&other))
                 .fold(Vector::default(), std::ops::Add::add);
+
+            body.velocity += cumulative_force * delta_time.as_secs_f64();
         }
     }
 }
