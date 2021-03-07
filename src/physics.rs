@@ -131,7 +131,7 @@ pub struct Body {
 impl Body {
     pub fn gravity_force(&self, rhs: &Body) -> Vector {
         const G: f64 = 6.67408e-11f64;
-        let offset = &self.position - &rhs.position ;
+        let offset = &self.position - &rhs.position;
         -G * ((self.mass * rhs.mass) / offset.length()) * offset.normalized()
     }
 }
