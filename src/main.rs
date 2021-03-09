@@ -1,16 +1,10 @@
-mod physics;
-use physics::*;
-
-use sdl2::event::Event;
-use sdl2::keyboard::Keycode;
-use sdl2::pixels::Color;
-use std::time::Duration;
 extern crate piston_window;
 use piston_window::*;
 
-fn main() {
-    println!("Bang!");
+mod physics;
+use physics::*;
 
+fn main() {
     let mut space = physics::Space::default();
 
     space.bodies.push(Body {
@@ -25,12 +19,15 @@ fn main() {
         mass: 1200000.0,
     });
 
-    let mut window: PistonWindow = WindowSettings::new("Hello Piston!", [800, 600])
+    let mut window: PistonWindow = WindowSettings::new("decay", [800, 600])
         .exit_on_esc(true)
         .build()
         .unwrap();
+
+    let mut glyphs = window.load_font("./FiraSans-Regular.ttf").unwrap();
+
     while let Some(event) = window.next() {
-        window.draw_2d(&event, |context, graphics, _device| {
+        window.draw_2d(&event, |context, graphics, device| {
             clear([0.0; 4], graphics);
             for body in &space.bodies {
                 ellipse(
@@ -39,9 +36,18 @@ fn main() {
                     context.transform,
                     graphics,
                 );
+                text(
+                    [0.7; 4],
+                    10,
+                    "Hello",
+                    &mut glyphs,
+                    context.transform.trans(body.position.x + 10.0, body.position.y),
+                    graphics,
+                )
+                .unwrap();
             }
+            glyphs.factory.encoder.flush(device);
 
-            println!("{:?}", space);
             space.tick(std::time::Duration::from_millis(10));
         });
     }
