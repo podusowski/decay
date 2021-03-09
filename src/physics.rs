@@ -121,8 +121,8 @@ impl Space {
     }
 
     pub fn tick(&mut self, delta_time: std::time::Duration) {
+        // Need to use this barbaric loop to trick the borrow checker a bit.
         for i in 0..self.bodies.len() {
-            // A hack to trick the borrow checker.
             let body = &self.bodies[i];
             let force = self.cumulative_force(body);
             let body = &mut self.bodies[i];
