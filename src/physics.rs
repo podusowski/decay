@@ -91,10 +91,10 @@ pub struct Body {
 }
 
 impl Body {
-    pub fn newtonian_gravity(&self, rhs: &Body) -> Vector {
+    pub fn newtonian_gravity(&self, other: &Body) -> Vector {
         const G: f64 = 6.67408e-11f64;
-        let offset = &self.position - &rhs.position;
-        -G * ((self.mass * rhs.mass) / offset.length()) * offset.normalized()
+        let offset = &self.position - &other.position;
+        -G * ((self.mass * other.mass) / offset.length()) * offset.normalized()
     }
 }
 
