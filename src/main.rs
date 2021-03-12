@@ -9,6 +9,7 @@ use physics::*;
 
 fn main() {
     let mut space = Space::solar_system();
+    println!("Space: {:?}", space);
 
     let mut window: PistonWindow = WindowSettings::new("decay", [800, 600])
         .exit_on_esc(true)
@@ -42,6 +43,7 @@ fn main() {
             glyphs.factory.encoder.flush(device);
 
             space.tick(std::time::Duration::from_millis(10));
+    println!("Space: {:?}", space);
         });
     }
 }

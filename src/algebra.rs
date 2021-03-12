@@ -2,6 +2,7 @@
 pub struct Vector {
     pub x: f64,
     pub y: f64,
+    pub z: f64,
 }
 
 impl Vector {
@@ -10,13 +11,17 @@ impl Vector {
     }
 
     pub fn length(&self) -> f64 {
-        (self.x.powi(2) + self.y.powi(2)).sqrt()
+        (self.x.powi(2) + self.y.powi(2) + self.z.powi(2)).sqrt()
     }
 }
 
 impl Default for Vector {
     fn default() -> Self {
-        Self { x: 0.0, y: 0.0 }
+        Self {
+            x: 0.0,
+            y: 0.0,
+            z: 0.0,
+        }
     }
 }
 
@@ -27,6 +32,7 @@ impl std::ops::Div<f64> for &Vector {
         Self::Output {
             x: self.x / rhs,
             y: self.y / rhs,
+            z: self.z / rhs,
         }
     }
 }
@@ -46,6 +52,7 @@ impl std::ops::Mul<f64> for &Vector {
         Self::Output {
             x: self.x * rhs,
             y: self.y * rhs,
+            z: self.z * rhs,
         }
     }
 }
@@ -57,6 +64,7 @@ impl std::ops::Mul<Vector> for f64 {
         Self::Output {
             x: self * rhs.x,
             y: self * rhs.y,
+            z: self * rhs.z,
         }
     }
 }
@@ -68,6 +76,7 @@ impl std::ops::Add for Vector {
         Self::Output {
             x: self.x + rhs.x,
             y: self.y + rhs.y,
+            z: self.z + rhs.z,
         }
     }
 }
@@ -79,6 +88,7 @@ impl std::ops::Sub for &Vector {
         Self::Output {
             x: self.x - rhs.x,
             y: self.y - rhs.y,
+            z: self.y - rhs.z,
         }
     }
 }
