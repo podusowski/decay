@@ -2,7 +2,10 @@ extern crate piston_window;
 use piston_window::*;
 
 mod physics;
+mod algebra;
+
 use physics::*;
+use algebra::Vector;
 
 fn main() {
     let mut space = physics::Space::default();
