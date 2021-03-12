@@ -1,26 +1,14 @@
 extern crate piston_window;
 use piston_window::*;
 
-mod physics;
 mod algebra;
+mod physics;
+mod ephemeris;
 
 use physics::*;
-use algebra::Vector;
 
 fn main() {
-    let mut space = physics::Space::default();
-
-    space.bodies.push(Body {
-        position: Vector { x: 400.0, y: 300.0 },
-        velocity: Vector { x: 0.0, y: -10.0 },
-        mass: 1200000.0,
-    });
-
-    space.bodies.push(Body {
-        position: Vector { x: 300.0, y: 300.0 },
-        velocity: Vector { x: 0.0, y: 10.0 },
-        mass: 1200000.0,
-    });
+    let mut space = Space::solar_system();
 
     let mut window: PistonWindow = WindowSettings::new("decay", [800, 600])
         .exit_on_esc(true)
@@ -44,7 +32,9 @@ fn main() {
                     10,
                     "Hello",
                     &mut glyphs,
-                    context.transform.trans(body.position.x + 10.0, body.position.y),
+                    context
+                        .transform
+                        .trans(body.position.x + 10.0, body.position.y),
                     graphics,
                 )
                 .unwrap();
