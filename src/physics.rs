@@ -45,11 +45,16 @@ impl Space {
             let force = self.cumulative_force(body);
             let acceleration = force / body.mass;
 
-            let body = &mut self.bodies[i];
-            body.velocity = acceleration * delta_time.as_secs_f64() + body.velocity;
+            // Calculate this before we store the new velocity.
+            let offset_ensued_from_velocity = body.velocity * delta_time.as_secs_f64();
+            let offset_ensued_from_acceleration =
+                acceleration * delta_time.as_secs_f64().powi(2) / 2.0;
 
-            let offset = body.velocity * delta_time.as_secs_f64();
-            body.position = body.position + offset;
+            let body = &mut self.bodies[i];
+
+            body.velocity = acceleration * delta_time.as_secs_f64() + body.velocity;
+            body.position =
+                body.position + offset_ensued_from_velocity + offset_ensued_from_acceleration;
         }
     }
 }
