@@ -1,4 +1,4 @@
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Vector {
     pub x: f64,
     pub y: f64,
@@ -88,7 +88,7 @@ impl std::ops::Sub for &Vector {
         Self::Output {
             x: self.x - rhs.x,
             y: self.y - rhs.y,
-            z: self.y - rhs.z,
+            z: self.z - rhs.z,
         }
     }
 }
