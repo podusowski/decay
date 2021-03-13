@@ -25,6 +25,18 @@ impl Default for Vector {
     }
 }
 
+impl std::ops::Div<f64> for Vector {
+    type Output = Vector;
+
+    fn div(self, rhs: f64) -> Self::Output {
+        Self::Output {
+            x: self.x / rhs,
+            y: self.y / rhs,
+            z: self.z / rhs,
+        }
+    }
+}
+
 impl std::ops::Div<f64> for &Vector {
     type Output = Vector;
 

@@ -7,9 +7,10 @@ pub struct Body {
     pub mass: f64,
 }
 
+const G: f64 = 6.67408e-11f64;
+
 impl Body {
     pub fn newtonian_gravity(&self, other: &Body) -> Vector {
-        const G: f64 = 6.67408e-11f64;
         let offset = &self.position - &other.position;
         -G * ((self.mass * other.mass) / offset.length()) * offset.normalized()
     }
@@ -42,11 +43,62 @@ impl Space {
         for i in 0..self.bodies.len() {
             let body = &self.bodies[i];
             let force = self.cumulative_force(body);
+            let acceleration = force / body.mass;
+
             let body = &mut self.bodies[i];
-            body.velocity = body.velocity + force * delta_time.as_secs_f64();
+            body.velocity = acceleration * delta_time.as_secs_f64() + body.velocity;
 
             // Pretty sure the World doesn't do it in a single loop
             body.position = body.position + body.velocity * delta_time.as_secs_f64();
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use approx::assert_abs_diff_eq;
+
+    #[test]
+    fn one_body_stays_in_place() {
+        let mut space = Space::default();
+        space.bodies.push(Body {
+            position: Vector::default(),
+            velocity: Vector::default(),
+            mass: 1.0,
+        });
+        space.tick(std::time::Duration::from_secs(1));
+        assert_eq!(Vector::default(), space.bodies[0].position);
+        assert_eq!(Vector::default(), space.bodies[0].velocity);
+    }
+
+    #[test]
+    fn two_bodies_fly_towards_each_other() {
+        let mut space = Space::default();
+        space.bodies.push(Body {
+            position: Vector::default(),
+            velocity: Vector::default(),
+            mass: 1.0,
+        });
+        space.bodies.push(Body {
+            position: Vector {
+                x: 1.0,
+                y: 0.0,
+                z: 0.0,
+            },
+            velocity: Vector::default(),
+            mass: 1.0,
+        });
+
+        space.tick(std::time::Duration::from_secs(1));
+
+        // Distance between the two, their mass product and square of distance, all equals 1.
+        // This gives a gravity force equal to G. With the mass of 1, such force will give
+        // the acceleration of G [m per sec per sec]. After one second such acceleration should
+        // give the velocity of G.
+        assert_abs_diff_eq!(G, space.bodies[0].velocity.x);
+
+        // For both bodies.
+        assert_abs_diff_eq!(-G, space.bodies[1].velocity.x);
     }
 }
