@@ -100,5 +100,11 @@ mod tests {
 
         // For both bodies.
         assert_abs_diff_eq!(-G, space.bodies[1].velocity.x);
+
+        // Distance traveled should be:
+        // a ^ 2 * t / 2
+        // G ^ 2 * 1 / 2
+        // G ^ 2 / 2
+        assert_abs_diff_eq!(G.powi(2) / 2.0, space.bodies[0].position.x);
     }
 }
