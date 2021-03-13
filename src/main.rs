@@ -2,8 +2,8 @@ extern crate piston_window;
 use piston_window::*;
 
 mod algebra;
-mod physics;
 mod ephemeris;
+mod physics;
 
 use physics::*;
 
@@ -43,7 +43,7 @@ fn main() {
             glyphs.factory.encoder.flush(device);
 
             space.tick(std::time::Duration::from_millis(10));
-    println!("Space: {:?}", space);
+            println!("Space: {:?}", space);
         });
     }
 }
