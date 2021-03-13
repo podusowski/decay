@@ -48,8 +48,8 @@ impl Space {
             let body = &mut self.bodies[i];
             body.velocity = acceleration * delta_time.as_secs_f64() + body.velocity;
 
-            // Pretty sure the World doesn't do it in a single loop
-            body.position = body.position + body.velocity * delta_time.as_secs_f64();
+            let offset = body.velocity * delta_time.as_secs_f64();
+            body.position = body.position + offset;
         }
     }
 }
@@ -102,9 +102,9 @@ mod tests {
         assert_abs_diff_eq!(-G, space.bodies[1].velocity.x);
 
         // Distance traveled should be:
-        // a ^ 2 * t / 2
-        // G ^ 2 * 1 / 2
-        // G ^ 2 / 2
-        assert_abs_diff_eq!(G.powi(2) / 2.0, space.bodies[0].position.x);
+        // a * t ^ 2 / 2
+        // G * 1 ^ 2 / 2
+        // G / 2
+        assert_abs_diff_eq!(G / 2.0, space.bodies[0].position.x);
     }
 }
