@@ -11,7 +11,7 @@ impl Space {
         space.bodies.push(Body {
             position: Vector::default(),
             velocity: Vector::default(),
-            mass: 1.989e30,
+            mass: 1.989e30 * 1000.0,
             name: "Sun",
         });
 
@@ -25,13 +25,13 @@ impl Space {
                 y: Distance::from_aus(7.655753687572452E-02).as_meters(),
                 z: Distance::from_aus(3.938313941762204E-02).as_meters(),
             },
-            velocity: Vector::default(),
-            //velocity: Vector {
-            //    x: Distance::from_aus(-1.166921930880622E-02).as_meters(),
-            //    y: Distance::from_aus(-2.631562924335937E-02).as_meters(),
-            //    z: Distance::from_aus(-1.079745298798429E-03).as_meters(),
-            //},
-            mass: 3.302e23,
+            //velocity: Vector::default(),
+            velocity: Vector {
+                x: Distance::from_aus(-1.166921930880622E-02).as_meters(),
+                y: Distance::from_aus(-2.631562924335937E-02).as_meters(),
+                z: Distance::from_aus(-1.079745298798429E-03).as_meters(),
+            },
+            mass: 3.302e23 * 1000.0,
             name: "Mercury",
         });
 
