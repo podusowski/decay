@@ -56,12 +56,14 @@ impl Body {
 #[derive(Debug)]
 pub struct Space /* perhaps time some day... */ {
     pub bodies: Vec<Body>,
+    pub time: std::time::Instant
 }
 
 impl Default for Space {
     fn default() -> Self {
         Space {
             bodies: Vec::default(),
+            time: std::time::Instant::now()
         }
     }
 }
@@ -81,11 +83,15 @@ impl Space {
             let body = &self.bodies[i];
             let force = self.cumulative_force(body);
             let acceleration = force / body.mass.as_grams();
+            //println!("{:?}", delta_time.as_secs_f64());
 
             // Calculate this before we store the new velocity.
             let offset_ensued_from_velocity = body.velocity * delta_time.as_secs_f64();
             let offset_ensued_from_acceleration =
                 acceleration * delta_time.as_secs_f64().powi(2) / 2.0;
+
+            println!("velocity: {:?}", body.velocity);
+            println!("{:?} {:?}", offset_ensued_from_velocity, offset_ensued_from_acceleration);
 
             let body = &mut self.bodies[i];
 
@@ -93,6 +99,8 @@ impl Space {
             body.position =
                 body.position + offset_ensued_from_velocity + offset_ensued_from_acceleration;
         }
+
+        self.time += delta_time;
     }
 }
 

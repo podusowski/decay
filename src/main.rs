@@ -51,7 +51,8 @@ fn main() {
             }
             glyphs.factory.encoder.flush(device);
 
-            space.tick(std::time::Duration::from_millis(100));
+            space.tick(std::time::Duration::from_secs(10));
+            println!("{:?}", space.time);
         });
     }
 }
