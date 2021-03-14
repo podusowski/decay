@@ -20,6 +20,7 @@ impl Space {
             position: Vector::default(),
             velocity: Vector::default(),
             mass: 1.989e30,
+            name: "Sun"
         });
 
         // Mercury
@@ -38,6 +39,7 @@ impl Space {
                 z: Au(-1.079745298798429E-03).as_meters(),
             },
             mass: 3.302e23,
+            name: "Mercury"
         });
 
         space

@@ -42,8 +42,8 @@ fn main() {
         window.draw_2d(&event, |context, graphics, device| {
             clear([0.0; 4], graphics);
             for body in &space.bodies {
-                let x = Distance::from_meters(body.position.x).as_au();
-                let y = Distance::from_meters(body.position.y).as_au();
+                let x = Distance::from_meters(body.position.x).as_au() * 100.0;
+                let y = Distance::from_meters(body.position.y).as_au() * 100.0;
 
                 ellipse(
                     [1.0; 4],
@@ -55,7 +55,7 @@ fn main() {
                 text(
                     [0.7; 4],
                     10,
-                    "Hello",
+                    body.name,
                     &mut glyphs,
                     context
                         .transform
@@ -67,7 +67,7 @@ fn main() {
             }
             glyphs.factory.encoder.flush(device);
 
-            space.tick(std::time::Duration::from_millis(10));
+            space.tick(std::time::Duration::from_millis(100));
             println!("Space: {:?}", space);
         });
     }

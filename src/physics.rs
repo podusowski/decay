@@ -5,6 +5,7 @@ pub struct Body {
     pub position: Vector,
     pub velocity: Vector,
     pub mass: f64,
+    pub name: &'static str
 }
 
 const G: f64 = 6.67408e-11f64;
