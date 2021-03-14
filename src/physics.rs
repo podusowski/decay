@@ -23,11 +23,24 @@ impl Distance {
 }
 
 #[derive(Debug)]
+pub struct Mass(f64);
+
+impl Mass {
+    pub fn from_kgs(kgs: f64) -> Mass {
+        Mass(kgs * 1000.0)
+    }
+
+    pub fn as_grams(&self) -> f64 {
+        self.0
+    }
+}
+
+#[derive(Debug)]
 pub struct Body {
     pub position: Vector,
     pub velocity: Vector,
-    pub mass: f64,
-    pub name: &'static str
+    pub mass: Mass,
+    pub name: &'static str,
 }
 
 const G: f64 = 6.67408e-11f64;
@@ -35,7 +48,8 @@ const G: f64 = 6.67408e-11f64;
 impl Body {
     pub fn newtonian_gravity(&self, other: &Body) -> Vector {
         let offset = &self.position - &other.position;
-        -G * ((self.mass * other.mass) / offset.length().powi(2)) * offset.normalized()
+        -G * ((self.mass.as_grams() * other.mass.as_grams()) / offset.length().powi(2))
+            * offset.normalized()
     }
 }
 
@@ -66,7 +80,7 @@ impl Space {
         for i in 0..self.bodies.len() {
             let body = &self.bodies[i];
             let force = self.cumulative_force(body);
-            let acceleration = force / body.mass;
+            let acceleration = force / body.mass.as_grams();
 
             // Calculate this before we store the new velocity.
             let offset_ensued_from_velocity = body.velocity * delta_time.as_secs_f64();
