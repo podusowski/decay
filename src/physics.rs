@@ -12,7 +12,7 @@ const G: f64 = 6.67408e-11f64;
 impl Body {
     pub fn newtonian_gravity(&self, other: &Body) -> Vector {
         let offset = &self.position - &other.position;
-        -G * ((self.mass * other.mass) / offset.length()) * offset.normalized()
+        -G * ((self.mass * other.mass) / offset.length().powi(2)) * offset.normalized()
     }
 }
 
