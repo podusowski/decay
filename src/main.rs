@@ -9,22 +9,6 @@ mod physics;
 
 use physics::*;
 
-struct Distance(f64);
-
-impl Distance {
-    fn from_meters(meters: f64) -> Self {
-        Distance(meters)
-    }
-
-    fn as_meters(&self) -> f64 {
-        self.0
-    }
-
-    fn as_au(&self) -> f64 {
-        self.0 / 597870700.0
-    }
-}
-
 fn main() {
     let mut space = Space::solar_system();
     println!("Space: {:?}", space);
@@ -42,8 +26,8 @@ fn main() {
         window.draw_2d(&event, |context, graphics, device| {
             clear([0.0; 4], graphics);
             for body in &space.bodies {
-                let x = Distance::from_meters(body.position.x).as_au() * 100.0;
-                let y = Distance::from_meters(body.position.y).as_au() * 100.0;
+                let x = physics::Distance::from_meters(body.position.x).as_au() * 100.0;
+                let y = physics::Distance::from_meters(body.position.y).as_au() * 100.0;
 
                 ellipse(
                     [1.0; 4],
