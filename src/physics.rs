@@ -5,17 +5,15 @@ pub struct Distance(f64);
 impl Distance {
     const METERS_IN_AU: f64 = 597870700.0;
 
-    /// Construct from meters.
     pub fn from_meters(meters: f64) -> Self {
         Distance(meters)
     }
 
-    /// Construct from Astronomical Units.
     pub fn from_aus(aus: f64) -> Self {
         Distance(aus * Self::METERS_IN_AU)
     }
 
-    fn as_meters(&self) -> f64 {
+    pub fn as_meters(&self) -> f64 {
         self.0
     }
 
