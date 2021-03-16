@@ -1,6 +1,5 @@
 extern crate piston_window;
 use piston_window::*; 
-use piston_window::types::Matrix2d;
 use piston_window::math::translate;
 
 mod algebra;
@@ -51,7 +50,7 @@ fn main() {
             }
             glyphs.factory.encoder.flush(device);
 
-            space.tick(std::time::Duration::from_secs(10));
+            space.tick(std::time::Duration::from_millis(10));
             println!("{:?}", space.time);
         });
     }

@@ -14,7 +14,8 @@ impl Space {
         space.bodies.push(Body {
             position: Vector::default(),
             velocity: Vector::default(),
-            mass: Mass::from_kgs(1.989e30),
+            //mass: Mass::from_kgs(1.989e30),
+            mass: Mass::from_kgs(1988500e24),
             name: "Sun",
         });
 
@@ -48,7 +49,7 @@ impl Space {
                 y: Distance::from_aus(5.418163683984627E-03).as_meters() / SECONDS_IN_DAY,
                 z: Distance::from_aus(-1.041291312991296E-03).as_meters() / SECONDS_IN_DAY,
             },
-            mass: Mass::from_kgs(4.867e24),
+            mass: Mass::from_kgs(48.685e23),
             name: "Venus",
         });
 
