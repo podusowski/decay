@@ -21,7 +21,7 @@ fn main() {
     let mut glyphs = window.load_font("./FiraSans-Regular.ttf").unwrap();
 
     let view_transform = translate([400.0, 400.0]);
-    let the_big_bang_instant = std::time::Instant::now();
+    let the_big_bang_instant = space.time;
 
     while let Some(event) = window.next() {
         window.draw_2d(&event, |context, graphics, device| {
@@ -67,7 +67,7 @@ fn main() {
             text(
                 [0.7; 4],
                 12,
-                format!("T = {}", the_big_bang_instant.elapsed().as_secs()).as_str(),
+                format!("T = {}", space.time.duration_since(the_big_bang_instant).as_secs()).as_str(),
                 &mut glyphs,
                 context.transform.trans(10.0, 10.0),
                 graphics,
@@ -75,7 +75,7 @@ fn main() {
             .unwrap();
 
             glyphs.factory.encoder.flush(device);
-            space.tick(std::time::Duration::from_secs(1));
+            space.tick(std::time::Duration::from_secs(3600));
         });
     }
 }

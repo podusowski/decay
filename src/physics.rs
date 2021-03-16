@@ -87,24 +87,11 @@ impl Space {
             let body = &self.bodies[i];
             let force = self.cumulative_force(body);
             let acceleration = force / body.mass.as_kgs();
-            //println!("{:?}", delta_time.as_secs_f64());
 
             // Calculate this before we store the new velocity.
             let offset_ensued_from_velocity = body.velocity * delta_time.as_secs_f64();
             let offset_ensued_from_acceleration =
                 acceleration * delta_time.as_secs_f64().powi(2) / 2.0;
-
-            if body.name == "Venus" {
-                println!("force   : {:?}", force);
-                println!("accelera: {:?}", acceleration);
-                println!("velocity: {:?}", body.velocity);
-                println!("velocity: {:?} m/s", body.velocity.length());
-                println!("position: {:?}", body.position);
-                println!(
-                    "{:?} {:?}",
-                    offset_ensued_from_velocity, offset_ensued_from_acceleration
-                );
-            }
 
             let body = &mut self.bodies[i];
 
