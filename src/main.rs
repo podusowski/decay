@@ -44,20 +44,7 @@ fn main() {
                     &mut glyphs,
                     context
                         .transform
-                        .trans(x + 15.0, y)
-                        .append_transform(view_transform),
-                    graphics,
-                )
-                .unwrap();
-
-                text(
-                    [0.7; 4],
-                    10,
-                    format!("velocity/ {:?}", body.velocity).as_str(),
-                    &mut glyphs,
-                    context
-                        .transform
-                        .trans(x + 15.0, y + 10.0)
+                        .trans(x + 10.0, y)
                         .append_transform(view_transform),
                     graphics,
                 )
