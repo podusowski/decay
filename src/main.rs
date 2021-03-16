@@ -1,6 +1,6 @@
 extern crate piston_window;
-use piston_window::*; 
 use piston_window::math::translate;
+use piston_window::*;
 
 mod algebra;
 mod ephemeris;
@@ -48,10 +48,21 @@ fn main() {
                 )
                 .unwrap();
             }
-            glyphs.factory.encoder.flush(device);
 
+            text(
+                [0.7; 4],
+                12,
+                format!("{:?}", space.time).as_str(),
+                &mut glyphs,
+                context
+                    .transform
+                    .trans(10.0, 10.0),
+                graphics,
+            )
+            .unwrap();
+
+            glyphs.factory.encoder.flush(device);
             space.tick(std::time::Duration::from_millis(10));
-            println!("{:?}", space.time);
         });
     }
 }
