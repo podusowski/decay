@@ -20,6 +20,7 @@ fn main() {
     let mut glyphs = window.load_font("./FiraSans-Regular.ttf").unwrap();
 
     let view_transform = translate([400.0, 400.0]);
+    let the_big_bang_instant = std::time::Instant::now();
 
     while let Some(event) = window.next() {
         window.draw_2d(&event, |context, graphics, device| {
@@ -42,7 +43,20 @@ fn main() {
                     &mut glyphs,
                     context
                         .transform
-                        .trans(x + 10.0, y)
+                        .trans(x + 15.0, y)
+                        .append_transform(view_transform),
+                    graphics,
+                )
+                .unwrap();
+
+                text(
+                    [0.7; 4],
+                    10,
+                    format!("velocity/ {:?}", body.velocity).as_str(),
+                    &mut glyphs,
+                    context
+                        .transform
+                        .trans(x + 15.0, y + 10.0)
                         .append_transform(view_transform),
                     graphics,
                 )
@@ -52,17 +66,15 @@ fn main() {
             text(
                 [0.7; 4],
                 12,
-                format!("{:?}", space.time).as_str(),
+                format!("T = {}", the_big_bang_instant.elapsed().as_secs()).as_str(),
                 &mut glyphs,
-                context
-                    .transform
-                    .trans(10.0, 10.0),
+                context.transform.trans(10.0, 10.0),
                 graphics,
             )
             .unwrap();
 
             glyphs.factory.encoder.flush(device);
-            space.tick(std::time::Duration::from_millis(100));
+            space.tick(std::time::Duration::from_millis(10));
         });
     }
 }
