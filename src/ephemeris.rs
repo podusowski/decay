@@ -14,7 +14,6 @@ impl Space {
         space.bodies.push(Body {
             position: Vector::default(),
             velocity: Vector::default(),
-            //mass: Mass::from_kgs(1.989e30),
             mass: Mass::from_kgs(1988500e24),
             name: "Sun",
         });
