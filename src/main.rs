@@ -62,7 +62,7 @@ fn main() {
             .unwrap();
 
             glyphs.factory.encoder.flush(device);
-            space.tick(std::time::Duration::from_millis(10));
+            space.tick(std::time::Duration::from_millis(100));
         });
     }
 }
