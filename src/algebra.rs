@@ -18,15 +18,15 @@ impl Vector {
 impl Default for Vector {
     fn default() -> Self {
         Self {
-            x: 0.0,
-            y: 0.0,
-            z: 0.0,
+            x: Default::default(),
+            y: Default::default(),
+            z: Default::default(),
         }
     }
 }
 
 impl std::ops::Div<f64> for Vector {
-    type Output = Vector;
+    type Output = Self;
 
     fn div(self, rhs: f64) -> Self::Output {
         Self::Output {
@@ -34,14 +34,6 @@ impl std::ops::Div<f64> for Vector {
             y: self.y / rhs,
             z: self.z / rhs,
         }
-    }
-}
-
-impl std::ops::Mul<f64> for Vector {
-    type Output = Vector;
-
-    fn mul(self, rhs: f64) -> Self::Output {
-        rhs * self
     }
 }
 
@@ -57,8 +49,16 @@ impl std::ops::Mul<Vector> for f64 {
     }
 }
 
+impl std::ops::Mul<f64> for Vector {
+    type Output = Self;
+
+    fn mul(self, rhs: f64) -> Self::Output {
+        rhs * self
+    }
+}
+
 impl std::ops::Add for Vector {
-    type Output = Vector;
+    type Output = Self;
 
     fn add(self, rhs: Self) -> Self::Output {
         Self::Output {
@@ -70,7 +70,7 @@ impl std::ops::Add for Vector {
 }
 
 impl std::ops::Sub for Vector {
-    type Output = Vector;
+    type Output = Self;
 
     fn sub(self, rhs: Self) -> Self::Output {
         Self::Output {
