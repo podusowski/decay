@@ -30,10 +30,6 @@ impl Mass {
         Mass(kgs * 1000.0)
     }
 
-    pub fn as_grams(&self) -> f64 {
-        self.0
-    }
-
     pub fn as_kgs(&self) -> f64 {
         self.0 / 1000.0
     }
