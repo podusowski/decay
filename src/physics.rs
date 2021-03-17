@@ -1,4 +1,5 @@
 use crate::algebra::Vector;
+use crate::units::Mass;
 
 #[derive(Debug)]
 pub struct Body {
@@ -68,6 +69,7 @@ impl Space {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::units::Mass;
     use approx::assert_abs_diff_eq;
 
     #[test]
@@ -77,7 +79,7 @@ mod tests {
             position: Vector::default(),
             velocity: Vector::default(),
             mass: Mass::from_kgs(1.0),
-            name: "Earth"
+            name: "Earth",
         });
         space.tick(std::time::Duration::from_secs(1));
         assert_eq!(Vector::default(), space.bodies[0].position);
@@ -91,7 +93,7 @@ mod tests {
             position: Vector::default(),
             velocity: Vector::default(),
             mass: Mass::from_kgs(1.0),
-            name: "Earth"
+            name: "Earth",
         });
         space.bodies.push(Body {
             position: Vector {
@@ -101,7 +103,7 @@ mod tests {
             },
             velocity: Vector::default(),
             mass: Mass::from_kgs(1.0),
-            name: "Earth"
+            name: "Earth",
         });
 
         space.tick(std::time::Duration::from_secs(1));

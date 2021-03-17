@@ -55,7 +55,11 @@ fn main() {
             text(
                 [0.7; 4],
                 12,
-                format!("T = {}", space.time.duration_since(the_big_bang_instant).as_secs()).as_str(),
+                format!(
+                    "T = {}",
+                    space.time.duration_since(the_big_bang_instant).as_secs()
+                )
+                .as_str(),
                 &mut glyphs,
                 context.transform.trans(10.0, 10.0),
                 graphics,
