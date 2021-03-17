@@ -7,7 +7,7 @@ pub struct Vector {
 
 impl Vector {
     pub fn normalized(&self) -> Self {
-        self / self.length()
+        *self / self.length()
     }
 
     pub fn length(&self) -> f64 {
@@ -37,35 +37,11 @@ impl std::ops::Div<f64> for Vector {
     }
 }
 
-impl std::ops::Div<f64> for &Vector {
-    type Output = Vector;
-
-    fn div(self, rhs: f64) -> Self::Output {
-        Self::Output {
-            x: self.x / rhs,
-            y: self.y / rhs,
-            z: self.z / rhs,
-        }
-    }
-}
-
 impl std::ops::Mul<f64> for Vector {
     type Output = Vector;
 
     fn mul(self, rhs: f64) -> Self::Output {
         rhs * self
-    }
-}
-
-impl std::ops::Mul<f64> for &Vector {
-    type Output = Vector;
-
-    fn mul(self, rhs: f64) -> Self::Output {
-        Self::Output {
-            x: self.x * rhs,
-            y: self.y * rhs,
-            z: self.z * rhs,
-        }
     }
 }
 
@@ -93,7 +69,7 @@ impl std::ops::Add for Vector {
     }
 }
 
-impl std::ops::Sub for &Vector {
+impl std::ops::Sub for Vector {
     type Output = Vector;
 
     fn sub(self, rhs: Self) -> Self::Output {
