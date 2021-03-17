@@ -52,7 +52,6 @@ impl Space {
             name: "Venus",
         });
 
-
         space.bodies.push(Body {
             position: Vector {
                 x: Distance::from_aus(9.255531850624332E-01).as_meters(),
@@ -66,6 +65,21 @@ impl Space {
             },
             mass: Mass::from_kgs(5.97219e24),
             name: "Earth",
+        });
+
+        space.bodies.push(Body {
+            position: Vector {
+                x: Distance::from_aus(1.158495532744392E+00).as_meters(),
+                y: Distance::from_aus(-7.536556465639087E-01).as_meters(),
+                z: Distance::from_aus(-4.422526991966770E-02).as_meters(),
+            },
+            velocity: Vector {
+                x: Distance::from_aus(8.162919959786599E-03).as_meters() / SECONDS_IN_DAY,
+                y: Distance::from_aus(1.292885802502735E-02).as_meters() / SECONDS_IN_DAY,
+                z: Distance::from_aus(7.059671810539333E-05).as_meters() / SECONDS_IN_DAY,
+            },
+            mass: Mass::from_kgs(6.4171e23),
+            name: "Mars",
         });
 
         space
