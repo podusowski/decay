@@ -75,6 +75,21 @@ impl Space {
             name: "Mars",
         });
 
+        space.bodies.push(Body {
+            position: Vector {
+                x: Distance::from_aus(-5.432121324842138E+00).as_meters(),
+                y: Distance::from_aus(-4.569844296390864E-01).as_meters(),
+                z: Distance::from_aus(1.234480663921852E-01).as_meters(),
+            },
+            velocity: Vector {
+                x: Distance::from_aus(5.420082489396598E-04).as_meters() / SECONDS_IN_DAY,
+                y: Distance::from_aus(-7.169749225100362E-03).as_meters() / SECONDS_IN_DAY,
+                z: Distance::from_aus(1.762648657670620E-05).as_meters() / SECONDS_IN_DAY,
+            },
+            mass: Mass::from_kgs(189818722e19),
+            name: "Jupiter",
+        });
+
         space
     }
 }
