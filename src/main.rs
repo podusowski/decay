@@ -14,7 +14,7 @@ fn main() {
     println!("Space: {:?}", space);
     println!("velocity: {:?} m/s", space.bodies[2].velocity.length());
 
-    let mut window: PistonWindow = WindowSettings::new("decay", [800, 600])
+    let mut window: PistonWindow = WindowSettings::new("decay", [1280, 720])
         .exit_on_esc(true)
         .build()
         .unwrap();
