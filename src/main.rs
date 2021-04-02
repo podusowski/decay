@@ -28,8 +28,8 @@ fn main() {
         window.draw_2d(&event, |context, graphics, device| {
             clear([0.0; 4], graphics);
             for body in &space.bodies {
-                let x = units::Distance::from_meters(body.position.x).as_au() * 50.0;
-                let y = units::Distance::from_meters(body.position.y).as_au() * 50.0;
+                let x = units::Distance::from_meters(body.position.x).as_au() * 20.0;
+                let y = units::Distance::from_meters(body.position.y).as_au() * 20.0;
 
                 ellipse(
                     [1.0; 4],
