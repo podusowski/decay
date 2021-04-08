@@ -21,10 +21,15 @@ fn main() {
     let mut glyphs = window.load_font("./FiraSans-Regular.ttf").unwrap();
 
     let view_transform = translate([400.0, 400.0]);
-    let au_as_pixels = 20.0;
+    let mut au_as_pixels = 20.0;
     let the_big_bang_instant = space.time;
 
     while let Some(event) = window.next() {
+        if let Event::Input(Input::Move(Motion::MouseScroll(zoom_amount)), _) = event {
+            println!("{:?}", zoom_amount);
+            au_as_pixels = (au_as_pixels + zoom_amount[1]).max(1.0);
+        };
+
         window.draw_2d(&event, |context, graphics, device| {
             clear([0.0; 4], graphics);
             for body in &space.bodies {
