@@ -21,14 +21,15 @@ fn main() {
     let mut glyphs = window.load_font("./FiraSans-Regular.ttf").unwrap();
 
     let view_transform = translate([400.0, 400.0]);
+    let au_as_pixels = 20.0;
     let the_big_bang_instant = space.time;
 
     while let Some(event) = window.next() {
         window.draw_2d(&event, |context, graphics, device| {
             clear([0.0; 4], graphics);
             for body in &space.bodies {
-                let x = units::Distance::from_meters(body.position.x).as_au() * 20.0;
-                let y = units::Distance::from_meters(body.position.y).as_au() * 20.0;
+                let x = units::Distance::from_meters(body.position.x).as_au() * au_as_pixels;
+                let y = units::Distance::from_meters(body.position.y).as_au() * au_as_pixels;
 
                 ellipse(
                     [1.0; 4],
