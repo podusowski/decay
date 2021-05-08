@@ -66,7 +66,6 @@ fn main() {
     let mut glyphs = window.load_font("./FiraSans-Regular.ttf").unwrap();
 
     let mut observer = Observer::default();
-    let the_big_bang_instant = space.time;
     let mut mouse_cursor = (0.0, 0.0);
 
     while let Some(event) = window.next() {
