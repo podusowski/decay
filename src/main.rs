@@ -33,9 +33,12 @@ impl Observer {
     }
 
     fn reverse_cast(&self, position: (f64, f64)) -> Vector {
+        println!("{:?}", self.view_transform);
+        let x_offset = self.view_transform[0][2];
+        let y_offset = self.view_transform[1][2];
         Vector {
-            x: units::Distance::from_aus(position.0 / self.au_as_pixels).as_meters(),
-            y: units::Distance::from_aus(position.1 / self.au_as_pixels).as_meters(),
+            x: units::Distance::from_aus((position.0 - x_offset) / self.au_as_pixels).as_meters(),
+            y: units::Distance::from_aus((position.1 - y_offset) / self.au_as_pixels).as_meters(),
             z: Default::default(),
         }
     }
@@ -85,7 +88,10 @@ fn main() {
         {
             let position = observer.reverse_cast(mouse_cursor);
             let body = space.body_at(position);
-            println!("click {:?}, position: {:?}, body: {:?}", mouse_cursor, position, body);
+            println!(
+                "click {:?}, position: {:?}, body: {:?}",
+                mouse_cursor, position, body
+            );
         };
 
         window.draw_2d(&event, |context, graphics, device| {
