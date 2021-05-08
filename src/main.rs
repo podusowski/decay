@@ -72,7 +72,7 @@ fn main() {
         if let Event::Input(
             Input::Button(ButtonArgs {
                 state: _,
-                button: Button::Mouse(_),
+                button: Button::Mouse(MouseButton::Left),
                 scancode: _,
             }),
             _,
