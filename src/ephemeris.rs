@@ -62,6 +62,21 @@ impl Space {
 
         space.bodies.push(Body {
             position: Vector {
+                x: Distance::from_aus(9.279584884887349E-01).as_meters(),
+                y: Distance::from_aus(3.711104444050654E-01).as_meters(),
+                z: Distance::from_aus(-1.037121134101948E-04).as_meters(),
+            },
+            velocity: Vector {
+                x: Distance::from_aus(-6.761640228117041E-03).as_meters() / SECONDS_IN_DAY,
+                y: Distance::from_aus(1.651990549601004E-02).as_meters() / SECONDS_IN_DAY,
+                z: Distance::from_aus(-5.110814081371464E-05).as_meters() / SECONDS_IN_DAY,
+            },
+            mass: Mass::from_kgs(7.349e22),
+            name: "Moon",
+        });
+
+        space.bodies.push(Body {
+            position: Vector {
                 x: Distance::from_aus(1.158495532744392E+00).as_meters(),
                 y: Distance::from_aus(-7.536556465639087E-01).as_meters(),
                 z: Distance::from_aus(-4.422526991966770E-02).as_meters(),
