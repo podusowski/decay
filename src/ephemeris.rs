@@ -1,6 +1,6 @@
-use chrono::prelude::*;
 use crate::physics::{Body, Space};
 use crate::{algebra::Vector, units::Distance, units::Mass};
+use chrono::prelude::*;
 
 const SECONDS_IN_DAY: f64 = 24.0 * 60.0 * 60.0;
 

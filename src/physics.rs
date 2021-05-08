@@ -22,14 +22,14 @@ impl Body {
 #[derive(Debug)]
 pub struct Space /* perhaps time some day... */ {
     pub bodies: Vec<Body>,
-    pub time: chrono::DateTime<chrono::Utc>
+    pub time: chrono::DateTime<chrono::Utc>,
 }
 
 impl Default for Space {
     fn default() -> Self {
         Space {
             bodies: Vec::default(),
-            time: chrono::Utc::now()
+            time: chrono::Utc::now(),
         }
     }
 }
