@@ -55,6 +55,7 @@ impl Default for Observer {
 
 fn main() {
     let mut space = Space::solar_system();
+    //let mut selected_body: &Body = &space.bodies[0];
     println!("Space: {:?}", space);
 
     let mut window: PistonWindow = WindowSettings::new("decay", [1280, 720])
@@ -92,7 +93,15 @@ fn main() {
                 "click {:?}, position: {:?}, body: {:?}",
                 mouse_cursor, position, body
             );
+            if let Some(body) = body {
+                //selected_body = &space.bodies[body];
+            }
         };
+
+        if let Event::Loop(Loop::Update(_)) = event {
+            space.tick(std::time::Duration::from_secs(3600));
+            observer.center_at(space.bodies[0].position);
+        }
 
         window.draw_2d(&event, |context, graphics, device| {
             clear([0.0; 4], graphics);
@@ -135,8 +144,6 @@ fn main() {
             .unwrap();
 
             glyphs.factory.encoder.flush(device);
-            space.tick(std::time::Duration::from_secs(3600));
-            observer.center_at(space.bodies[0].position);
         });
     }
 }
