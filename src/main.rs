@@ -1,4 +1,5 @@
 extern crate piston_window;
+use algebra::Vector;
 use piston_window::*;
 use piston_window::{math::translate, types::Matrix2d};
 
@@ -30,6 +31,14 @@ impl Observer {
             units::Distance::from_meters(position.y).as_au() * self.au_as_pixels,
         )
     }
+
+    fn reverse_cast(&self, position: (f64, f64)) -> Vector {
+        Vector {
+            x: units::Distance::from_aus(position.0 / self.au_as_pixels).as_meters(),
+            y: units::Distance::from_aus(position.1 / self.au_as_pixels).as_meters(),
+            z: Default::default(),
+        }
+    }
 }
 
 impl Default for Observer {
@@ -58,6 +67,18 @@ fn main() {
     while let Some(event) = window.next() {
         if let Event::Input(Input::Move(Motion::MouseScroll(zoom_amount)), _) = event {
             observer.zoom_in_out(zoom_amount[1]);
+        };
+
+        if let Event::Input(
+            Input::Button(ButtonArgs {
+                state: _,
+                button: Button::Mouse(_),
+                scancode: _,
+            }),
+            _,
+        ) = event
+        {
+            println!("click");
         };
 
         window.draw_2d(&event, |context, graphics, device| {

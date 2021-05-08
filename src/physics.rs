@@ -64,6 +64,15 @@ impl Space {
 
         self.time += delta_time;
     }
+
+    pub fn body_at(&self, position: Vector) -> Option<usize> {
+        for i in 0..self.bodies.len() {
+            if (self.bodies[i].position - position).length() < 100000.0 {
+                return Some(i);
+            }
+        }
+        None
+    }
 }
 
 #[cfg(test)]
