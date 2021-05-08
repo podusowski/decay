@@ -18,12 +18,19 @@ impl Observer {
     fn zoom_in_out(&mut self, amount: f64) {
         self.au_as_pixels = (self.au_as_pixels + amount).max(1.0);
     }
+
+    fn center_at(&mut self, position: algebra::Vector) {
+        let x = (1280.0 / 2.0) + (units::Distance::from_meters(position.x).as_au() * self.au_as_pixels);
+        let y = (720.0 / 2.0) + (units::Distance::from_meters(position.y).as_au() * self.au_as_pixels);
+
+        self.view_transform = translate([x,  y]);
+    }
 }
 
 impl Default for Observer {
     fn default() -> Self {
         Observer {
-            view_transform: translate([400.0, 400.0]),
+            view_transform: Default::default(),
             au_as_pixels: 20.0,
         }
     }
@@ -93,6 +100,7 @@ fn main() {
 
             glyphs.factory.encoder.flush(device);
             space.tick(std::time::Duration::from_secs(3600));
+            observer.center_at(space.bodies[0].position);
         });
     }
 }
