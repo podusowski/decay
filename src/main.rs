@@ -63,7 +63,7 @@ fn main() {
 
     let mut observer = Observer::default();
     let the_big_bang_instant = space.time;
-    let mut mouse_cursor = [0.0, 0.0];
+    let mut mouse_cursor = (0.0, 0.0);
 
     while let Some(event) = window.next() {
         if let Event::Input(Input::Move(Motion::MouseScroll(zoom_amount)), _) = event {
@@ -71,7 +71,7 @@ fn main() {
         };
 
         if let Event::Input(Input::Move(Motion::MouseCursor(cursor)), _) = event {
-            mouse_cursor = cursor;
+            mouse_cursor = (cursor[0], cursor[1]);
         }
 
         if let Event::Input(
@@ -83,8 +83,9 @@ fn main() {
             _,
         ) = event
         {
-            //let position = observer.reverse_cast(window)
-            println!("click {:?}", mouse_cursor);
+            let position = observer.reverse_cast(mouse_cursor);
+            let body = space.body_at(position);
+            println!("click {:?}, position: {:?}, body: {:?}", mouse_cursor, position, body);
         };
 
         window.draw_2d(&event, |context, graphics, device| {

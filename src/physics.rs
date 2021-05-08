@@ -67,7 +67,8 @@ impl Space {
 
     pub fn body_at(&self, position: Vector) -> Option<usize> {
         for i in 0..self.bodies.len() {
-            if (self.bodies[i].position - position).length() < 100000.0 {
+            println!("dist: {:?}", (self.bodies[i].position - position).length());
+            if (self.bodies[i].position - position).length() < 10e10 {
                 return Some(i);
             }
         }
