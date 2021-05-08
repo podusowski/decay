@@ -22,14 +22,14 @@ impl Body {
 #[derive(Debug)]
 pub struct Space /* perhaps time some day... */ {
     pub bodies: Vec<Body>,
-    pub time: std::time::Instant,
+    pub time: chrono::DateTime<chrono::Utc>
 }
 
 impl Default for Space {
     fn default() -> Self {
         Space {
             bodies: Vec::default(),
-            time: std::time::Instant::now(),
+            time: chrono::Utc::now()
         }
     }
 }
@@ -43,7 +43,7 @@ impl Space {
             .fold(Vector::default(), std::ops::Add::add)
     }
 
-    pub fn tick(&mut self, delta_time: std::time::Duration) {
+    pub fn tick(&mut self, delta_time: chrono::Duration) {
         // Need to use this barbaric loop to trick the borrow checker a bit.
         for i in 0..self.bodies.len() {
             let body = &self.bodies[i];
@@ -51,18 +51,18 @@ impl Space {
             let acceleration = force / body.mass.as_kgs();
 
             // Calculate this before we store the new velocity.
-            let offset_ensued_from_velocity = body.velocity * delta_time.as_secs_f64();
+            let offset_ensued_from_velocity = body.velocity * delta_time.num_seconds() as f64;
             let offset_ensued_from_acceleration =
-                acceleration * delta_time.as_secs_f64().powi(2) / 2.0;
+                acceleration * delta_time.num_seconds().pow(2) as f64 / 2.0;
 
             let body = &mut self.bodies[i];
 
-            body.velocity = acceleration * delta_time.as_secs_f64() + body.velocity;
+            body.velocity = acceleration * delta_time.num_seconds() as f64 + body.velocity;
             body.position =
                 body.position + offset_ensued_from_velocity + offset_ensued_from_acceleration;
         }
 
-        self.time += delta_time;
+        self.time = self.time.checked_add_signed(delta_time).unwrap();
     }
 
     pub fn body_at(&self, position: Vector) -> Option<usize> {

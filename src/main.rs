@@ -99,7 +99,7 @@ fn main() {
         };
 
         if let Event::Loop(Loop::Update(_)) = event {
-            space.tick(std::time::Duration::from_secs(3600));
+            space.tick(chrono::Duration::hours(1));
             observer.center_at(space.bodies[selected_body].position);
         }
 
@@ -132,11 +132,7 @@ fn main() {
             text(
                 [0.7; 4],
                 12,
-                format!(
-                    "T = {}",
-                    space.time.duration_since(the_big_bang_instant).as_secs()
-                )
-                .as_str(),
+                format!("T = {}", space.time).as_str(),
                 &mut glyphs,
                 context.transform.trans(10.0, 10.0),
                 graphics,

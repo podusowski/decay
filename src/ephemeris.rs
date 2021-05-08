@@ -1,3 +1,4 @@
+use chrono::prelude::*;
 use crate::physics::{Body, Space};
 use crate::{algebra::Vector, units::Distance, units::Mass};
 
@@ -7,6 +8,7 @@ impl Space {
     /// Taken from JPL's HORIZONS for A.D. 2016-Oct-15 00:00:00.0000 TDB
     pub fn solar_system() -> Space {
         let mut space = Space::default();
+        space.time = Utc.ymd(2016, 10, 15).and_hms(0, 0, 0);
 
         space.bodies.push(Body {
             position: Vector::default(),
