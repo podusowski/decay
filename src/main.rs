@@ -20,10 +20,15 @@ impl Observer {
     }
 
     fn center_at(&mut self, position: algebra::Vector) {
-        let x = (1280.0 / 2.0) + (units::Distance::from_meters(position.x).as_au() * self.au_as_pixels);
-        let y = (720.0 / 2.0) + (units::Distance::from_meters(position.y).as_au() * self.au_as_pixels);
+        let (x, y) = self.cast(position);
+        self.view_transform = translate([x + 1280.0 / 2.0, y + 720.0 / 2.0]);
+    }
 
-        self.view_transform = translate([x,  y]);
+    fn cast(&self, position: algebra::Vector) -> (f64, f64) {
+        (
+            units::Distance::from_meters(position.x).as_au() * self.au_as_pixels,
+            units::Distance::from_meters(position.y).as_au() * self.au_as_pixels,
+        )
     }
 }
 
@@ -58,10 +63,7 @@ fn main() {
         window.draw_2d(&event, |context, graphics, device| {
             clear([0.0; 4], graphics);
             for body in &space.bodies {
-                let x =
-                    units::Distance::from_meters(body.position.x).as_au() * observer.au_as_pixels;
-                let y =
-                    units::Distance::from_meters(body.position.y).as_au() * observer.au_as_pixels;
+                let (x, y) = observer.cast(body.position);
 
                 ellipse(
                     [1.0; 4],
