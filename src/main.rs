@@ -22,7 +22,7 @@ impl Observer {
 
     fn center_at(&mut self, position: algebra::Vector) {
         let (x, y) = self.cast(position);
-        self.view_transform = translate([x + 1280.0 / 2.0, y + 720.0 / 2.0]);
+        self.view_transform = translate([(1280.0 / 2.0) - x, (720.0 / 2.0) - y]);
     }
 
     fn cast(&self, position: algebra::Vector) -> (f64, f64) {
@@ -55,7 +55,7 @@ impl Default for Observer {
 
 fn main() {
     let mut space = Space::solar_system();
-    //let mut selected_body: &Body = &space.bodies[0];
+    let mut selected_body: usize = 0;
     println!("Space: {:?}", space);
 
     let mut window: PistonWindow = WindowSettings::new("decay", [1280, 720])
@@ -80,7 +80,7 @@ fn main() {
 
         if let Event::Input(
             Input::Button(ButtonArgs {
-                state: _,
+                state: ButtonState::Press,
                 button: Button::Mouse(MouseButton::Left),
                 scancode: _,
             }),
@@ -94,13 +94,13 @@ fn main() {
                 mouse_cursor, position, body
             );
             if let Some(body) = body {
-                //selected_body = &space.bodies[body];
+                selected_body = body;
             }
         };
 
         if let Event::Loop(Loop::Update(_)) = event {
             space.tick(std::time::Duration::from_secs(3600));
-            observer.center_at(space.bodies[0].position);
+            observer.center_at(space.bodies[selected_body].position);
         }
 
         window.draw_2d(&event, |context, graphics, device| {
