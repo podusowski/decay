@@ -105,6 +105,21 @@ impl Space {
             name: "Saturn",
         });
 
+        space.bodies.push(Body {
+            position: Vector {
+                x: Distance::from_aus(2.825736958467999e+01).as_meters(),
+                y: Distance::from_aus(-9.925704611354977e+00).as_meters(),
+                z: Distance::from_aus(-4.468121470675587e-01).as_meters(),
+            },
+            velocity: Vector {
+                x: Distance::from_aus(1.020926560027260e-03).as_meters() / SECONDS_IN_DAY,
+                y: Distance::from_aus(2.974039863467131e-03).as_meters() / SECONDS_IN_DAY,
+                z: Distance::from_aus(-8.451314801496931e-05).as_meters() / SECONDS_IN_DAY,
+            },
+            mass: Mass::from_kgs(1.024e26),
+            name: "Neptune",
+        });
+
         space
     }
 }
