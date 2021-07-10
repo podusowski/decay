@@ -81,6 +81,7 @@ mod tests {
     use super::*;
     use crate::units::Mass;
     use approx::assert_abs_diff_eq;
+    use chrono::Duration;
 
     #[test]
     fn one_body_stays_in_place() {
@@ -91,7 +92,7 @@ mod tests {
             mass: Mass::from_kgs(1.0),
             name: "Earth",
         });
-        space.tick(std::time::Duration::from_secs(1));
+        space.tick(Duration::seconds(1));
         assert_eq!(Vector::default(), space.bodies[0].position);
         assert_eq!(Vector::default(), space.bodies[0].velocity);
     }
@@ -116,7 +117,7 @@ mod tests {
             name: "Earth",
         });
 
-        space.tick(std::time::Duration::from_secs(1));
+        space.tick(Duration::seconds(1));
 
         // Distance between the two, their mass product and square of distance, all equals 1.
         // This gives a gravity force equal to G. With the mass of 1, such force will give
