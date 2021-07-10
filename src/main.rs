@@ -229,6 +229,17 @@ fn main() {
             )
             .unwrap();
 
+            let ship = &space.ships[0];
+            text(
+                [0.7; 4],
+                12,
+                format!("{} thrust: {:?}", ship.name, ship.thrust).as_str(),
+                &mut glyphs,
+                context.transform.trans(300.0, 10.0),
+                graphics,
+            )
+            .unwrap();
+
             glyphs.factory.encoder.flush(device);
         });
     }
