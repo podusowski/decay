@@ -12,13 +12,34 @@ use physics::*;
 
 struct Observer {
     view_transform: Matrix2d<f64>,
+
+    /// How many pixels has one astronomical unit.
     au_as_pixels: f64,
+}
+
+const SYSTEM_WIDE_ZOOM: f64 = 20.0;
+
+impl Default for Observer {
+    fn default() -> Self {
+        Observer {
+            view_transform: Default::default(),
+            au_as_pixels: SYSTEM_WIDE_ZOOM,
+        }
+    }
 }
 
 impl Observer {
     /// Zoom in or out, depending on `amount` sign.
     fn zoom_in_out(&mut self, amount: f64) {
         self.au_as_pixels = (self.au_as_pixels + amount).max(1.0);
+    }
+
+    fn ship_wide_zoom(&mut self) {
+        self.au_as_pixels = 10000.0;
+    }
+
+    fn system_wide_zoom(&mut self) {
+        self.au_as_pixels = SYSTEM_WIDE_ZOOM;
     }
 
     fn look_at(&mut self, position: algebra::Vector) {
@@ -41,15 +62,6 @@ impl Observer {
             x: units::Distance::from_aus((position.0 - x_offset) / self.au_as_pixels).as_meters(),
             y: units::Distance::from_aus((position.1 - y_offset) / self.au_as_pixels).as_meters(),
             z: Default::default(),
-        }
-    }
-}
-
-impl Default for Observer {
-    fn default() -> Self {
-        Observer {
-            view_transform: Default::default(),
-            au_as_pixels: 20.0,
         }
     }
 }
@@ -109,7 +121,19 @@ fn main() {
             _,
         ) = event
         {
-            println!("Q");
+            observer.ship_wide_zoom();
+        };
+
+        if let Event::Input(
+            Input::Button(ButtonArgs {
+                state: ButtonState::Press,
+                button: Button::Keyboard(Key::W),
+                scancode: _,
+            }),
+            _,
+        ) = event
+        {
+            observer.system_wide_zoom();
         };
 
         if let Event::Loop(Loop::Update(_)) = event {
