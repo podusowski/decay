@@ -160,7 +160,20 @@ fn main() {
         ) = event
         {
             let ship = &mut space.ships[0];
-            ship.thrust = Vector{x: 0.0, y: -1000.0, z: 0.0};
+            ship.thrust = ship.thrust + Vector{x: 0.0, y: -10.0, z: 0.0};
+        };
+
+        if let Event::Input(
+            Input::Button(ButtonArgs {
+                state: ButtonState::Press,
+                button: Button::Keyboard(Key::R),
+                scancode: _,
+            }),
+            _,
+        ) = event
+        {
+            let ship = &mut space.ships[0];
+            ship.thrust = Vector{x: 0.0, y: 0.0, z: 0.0};
         };
 
         if let Event::Loop(Loop::Update(_)) = event {
