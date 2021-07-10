@@ -109,6 +109,17 @@ impl Space {
         for i in 0..self.ships.len() {
             let ship = &self.ships[i];
             let force = self.cumulative_gravity_force(ship) + ship.thrust;
+            let acceleration = force / ship.mass().as_kgs();
+
+            let offset_ensued_from_velocity = ship.velocity * delta_time.num_seconds() as f64;
+            let offset_ensued_from_acceleration =
+                acceleration * delta_time.num_seconds().pow(2) as f64 / 2.0;
+
+            let ship = &mut self.ships[i];
+
+            ship.velocity = acceleration * delta_time.num_seconds() as f64 + ship.velocity;
+            ship.position =
+                ship.position + offset_ensued_from_velocity + offset_ensued_from_acceleration;
         }
 
         self.time = self.time.checked_add_signed(delta_time).unwrap();
