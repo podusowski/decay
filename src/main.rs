@@ -74,10 +74,12 @@ fn main() {
             observer.zoom_in_out(zoom_amount[1]);
         };
 
+        // Record position of the mouse to know where the click happened later on.
         if let Event::Input(Input::Move(Motion::MouseCursor(cursor)), _) = event {
             mouse_cursor = (cursor[0], cursor[1]);
         }
 
+        // Handle clicks.
         if let Event::Input(
             Input::Button(ButtonArgs {
                 state: ButtonState::Press,
@@ -96,6 +98,18 @@ fn main() {
             if let Some(body) = body {
                 selected_body = body;
             }
+        };
+
+        if let Event::Input(
+            Input::Button(ButtonArgs {
+                state: ButtonState::Press,
+                button: Button::Keyboard(Key::Q),
+                scancode: _,
+            }),
+            _,
+        ) = event
+        {
+            println!("Q");
         };
 
         if let Event::Loop(Loop::Update(_)) = event {

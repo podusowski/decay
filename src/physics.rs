@@ -37,7 +37,8 @@ impl Default for Space {
     fn default() -> Self {
         Space {
             time: chrono::Utc::now(),
-            ..Default::default()
+            bodies: Default::default(),
+            ships: Default::default()
         }
     }
 }
