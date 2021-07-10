@@ -16,23 +16,24 @@ struct Observer {
 }
 
 impl Observer {
+    /// Zoom in or out, depending on `amount` sign.
     fn zoom_in_out(&mut self, amount: f64) {
         self.au_as_pixels = (self.au_as_pixels + amount).max(1.0);
     }
 
-    fn center_at(&mut self, position: algebra::Vector) {
-        let (x, y) = self.cast(position);
+    fn look_at(&mut self, position: algebra::Vector) {
+        let (x, y) = self.to_screen_coords(position);
         self.view_transform = translate([(1280.0 / 2.0) - x, (720.0 / 2.0) - y]);
     }
 
-    fn cast(&self, position: algebra::Vector) -> (f64, f64) {
+    fn to_screen_coords(&self, position: algebra::Vector) -> (f64, f64) {
         (
             units::Distance::from_meters(position.x).as_au() * self.au_as_pixels,
             units::Distance::from_meters(position.y).as_au() * self.au_as_pixels,
         )
     }
 
-    fn reverse_cast(&self, position: (f64, f64)) -> Vector {
+    fn to_world_coords(&self, position: (f64, f64)) -> Vector {
         println!("{:?}", self.view_transform);
         let x_offset = self.view_transform[0][2];
         let y_offset = self.view_transform[1][2];
@@ -86,7 +87,7 @@ fn main() {
             _,
         ) = event
         {
-            let position = observer.reverse_cast(mouse_cursor);
+            let position = observer.to_world_coords(mouse_cursor);
             let body = space.body_at(position);
             println!(
                 "click {:?}, position: {:?}, body: {:?}",
@@ -99,13 +100,13 @@ fn main() {
 
         if let Event::Loop(Loop::Update(_)) = event {
             space.tick(chrono::Duration::hours(1));
-            observer.center_at(space.bodies[selected_body].position);
+            observer.look_at(space.bodies[selected_body].position);
         }
 
         window.draw_2d(&event, |context, graphics, device| {
             clear([0.0; 4], graphics);
             for body in &space.bodies {
-                let (x, y) = observer.cast(body.position);
+                let (x, y) = observer.to_screen_coords(body.position);
 
                 ellipse(
                     [1.0; 4],
