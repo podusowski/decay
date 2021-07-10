@@ -14,6 +14,7 @@ pub struct Body {
 pub struct Ship {
     pub position: Vector,
     pub velocity: Vector,
+    pub name: &'static str,
 }
 
 const G: f64 = 6.67408e-11f64;
@@ -38,7 +39,7 @@ impl Default for Space {
         Space {
             time: chrono::Utc::now(),
             bodies: Default::default(),
-            ships: Default::default()
+            ships: Default::default(),
         }
     }
 }

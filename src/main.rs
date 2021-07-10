@@ -10,6 +10,8 @@ mod units;
 
 use physics::*;
 
+use crate::units::Distance;
+
 struct Observer {
     view_transform: Matrix2d<f64>,
 
@@ -68,6 +70,17 @@ impl Observer {
 
 fn main() {
     let mut space = Space::solar_system();
+
+    space.ships.push(Ship {
+        position: Vector {
+            x: Distance::from_aus(1.0).as_meters(),
+            y: Distance::from_aus(1.0).as_meters(),
+            z: Default::default(),
+        },
+        velocity: Default::default(),
+        name: "Rocinante"
+    });
+
     let mut selected_body: usize = 0;
     println!("Space: {:?}", space);
 
@@ -157,6 +170,31 @@ fn main() {
                     [0.7; 4],
                     10,
                     body.name,
+                    &mut glyphs,
+                    context
+                        .transform
+                        .trans(x + 10.0, y)
+                        .append_transform(observer.view_transform),
+                    graphics,
+                )
+                .unwrap();
+            }
+
+            // Draw ships.
+            for ship in &space.ships{
+                let (x, y) = observer.to_screen_coords(ship.position);
+
+                ellipse(
+                    [1.0; 4],
+                    [x, y, 10.0, 10.0],
+                    context.transform.append_transform(observer.view_transform),
+                    graphics,
+                );
+
+                text(
+                    [0.7; 4],
+                    10,
+                    ship.name,
                     &mut glyphs,
                     context
                         .transform
