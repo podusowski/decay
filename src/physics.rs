@@ -35,7 +35,7 @@ impl Default for Space {
 }
 
 impl Space {
-    fn cumulative_force(&self, body: &Body) -> Vector {
+    fn cumulative_gravity_force(&self, body: &Body) -> Vector {
         self.bodies
             .iter()
             .filter(|&other| !std::ptr::eq(body, other))
@@ -47,7 +47,7 @@ impl Space {
         // Need to use this barbaric loop to trick the borrow checker a bit.
         for i in 0..self.bodies.len() {
             let body = &self.bodies[i];
-            let force = self.cumulative_force(body);
+            let force = self.cumulative_gravity_force(body);
             let acceleration = force / body.mass.as_kgs();
 
             // Calculate this before we store the new velocity.
