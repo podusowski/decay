@@ -20,7 +20,7 @@ impl Distance {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub struct Mass(f64);
 
 impl Mass {

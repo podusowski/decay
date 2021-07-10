@@ -1,12 +1,43 @@
 use crate::algebra::Vector;
 use crate::units::Mass;
 
+// Object having a mass and position in space.
+trait MassObject {
+    fn mass(&self) -> Mass;
+    fn position(&self) -> Vector;
+
+    fn newtonian_gravity(&self, other: &impl MassObject) -> Vector {
+        // Pauli exclusion principle FTW!
+        if self.position() == other.position() {
+            Vector {
+                x: 0.0,
+                y: 0.0,
+                z: 0.0,
+            }
+        } else {
+            let offset = self.position() - other.position();
+            -G * ((self.mass().as_kgs() * other.mass().as_kgs()) / offset.length().powi(2))
+                * offset.normalized()
+        }
+    }
+}
+
 #[derive(Debug)]
 pub struct Body {
     pub position: Vector,
     pub velocity: Vector,
     pub mass: Mass,
     pub name: &'static str,
+}
+
+impl MassObject for Body {
+    fn mass(&self) -> Mass {
+        self.mass
+    }
+
+    fn position(&self) -> Vector {
+        self.position
+    }
 }
 
 /// Ships are objects too, but unlike regular bodies they can move by their own.
@@ -18,15 +49,17 @@ pub struct Ship {
     pub name: &'static str,
 }
 
-const G: f64 = 6.67408e-11f64;
+impl MassObject for Ship {
+    fn mass(&self) -> Mass {
+        Mass::from_kgs(10000.0)
+    }
 
-impl Body {
-    pub fn newtonian_gravity(&self, other: &Body) -> Vector {
-        let offset = self.position - other.position;
-        -G * ((self.mass.as_kgs() * other.mass.as_kgs()) / offset.length().powi(2))
-            * offset.normalized()
+    fn position(&self) -> Vector {
+        self.position
     }
 }
+
+const G: f64 = 6.67408e-11f64;
 
 #[derive(Debug)]
 pub struct Space /* perhaps time some day... */ {
@@ -46,11 +79,10 @@ impl Default for Space {
 }
 
 impl Space {
-    fn cumulative_gravity_force(&self, body: &Body) -> Vector {
+    fn cumulative_gravity_force(&self, body: &impl MassObject) -> Vector {
         self.bodies
             .iter()
-            .filter(|&other| !std::ptr::eq(body, other))
-            .map(|other| body.newtonian_gravity(&other))
+            .map(|other| body.newtonian_gravity(other))
             .fold(Vector::default(), std::ops::Add::add)
     }
 
@@ -71,6 +103,12 @@ impl Space {
             body.velocity = acceleration * delta_time.num_seconds() as f64 + body.velocity;
             body.position =
                 body.position + offset_ensued_from_velocity + offset_ensued_from_acceleration;
+        }
+
+        // Now update velocities and positions of ships.
+        for i in 0..self.ships.len() {
+            let ship = &self.ships[i];
+            let force = self.cumulative_gravity_force(ship) + ship.thrust;
         }
 
         self.time = self.time.checked_add_signed(delta_time).unwrap();
