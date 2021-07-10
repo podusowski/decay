@@ -14,6 +14,7 @@ pub struct Body {
 pub struct Ship {
     pub position: Vector,
     pub velocity: Vector,
+    pub thrust: Vector,
     pub name: &'static str,
 }
 

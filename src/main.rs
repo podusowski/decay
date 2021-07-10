@@ -78,6 +78,7 @@ fn main() {
             z: Default::default(),
         },
         velocity: Default::default(),
+        thrust: Default::default(),
         name: "Rocinante"
     });
 
@@ -147,6 +148,19 @@ fn main() {
         ) = event
         {
             observer.system_wide_zoom();
+        };
+
+        if let Event::Input(
+            Input::Button(ButtonArgs {
+                state: ButtonState::Press,
+                button: Button::Keyboard(Key::E),
+                scancode: _,
+            }),
+            _,
+        ) = event
+        {
+            let ship = &mut space.ships[0];
+            ship.thrust = Vector{x: 0.0, y: -1000.0, z: 0.0};
         };
 
         if let Event::Loop(Loop::Update(_)) = event {
