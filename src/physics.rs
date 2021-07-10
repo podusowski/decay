@@ -9,6 +9,13 @@ pub struct Body {
     pub name: &'static str,
 }
 
+/// Ships are objects too, but unlike regular bodies they can move by their own.
+#[derive(Debug)]
+pub struct Ship {
+    pub position: Vector,
+    pub velocity: Vector,
+}
+
 const G: f64 = 6.67408e-11f64;
 
 impl Body {
@@ -21,15 +28,16 @@ impl Body {
 
 #[derive(Debug)]
 pub struct Space /* perhaps time some day... */ {
-    pub bodies: Vec<Body>,
     pub time: chrono::DateTime<chrono::Utc>,
+    pub bodies: Vec<Body>,
+    pub ships: Vec<Ship>,
 }
 
 impl Default for Space {
     fn default() -> Self {
         Space {
-            bodies: Vec::default(),
             time: chrono::Utc::now(),
+            ..Default::default()
         }
     }
 }
