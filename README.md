@@ -1,6 +1,6 @@
 Decay is a Solar System simulator that uses newtonian physics.
 
-![](screenshots/latest.png)
+![](screenshots/2021-07-28.png)
 
 - <kbd>mouse down / up</kbd> - Zoom in and out.
 - <kbd>Q</kbd> - Zoom to ship level.
