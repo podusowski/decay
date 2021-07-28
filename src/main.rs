@@ -170,27 +170,6 @@ fn main() {
 
             graphics::draw_statusbar(&space, &context, graphics, &mut glyphs);
 
-            text(
-                [0.7; 4],
-                16,
-                format!("{}", space.time).as_str(),
-                &mut glyphs,
-                context.transform.trans(10.0, 20.0),
-                graphics,
-            )
-            .unwrap();
-
-            let ship = &space.ships[0];
-            text(
-                [0.7; 4],
-                12,
-                format!("{} thrust: {:?}", ship.name, ship.thrust).as_str(),
-                &mut glyphs,
-                context.transform.trans(300.0, 20.0),
-                graphics,
-            )
-            .unwrap();
-
             glyphs.factory.encoder.flush(device);
         });
     }
