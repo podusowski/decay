@@ -125,7 +125,7 @@ fn main() {
 
     println!("Space: {:?}", space);
 
-    let mut window: PistonWindow = WindowSettings::new("decay", [1280, 720])
+    let mut window: PistonWindow = WindowSettings::new("Decay", [1280, 720])
         .exit_on_esc(true)
         .build()
         .unwrap();
