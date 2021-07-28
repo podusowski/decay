@@ -90,16 +90,10 @@ impl<'a, 'b> Frame<'a, 'b> {
         }
 
         for ship in &self.space.ships {
-            draw_ship(
-                ship,
-                &self.observer,
-                &self.context,
-                self.graphics,
-                &mut self.glyphs,
-            );
+            self.draw_ship(ship);
         }
 
-        draw_statusbar(&self.space, &self.context, self.graphics, &mut self.glyphs);
+        self.draw_statusbar();
 
         self.glyphs.factory.encoder.flush(self.device);
     }
@@ -129,57 +123,53 @@ impl<'a, 'b> Frame<'a, 'b> {
         )
         .unwrap();
     }
-}
 
-pub fn draw_ship(
-    ship: &Ship,
-    observer: &Observer,
-    context: &Context,
-    graphics: &mut G2d,
-    glyphs: &mut Glyphs,
-) {
-    let (x, y) = observer.to_screen_coords(ship.position);
+    fn draw_ship(&mut self, ship: &Ship) {
+        let (x, y) = self.observer.to_screen_coords(ship.position);
 
-    ellipse(
-        [1.0; 4],
-        [x, y, 10.0, 10.0],
-        context.transform.append_transform(observer.view_transform),
-        graphics,
-    );
+        ellipse(
+            [1.0; 4],
+            [x, y, 10.0, 10.0],
+            self.context
+                .transform
+                .append_transform(self.observer.view_transform),
+            self.graphics,
+        );
 
-    text(
-        [0.7; 4],
-        10,
-        ship.name,
-        glyphs,
-        context
-            .transform
-            .trans(x + 10.0, y)
-            .append_transform(observer.view_transform),
-        graphics,
-    )
-    .unwrap();
-}
+        text(
+            [0.7; 4],
+            10,
+            ship.name,
+            self.glyphs,
+            self.context
+                .transform
+                .trans(x + 10.0, y)
+                .append_transform(self.observer.view_transform),
+            self.graphics,
+        )
+        .unwrap();
+    }
 
-pub fn draw_statusbar(space: &Space, context: &Context, graphics: &mut G2d, glyphs: &mut Glyphs) {
-    text(
-        [0.7; 4],
-        16,
-        format!("{}", space.time).as_str(),
-        glyphs,
-        context.transform.trans(10.0, 20.0),
-        graphics,
-    )
-    .unwrap();
+    fn draw_statusbar(&mut self) {
+        text(
+            [0.7; 4],
+            16,
+            format!("{}", self.space.time).as_str(),
+            self.glyphs,
+            self.context.transform.trans(10.0, 20.0),
+            self.graphics,
+        )
+        .unwrap();
 
-    let ship = &space.ships[0];
-    text(
-        [0.7; 4],
-        12,
-        format!("{} thrust: {:?}", ship.name, ship.thrust).as_str(),
-        glyphs,
-        context.transform.trans(300.0, 20.0),
-        graphics,
-    )
-    .unwrap();
+        let ship = &self.space.ships[0];
+        text(
+            [0.7; 4],
+            12,
+            format!("{} thrust: {:?}", ship.name, ship.thrust).as_str(),
+            self.glyphs,
+            self.context.transform.trans(300.0, 20.0),
+            self.graphics,
+        )
+        .unwrap();
+    }
 }
