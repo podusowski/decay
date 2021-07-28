@@ -5,6 +5,7 @@ use piston_window::{math::translate, types::Matrix2d};
 
 mod algebra;
 mod ephemeris;
+mod graphics;
 mod physics;
 mod units;
 
@@ -223,7 +224,7 @@ fn main() {
         .build()
         .unwrap();
 
-    let mut glyphs = window.load_font("./FiraSans-Regular.ttf").unwrap();
+    let mut glyphs = window.load_font("./Rajdhani-Light.ttf").unwrap();
 
     let mut observer = Observer::default();
 
@@ -261,12 +262,14 @@ fn main() {
                 .unwrap();
             }
 
+            graphics::draw_statusbar(&space, &context, graphics, &mut glyphs);
+
             text(
                 [0.7; 4],
-                12,
-                format!("T = {}", space.time).as_str(),
+                16,
+                format!("{}", space.time).as_str(),
                 &mut glyphs,
-                context.transform.trans(10.0, 10.0),
+                context.transform.trans(10.0, 20.0),
                 graphics,
             )
             .unwrap();
@@ -277,7 +280,7 @@ fn main() {
                 12,
                 format!("{} thrust: {:?}", ship.name, ship.thrust).as_str(),
                 &mut glyphs,
-                context.transform.trans(300.0, 10.0),
+                context.transform.trans(300.0, 20.0),
                 graphics,
             )
             .unwrap();
