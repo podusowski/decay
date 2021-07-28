@@ -74,15 +74,41 @@ impl Observer {
 /// Draws a single frame. Didn't call it `Graphics` to avoid ambiguity with
 /// Piston types.
 pub struct Frame<'a, 'b> {
+    pub space: &'a Space,
     pub observer: &'a Observer,
     pub context: &'a Context,
     pub graphics: &'a mut G2d<'b>,
+    pub device: &'a mut gfx_device_gl::Device,
     pub glyphs: &'a mut Glyphs,
 }
 
 impl<'a, 'b> Frame<'a, 'b> {
     pub fn draw(&mut self) {
         clear([0.0; 4], self.graphics);
+
+        for body in &self.space.bodies {
+            draw_body(
+                body,
+                &self.observer,
+                &self.context,
+                self.graphics,
+                &mut self.glyphs,
+            );
+        }
+
+        for ship in &self.space.ships {
+            draw_ship(
+                ship,
+                &self.observer,
+                &self.context,
+                self.graphics,
+                &mut self.glyphs,
+            );
+        }
+
+        draw_statusbar(&self.space, &self.context, self.graphics, &mut self.glyphs);
+
+        self.glyphs.factory.encoder.flush(self.device);
     }
 }
 

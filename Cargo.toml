@@ -9,5 +9,6 @@ edition = "2018"
 [dependencies]
 sdl2 = "*"
 piston_window = "*"
+gfx_device_gl = "*"
 approx = "*"
 chrono = "*"

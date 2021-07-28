@@ -139,25 +139,15 @@ fn main() {
 
         window.draw_2d(&event, |context, graphics, device| {
             let mut frame = Frame {
+                space: &space,
                 observer: &observer,
                 context: &context,
                 graphics: graphics,
+                device: device,
                 glyphs: &mut glyphs,
             };
 
             frame.draw();
-
-            for body in &space.bodies {
-                graphics::draw_body(body, &observer, &context, graphics, &mut glyphs);
-            }
-
-            for ship in &space.ships {
-                graphics::draw_ship(ship, &observer, &context, graphics, &mut glyphs);
-            }
-
-            graphics::draw_statusbar(&space, &context, graphics, &mut glyphs);
-
-            glyphs.factory.encoder.flush(device);
         });
     }
 }
