@@ -17,6 +17,12 @@ struct Observer {
 
     /// How many pixels has one astronomical unit.
     au_as_pixels: f64,
+
+    // Need to track current mouse position as Piston doesn't do that.
+    mouse_cursor: (f64, f64),
+
+    // Index of the body the player is looking at.
+    selected_body: usize,
 }
 
 const SYSTEM_WIDE_ZOOM: f64 = 20.0;
@@ -26,6 +32,8 @@ impl Default for Observer {
         Observer {
             view_transform: Default::default(),
             au_as_pixels: SYSTEM_WIDE_ZOOM,
+            mouse_cursor: Default::default(),
+            selected_body: 0,
         }
     }
 }
@@ -68,6 +76,102 @@ impl Observer {
     }
 }
 
+fn handle_event(event: &Event, observer: &mut Observer, space: &mut Space) {
+    if let Event::Input(Input::Move(Motion::MouseScroll(zoom_amount)), _) = event {
+        observer.zoom_in_out(zoom_amount[1]);
+    };
+
+    // Record position of the mouse to know where the click happened later on.
+    if let Event::Input(Input::Move(Motion::MouseCursor(cursor)), _) = event {
+        observer.mouse_cursor = (cursor[0], cursor[1]);
+    }
+
+    // Handle clicks.
+    if let Event::Input(
+        Input::Button(ButtonArgs {
+            state: ButtonState::Press,
+            button: Button::Mouse(MouseButton::Left),
+            scancode: _,
+        }),
+        _,
+    ) = event
+    {
+        let position = observer.to_world_coords(observer.mouse_cursor);
+        let body = space.body_at(position);
+        println!(
+            "click {:?}, position: {:?}, body: {:?}",
+            observer.mouse_cursor, position, body
+        );
+        if let Some(body) = body {
+            observer.selected_body = body;
+        }
+    };
+
+    if let Event::Input(
+        Input::Button(ButtonArgs {
+            state: ButtonState::Press,
+            button: Button::Keyboard(Key::Q),
+            scancode: _,
+        }),
+        _,
+    ) = event
+    {
+        observer.ship_wide_zoom();
+    };
+
+    if let Event::Input(
+        Input::Button(ButtonArgs {
+            state: ButtonState::Press,
+            button: Button::Keyboard(Key::W),
+            scancode: _,
+        }),
+        _,
+    ) = event
+    {
+        observer.system_wide_zoom();
+    };
+
+    if let Event::Input(
+        Input::Button(ButtonArgs {
+            state: ButtonState::Press,
+            button: Button::Keyboard(Key::E),
+            scancode: _,
+        }),
+        _,
+    ) = event
+    {
+        let ship = &mut space.ships[0];
+        ship.thrust = ship.thrust
+            + Vector {
+                x: 0.0,
+                y: -10.0,
+                z: 0.0,
+            };
+    };
+
+    if let Event::Input(
+        Input::Button(ButtonArgs {
+            state: ButtonState::Press,
+            button: Button::Keyboard(Key::R),
+            scancode: _,
+        }),
+        _,
+    ) = event
+    {
+        let ship = &mut space.ships[0];
+        ship.thrust = Vector {
+            x: 0.0,
+            y: 0.0,
+            z: 0.0,
+        };
+    };
+
+    if let Event::Loop(Loop::Update(_)) = event {
+        space.tick(chrono::Duration::hours(1));
+        observer.look_at(space.bodies[observer.selected_body].position);
+    }
+}
+
 fn main() {
     let mut space = Space::solar_system();
 
@@ -79,10 +183,9 @@ fn main() {
         },
         velocity: Default::default(),
         thrust: Default::default(),
-        name: "Rocinante"
+        name: "Rocinante",
     });
 
-    let mut selected_body: usize = 0;
     println!("Space: {:?}", space);
 
     let mut window: PistonWindow = WindowSettings::new("decay", [1280, 720])
@@ -93,93 +196,9 @@ fn main() {
     let mut glyphs = window.load_font("./FiraSans-Regular.ttf").unwrap();
 
     let mut observer = Observer::default();
-    let mut mouse_cursor = (0.0, 0.0);
 
     while let Some(event) = window.next() {
-        if let Event::Input(Input::Move(Motion::MouseScroll(zoom_amount)), _) = event {
-            observer.zoom_in_out(zoom_amount[1]);
-        };
-
-        // Record position of the mouse to know where the click happened later on.
-        if let Event::Input(Input::Move(Motion::MouseCursor(cursor)), _) = event {
-            mouse_cursor = (cursor[0], cursor[1]);
-        }
-
-        // Handle clicks.
-        if let Event::Input(
-            Input::Button(ButtonArgs {
-                state: ButtonState::Press,
-                button: Button::Mouse(MouseButton::Left),
-                scancode: _,
-            }),
-            _,
-        ) = event
-        {
-            let position = observer.to_world_coords(mouse_cursor);
-            let body = space.body_at(position);
-            println!(
-                "click {:?}, position: {:?}, body: {:?}",
-                mouse_cursor, position, body
-            );
-            if let Some(body) = body {
-                selected_body = body;
-            }
-        };
-
-        if let Event::Input(
-            Input::Button(ButtonArgs {
-                state: ButtonState::Press,
-                button: Button::Keyboard(Key::Q),
-                scancode: _,
-            }),
-            _,
-        ) = event
-        {
-            observer.ship_wide_zoom();
-        };
-
-        if let Event::Input(
-            Input::Button(ButtonArgs {
-                state: ButtonState::Press,
-                button: Button::Keyboard(Key::W),
-                scancode: _,
-            }),
-            _,
-        ) = event
-        {
-            observer.system_wide_zoom();
-        };
-
-        if let Event::Input(
-            Input::Button(ButtonArgs {
-                state: ButtonState::Press,
-                button: Button::Keyboard(Key::E),
-                scancode: _,
-            }),
-            _,
-        ) = event
-        {
-            let ship = &mut space.ships[0];
-            ship.thrust = ship.thrust + Vector{x: 0.0, y: -10.0, z: 0.0};
-        };
-
-        if let Event::Input(
-            Input::Button(ButtonArgs {
-                state: ButtonState::Press,
-                button: Button::Keyboard(Key::R),
-                scancode: _,
-            }),
-            _,
-        ) = event
-        {
-            let ship = &mut space.ships[0];
-            ship.thrust = Vector{x: 0.0, y: 0.0, z: 0.0};
-        };
-
-        if let Event::Loop(Loop::Update(_)) = event {
-            space.tick(chrono::Duration::hours(1));
-            observer.look_at(space.bodies[selected_body].position);
-        }
+        handle_event(&event, &mut observer, &mut space);
 
         window.draw_2d(&event, |context, graphics, device| {
             clear([0.0; 4], graphics);
@@ -208,7 +227,7 @@ fn main() {
             }
 
             // Draw ships.
-            for ship in &space.ships{
+            for ship in &space.ships {
                 let (x, y) = observer.to_screen_coords(ship.position);
 
                 ellipse(
