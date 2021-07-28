@@ -13,10 +13,10 @@ pub struct Observer {
     /// How many pixels has one astronomical unit.
     au_as_pixels: f64,
 
-    // Need to track current mouse position as Piston doesn't do that.
+    /// Need to track current mouse position as Piston doesn't do that.
     pub mouse_cursor: (f64, f64),
 
-    // Index of the body the player is looking at.
+    /// Index of the body the player is looking at.
     pub selected_body: usize,
 }
 
