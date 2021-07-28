@@ -10,7 +10,7 @@ mod units;
 
 use physics::*;
 
-use crate::graphics::Observer;
+use crate::graphics::{Frame, Observer};
 use crate::units::Distance;
 
 fn handle_event(event: &Event, observer: &mut graphics::Observer, space: &mut Space) {
@@ -138,7 +138,14 @@ fn main() {
         handle_event(&event, &mut observer, &mut space);
 
         window.draw_2d(&event, |context, graphics, device| {
-            clear([0.0; 4], graphics);
+            let mut frame = Frame {
+                observer: &observer,
+                context: &context,
+                graphics: graphics,
+                glyphs: &mut glyphs,
+            };
+
+            frame.draw();
 
             for body in &space.bodies {
                 graphics::draw_body(body, &observer, &context, graphics, &mut glyphs);
