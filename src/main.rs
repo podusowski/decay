@@ -172,6 +172,36 @@ fn handle_event(event: &Event, observer: &mut Observer, space: &mut Space) {
     }
 }
 
+fn draw_body(
+    body: &Body,
+    observer: &Observer,
+    context: &Context,
+    graphics: &mut G2d,
+    glyphs: &mut Glyphs,
+) {
+    let (x, y) = observer.to_screen_coords(body.position);
+
+    ellipse(
+        [1.0; 4],
+        [x, y, 10.0, 10.0],
+        context.transform.append_transform(observer.view_transform),
+        graphics,
+    );
+
+    text(
+        [0.7; 4],
+        10,
+        body.name,
+        glyphs,
+        context
+            .transform
+            .trans(x + 10.0, y)
+            .append_transform(observer.view_transform),
+        graphics,
+    )
+    .unwrap();
+}
+
 fn main() {
     let mut space = Space::solar_system();
 
@@ -203,27 +233,7 @@ fn main() {
         window.draw_2d(&event, |context, graphics, device| {
             clear([0.0; 4], graphics);
             for body in &space.bodies {
-                let (x, y) = observer.to_screen_coords(body.position);
-
-                ellipse(
-                    [1.0; 4],
-                    [x, y, 10.0, 10.0],
-                    context.transform.append_transform(observer.view_transform),
-                    graphics,
-                );
-
-                text(
-                    [0.7; 4],
-                    10,
-                    body.name,
-                    &mut glyphs,
-                    context
-                        .transform
-                        .trans(x + 10.0, y)
-                        .append_transform(observer.view_transform),
-                    graphics,
-                )
-                .unwrap();
+                draw_body(body, &observer, &context, graphics, &mut glyphs);
             }
 
             // Draw ships.
