@@ -127,7 +127,7 @@ impl<'a, 'b> Frame<'a, 'b> {
             self.graphics,
         );
 
-	self.draw_label(body.name, body.position);
+        self.draw_label(body.name, body.position);
     }
 
     fn draw_ship(&mut self, ship: &Ship) {
@@ -142,7 +142,7 @@ impl<'a, 'b> Frame<'a, 'b> {
             self.graphics,
         );
 
-	self.draw_label(ship.name, ship.position);
+        self.draw_label(ship.name, ship.position);
     }
 
     fn draw_statusbar(&mut self) {
@@ -163,6 +163,21 @@ impl<'a, 'b> Frame<'a, 'b> {
             format!("{} thrust: {:?}", ship.name, ship.thrust).as_str(),
             self.glyphs,
             self.context.transform.trans(300.0, 20.0),
+            self.graphics,
+        )
+        .unwrap();
+
+        let selected_body = &self.space.bodies[self.observer.selected_body];
+        text(
+            [0.7; 4],
+            12,
+            format!(
+                "{} position: {:?}",
+                selected_body.name, selected_body.position
+            )
+            .as_str(),
+            self.glyphs,
+            self.context.transform.trans(300.0, 50.0),
             self.graphics,
         )
         .unwrap();
