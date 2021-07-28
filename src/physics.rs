@@ -2,7 +2,7 @@ use crate::algebra::Vector;
 use crate::units::Mass;
 
 // Object having a mass and position in space.
-trait MassObject {
+pub trait MassObject {
     fn mass(&self) -> Mass;
     fn position(&self) -> Vector;
 

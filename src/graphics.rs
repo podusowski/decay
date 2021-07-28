@@ -4,7 +4,7 @@ use piston_window::*;
 use piston_window::{text, Context, G2d, Glyphs};
 
 use crate::algebra::{self, Vector};
-use crate::physics::{Body, Ship, Space};
+use crate::physics::{Body, MassObject, Ship, Space};
 use crate::units;
 
 pub struct Observer {
@@ -98,6 +98,23 @@ impl<'a, 'b> Frame<'a, 'b> {
         self.glyphs.factory.encoder.flush(self.device);
     }
 
+    fn draw_label(&mut self, name: &str, position: Vector) {
+        let (x, y) = self.observer.to_screen_coords(position);
+
+        text(
+            [0.7; 4],
+            10,
+            name,
+            self.glyphs,
+            self.context
+                .transform
+                .trans(x + 10.0, y)
+                .append_transform(self.observer.view_transform),
+            self.graphics,
+        )
+        .unwrap();
+    }
+
     fn draw_body(&mut self, body: &Body) {
         let (x, y) = self.observer.to_screen_coords(body.position);
 
@@ -110,18 +127,7 @@ impl<'a, 'b> Frame<'a, 'b> {
             self.graphics,
         );
 
-        text(
-            [0.7; 4],
-            10,
-            body.name,
-            self.glyphs,
-            self.context
-                .transform
-                .trans(x + 10.0, y)
-                .append_transform(self.observer.view_transform),
-            self.graphics,
-        )
-        .unwrap();
+	self.draw_label(body.name, body.position);
     }
 
     fn draw_ship(&mut self, ship: &Ship) {
@@ -136,18 +142,7 @@ impl<'a, 'b> Frame<'a, 'b> {
             self.graphics,
         );
 
-        text(
-            [0.7; 4],
-            10,
-            ship.name,
-            self.glyphs,
-            self.context
-                .transform
-                .trans(x + 10.0, y)
-                .append_transform(self.observer.view_transform),
-            self.graphics,
-        )
-        .unwrap();
+	self.draw_label(ship.name, ship.position);
     }
 
     fn draw_statusbar(&mut self) {
