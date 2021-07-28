@@ -4,7 +4,7 @@ use piston_window::*;
 use piston_window::{text, Context, G2d, Glyphs};
 
 use crate::algebra::{self, Vector};
-use crate::physics::{Body, Space};
+use crate::physics::{Body, Ship, Space};
 use crate::units;
 
 pub struct Observer {
@@ -91,6 +91,36 @@ pub fn draw_body(
         [0.7; 4],
         10,
         body.name,
+        glyphs,
+        context
+            .transform
+            .trans(x + 10.0, y)
+            .append_transform(observer.view_transform),
+        graphics,
+    )
+    .unwrap();
+}
+
+pub fn draw_ship(
+    ship: &Ship,
+    observer: &Observer,
+    context: &Context,
+    graphics: &mut G2d,
+    glyphs: &mut Glyphs,
+) {
+    let (x, y) = observer.to_screen_coords(ship.position);
+
+    ellipse(
+        [1.0; 4],
+        [x, y, 10.0, 10.0],
+        context.transform.append_transform(observer.view_transform),
+        graphics,
+    );
+
+    text(
+        [0.7; 4],
+        10,
+        ship.name,
         glyphs,
         context
             .transform

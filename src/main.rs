@@ -139,33 +139,13 @@ fn main() {
 
         window.draw_2d(&event, |context, graphics, device| {
             clear([0.0; 4], graphics);
+
             for body in &space.bodies {
                 graphics::draw_body(body, &observer, &context, graphics, &mut glyphs);
             }
 
-            // Draw ships.
             for ship in &space.ships {
-                let (x, y) = observer.to_screen_coords(ship.position);
-
-                ellipse(
-                    [1.0; 4],
-                    [x, y, 10.0, 10.0],
-                    context.transform.append_transform(observer.view_transform),
-                    graphics,
-                );
-
-                text(
-                    [0.7; 4],
-                    10,
-                    ship.name,
-                    &mut glyphs,
-                    context
-                        .transform
-                        .trans(x + 10.0, y)
-                        .append_transform(observer.view_transform),
-                    graphics,
-                )
-                .unwrap();
+                graphics::draw_ship(ship, &observer, &context, graphics, &mut glyphs);
             }
 
             graphics::draw_statusbar(&space, &context, graphics, &mut glyphs);
