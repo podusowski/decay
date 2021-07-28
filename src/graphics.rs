@@ -71,8 +71,7 @@ impl Observer {
     }
 }
 
-/// Draws a single frame. Didn't call it `Graphics` to avoid ambiguity with
-/// Piston types.
+/// Draws a single frame. Didn't call it `Graphics` to avoid ambiguity with Piston types.
 pub struct Frame<'a, 'b> {
     pub space: &'a Space,
     pub observer: &'a Observer,
@@ -87,13 +86,7 @@ impl<'a, 'b> Frame<'a, 'b> {
         clear([0.0; 4], self.graphics);
 
         for body in &self.space.bodies {
-            draw_body(
-                body,
-                &self.observer,
-                &self.context,
-                self.graphics,
-                &mut self.glyphs,
-            );
+            self.draw_body(body);
         }
 
         for ship in &self.space.ships {
@@ -110,36 +103,32 @@ impl<'a, 'b> Frame<'a, 'b> {
 
         self.glyphs.factory.encoder.flush(self.device);
     }
-}
 
-pub fn draw_body(
-    body: &Body,
-    observer: &Observer,
-    context: &Context,
-    graphics: &mut G2d,
-    glyphs: &mut Glyphs,
-) {
-    let (x, y) = observer.to_screen_coords(body.position);
+    fn draw_body(&mut self, body: &Body) {
+        let (x, y) = self.observer.to_screen_coords(body.position);
 
-    ellipse(
-        [1.0; 4],
-        [x, y, 10.0, 10.0],
-        context.transform.append_transform(observer.view_transform),
-        graphics,
-    );
+        ellipse(
+            [1.0; 4],
+            [x, y, 10.0, 10.0],
+            self.context
+                .transform
+                .append_transform(self.observer.view_transform),
+            self.graphics,
+        );
 
-    text(
-        [0.7; 4],
-        10,
-        body.name,
-        glyphs,
-        context
-            .transform
-            .trans(x + 10.0, y)
-            .append_transform(observer.view_transform),
-        graphics,
-    )
-    .unwrap();
+        text(
+            [0.7; 4],
+            10,
+            body.name,
+            self.glyphs,
+            self.context
+                .transform
+                .trans(x + 10.0, y)
+                .append_transform(self.observer.view_transform),
+            self.graphics,
+        )
+        .unwrap();
+    }
 }
 
 pub fn draw_ship(
