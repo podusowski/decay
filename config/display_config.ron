@@ -1,0 +1,4 @@
+(
+  title: "Decay",
+  dimensions: Some((800, 600)),
+)
