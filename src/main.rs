@@ -6,10 +6,13 @@ mod graphics;
 mod physics;
 mod units;
 
+use amethyst::assets::{PrefabLoader, PrefabLoaderSystemDesc, RonFormat};
 use amethyst::core::{Transform, TransformBundle};
 use amethyst::input::{InputBundle, StringBindings};
-use amethyst::renderer::Camera;
+use amethyst::renderer::rendy::mesh::{Normal, Position, TexCoord};
+use amethyst::renderer::{Camera, RenderShaded3D};
 use amethyst::ui::{RenderUi, UiBundle};
+use amethyst::utils::scene::BasicScenePrefab;
 use amethyst::window::ScreenDimensions;
 use physics::*;
 
@@ -124,23 +127,28 @@ use amethyst::{
 
 struct State;
 
+type MyPrefabData = BasicScenePrefab<(Vec<Position>, Vec<Normal>, Vec<TexCoord>)>;
+
 impl SimpleState for State {
     fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
-        let world = data.world;
-
         // Get the screen dimensions so we can initialize the camera and
         // place our sprites correctly later. We'll clone this since we'll
         // pass the world mutably to the following functions.
-        let dimensions = (*world.read_resource::<ScreenDimensions>()).clone();
+        let dimensions = (*data.world.read_resource::<ScreenDimensions>()).clone();
 
         // Place the camera
-        init_camera(world, &dimensions);
+        //init_camera(data.world, &dimensions);
 
         // Load our sprites and display them
         //let sprites = load_sprites(world);
         //init_sprites(world, &sprites, &dimensions);
 
         //create_ui_example(world);
+
+        let handle = data.world.exec(|loader: PrefabLoader<'_, MyPrefabData>| {
+            loader.load("prefab/sphere.ron", RonFormat, ())
+        });
+        data.world.create_entity().with(handle).build();
     }
 }
 
@@ -182,6 +190,7 @@ fn main() -> amethyst::Result<()> {
     //let key_bindings_path = app_root.join("config/input.ron");
 
     let game_data = GameDataBuilder::default()
+        .with_system_desc(PrefabLoaderSystemDesc::<MyPrefabData>::default(), "", &[])
         .with_bundle(TransformBundle::new())?
         //.with_bundle(
         //    InputBundle::<StringBindings>::new().with_bindings_from_file(&key_bindings_path)?,
@@ -194,7 +203,8 @@ fn main() -> amethyst::Result<()> {
                         .with_clear([0.34, 0.36, 0.52, 1.0]),
                 )
                 //.with_plugin(RenderUi::default())
-                .with_plugin(RenderFlat2D::default()),
+                //.with_plugin(RenderFlat2D::default()),
+                .with_plugin(RenderShaded3D::default()),
         )?;
 
     let mut game = Application::new(resources, State, game_data)?;
