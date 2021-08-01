@@ -7,7 +7,8 @@ mod physics;
 mod units;
 
 use amethyst::assets::{PrefabLoader, PrefabLoaderSystemDesc, RonFormat};
-use amethyst::core::{Transform, TransformBundle};
+use amethyst::core::transform::Transform;
+use amethyst::core::TransformBundle;
 use amethyst::input::{InputBundle, StringBindings};
 use amethyst::renderer::rendy::mesh::{Normal, Position, TexCoord};
 use amethyst::renderer::{Camera, RenderShaded3D};
@@ -125,7 +126,28 @@ use amethyst::{
 //    }
 //}
 
-struct State;
+struct State {
+    space: Space,
+}
+
+impl State {
+    fn new() -> State {
+        let mut space = Space::solar_system();
+
+        space.ships.push(Ship {
+            position: Vector {
+                x: Distance::from_aus(1.0).as_meters(),
+                y: Distance::from_aus(1.0).as_meters(),
+                z: Default::default(),
+            },
+            velocity: Default::default(),
+            thrust: Default::default(),
+            name: "Rocinante",
+        });
+
+        State { space: space }
+    }
+}
 
 type MyPrefabData = BasicScenePrefab<(Vec<Position>, Vec<Normal>, Vec<TexCoord>)>;
 
@@ -136,8 +158,7 @@ impl SimpleState for State {
         // pass the world mutably to the following functions.
         let dimensions = (*data.world.read_resource::<ScreenDimensions>()).clone();
 
-        // Place the camera
-        //init_camera(data.world, &dimensions);
+        initialise_camera(data.world);
 
         // Load our sprites and display them
         //let sprites = load_sprites(world);
@@ -145,20 +166,44 @@ impl SimpleState for State {
 
         //create_ui_example(world);
 
-        let handle = data.world.exec(|loader: PrefabLoader<'_, MyPrefabData>| {
-            loader.load("prefab/sphere.ron", RonFormat, ())
-        });
-        data.world.create_entity().with(handle).build();
+        for body in &self.space.bodies[..1] {
+            let handle = data.world.exec(|loader: PrefabLoader<'_, MyPrefabData>| {
+                loader.load("prefab/sphere.ron", RonFormat, ())
+            });
+
+            let mut transform = Transform::default();
+            transform.set_translation_xyz(
+                    (body.position().x + 1000.0) as f32,
+                    (body.position().y + 100000.0) as f32,
+                    body.position().z as f32,
+                );
+
+            println!("{:?}", transform);
+
+            data.world
+                .create_entity()
+                .with(handle)
+                //.with(transform)
+                .build();
+        }
+    }
+
+    fn update(&mut self, data: &mut StateData<'_, GameData<'_, '_>>) -> SimpleTrans {
+        Trans::None
     }
 }
 
-fn init_camera(world: &mut World, dimensions: &ScreenDimensions) {
+fn initialise_camera(world: &mut World) {
+    pub const ARENA_HEIGHT: f32 = 600.0;
+    pub const ARENA_WIDTH: f32 = 800.0;
+
+    // Setup camera in a way that our screen covers whole arena and (0, 0) is in the bottom left.
     let mut transform = Transform::default();
-    transform.set_translation_xyz(dimensions.width() * 0.5, dimensions.height() * 0.5, 1.);
+    transform.set_translation_xyz(0., 0., 1.0);
 
     world
         .create_entity()
-        .with(Camera::standard_2d(dimensions.width(), dimensions.height()))
+        .with(Camera::standard_2d(ARENA_WIDTH, ARENA_HEIGHT))
         .with(transform)
         .build();
 }
@@ -207,7 +252,7 @@ fn main() -> amethyst::Result<()> {
                 .with_plugin(RenderShaded3D::default()),
         )?;
 
-    let mut game = Application::new(resources, State, game_data)?;
+    let mut game = Application::new(resources, State::new(), game_data)?;
     game.run();
 
     Ok(())
