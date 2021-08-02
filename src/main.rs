@@ -11,6 +11,7 @@ use amethyst::core::transform::Transform;
 use amethyst::core::TransformBundle;
 use amethyst::input::{InputBundle, StringBindings};
 use amethyst::renderer::rendy::mesh::{Normal, Position, TexCoord};
+use amethyst::renderer::shape::Shape;
 use amethyst::renderer::{Camera, RenderShaded3D};
 use amethyst::ui::{RenderUi, UiBundle};
 use amethyst::utils::scene::BasicScenePrefab;
@@ -166,24 +167,21 @@ impl SimpleState for State {
 
         //create_ui_example(world);
 
+
         for body in &self.space.bodies[..1] {
             let handle = data.world.exec(|loader: PrefabLoader<'_, MyPrefabData>| {
                 loader.load("prefab/sphere.ron", RonFormat, ())
             });
 
             let mut transform = Transform::default();
-            transform.set_translation_xyz(
-                    (body.position().x + 1000.0) as f32,
-                    (body.position().y + 100000.0) as f32,
-                    body.position().z as f32,
-                );
+            transform.set_translation_xyz(80., 100., 0.);
 
             println!("{:?}", transform);
 
             data.world
                 .create_entity()
                 .with(handle)
-                //.with(transform)
+                .with(transform)
                 .build();
         }
     }
