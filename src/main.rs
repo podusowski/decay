@@ -9,8 +9,12 @@ mod physics;
 mod units;
 
 use physics::*;
+use rg3d::core::algebra::Vector2;
 use rg3d::core::pool::Handle;
 use rg3d::engine::framework::{Framework, GameState};
+use rg3d::scene2d::base::BaseBuilder;
+use rg3d::scene2d::sprite::SpriteBuilder;
+use rg3d::scene2d::transform::TransformBuilder;
 use rg3d::scene2d::Scene2d;
 
 use crate::graphics::{Frame, Observer};
@@ -136,15 +140,29 @@ impl GameState for Decay {
 
         println!("Space: {:?}", space);
 
+        let scene = create_scene(&space);
+
         Self {
             space: space,
-            scene: engine.scenes2d.add(create_scene()),
+            scene: engine.scenes2d.add(scene),
         }
     }
 }
 
-fn create_scene() -> Scene2d {
-    Scene2d::new()
+fn create_scene(space: &Space) -> Scene2d {
+    let mut scene = Scene2d::new();
+
+    for body in &space.bodies {
+        SpriteBuilder::new(
+            BaseBuilder::new().with_local_transform(
+                TransformBuilder::new()
+                    .with_position(Vector2::new(0.0, 0.0))
+                    .build(),
+            ),
+        );
+    }
+
+    scene
 }
 
 fn main() {
