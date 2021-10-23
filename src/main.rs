@@ -9,6 +9,7 @@ mod physics;
 mod units;
 
 use physics::*;
+use rg3d::engine::framework::{Framework, GameState};
 
 use crate::graphics::{Frame, Observer};
 use crate::units::Distance;
@@ -109,6 +110,17 @@ fn handle_event(event: &Event, observer: &mut graphics::Observer, space: &mut Sp
     }
 }
 
+struct Decay;
+
+impl GameState for Decay {
+    fn init(engine: &mut rg3d::engine::framework::GameEngine) -> Self
+    where
+        Self: Sized,
+    {
+        Self
+    }
+}
+
 fn main() {
     let mut space = Space::solar_system();
 
@@ -125,29 +137,31 @@ fn main() {
 
     println!("Space: {:?}", space);
 
-    let mut window: PistonWindow = WindowSettings::new("Decay", [1280, 720])
-        .exit_on_esc(true)
-        .build()
-        .unwrap();
+    //let mut window: PistonWindow = WindowSettings::new("Decay", [1280, 720])
+    //    .exit_on_esc(true)
+    //    .build()
+    //    .unwrap();
 
-    let mut glyphs = window.load_font("./Rajdhani-Light.ttf").unwrap();
+    //let mut glyphs = window.load_font("./Rajdhani-Light.ttf").unwrap();
 
-    let mut observer = Observer::default();
+    //let mut observer = Observer::default();
 
-    while let Some(event) = window.next() {
-        handle_event(&event, &mut observer, &mut space);
+    //while let Some(event) = window.next() {
+    //    handle_event(&event, &mut observer, &mut space);
 
-        window.draw_2d(&event, |context, graphics, device| {
-            let mut frame = Frame {
-                space: &space,
-                observer: &observer,
-                context: &context,
-                graphics: graphics,
-                device: device,
-                glyphs: &mut glyphs,
-            };
+    //    window.draw_2d(&event, |context, graphics, device| {
+    //        let mut frame = Frame {
+    //            space: &space,
+    //            observer: &observer,
+    //            context: &context,
+    //            graphics: graphics,
+    //            device: device,
+    //            glyphs: &mut glyphs,
+    //        };
 
-            frame.draw();
-        });
-    }
+    //        frame.draw();
+    //    });
+    //}
+
+    Framework::<Decay>::new().unwrap().run();
 }
