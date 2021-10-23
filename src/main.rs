@@ -9,7 +9,9 @@ mod physics;
 mod units;
 
 use physics::*;
+use rg3d::core::pool::Handle;
 use rg3d::engine::framework::{Framework, GameState};
+use rg3d::scene2d::Scene2d;
 
 use crate::graphics::{Frame, Observer};
 use crate::units::Distance;
@@ -110,33 +112,42 @@ fn handle_event(event: &Event, observer: &mut graphics::Observer, space: &mut Sp
     }
 }
 
-struct Decay;
+struct Decay {
+    space: Space,
+    scene: Handle<Scene2d>,
+}
 
 impl GameState for Decay {
     fn init(engine: &mut rg3d::engine::framework::GameEngine) -> Self
     where
         Self: Sized,
     {
-        Self
+        let mut space = Space::solar_system();
+        space.ships.push(Ship {
+            position: Vector {
+                x: Distance::from_aus(1.0).as_meters(),
+                y: Distance::from_aus(1.0).as_meters(),
+                z: Default::default(),
+            },
+            velocity: Default::default(),
+            thrust: Default::default(),
+            name: "Rocinante",
+        });
+
+        println!("Space: {:?}", space);
+
+        Self {
+            space: space,
+            scene: engine.scenes2d.add(create_scene()),
+        }
     }
 }
 
+fn create_scene() -> Scene2d {
+    Scene2d::new()
+}
+
 fn main() {
-    let mut space = Space::solar_system();
-
-    space.ships.push(Ship {
-        position: Vector {
-            x: Distance::from_aus(1.0).as_meters(),
-            y: Distance::from_aus(1.0).as_meters(),
-            z: Default::default(),
-        },
-        velocity: Default::default(),
-        thrust: Default::default(),
-        name: "Rocinante",
-    });
-
-    println!("Space: {:?}", space);
-
     //let mut window: PistonWindow = WindowSettings::new("Decay", [1280, 720])
     //    .exit_on_esc(true)
     //    .build()
