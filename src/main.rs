@@ -12,7 +12,12 @@ use physics::*;
 use rg3d::core::algebra::Vector2;
 use rg3d::core::pool::Handle;
 use rg3d::engine::framework::{Framework, GameState};
+use rg3d::engine::resource_manager::ResourceManager;
 use rg3d::scene2d::base::BaseBuilder;
+use rg3d::scene2d::camera::CameraBuilder;
+use rg3d::scene2d::light::BaseLightBuilder;
+use rg3d::scene2d::light::point::PointLightBuilder;
+use rg3d::scene2d::light::spot::SpotLightBuilder;
 use rg3d::scene2d::sprite::SpriteBuilder;
 use rg3d::scene2d::transform::TransformBuilder;
 use rg3d::scene2d::Scene2d;
@@ -140,7 +145,7 @@ impl GameState for Decay {
 
         println!("Space: {:?}", space);
 
-        let scene = create_scene(&space);
+        let scene = create_scene(&space, &engine.resource_manager);
 
         Self {
             space: space,
@@ -149,8 +154,10 @@ impl GameState for Decay {
     }
 }
 
-fn create_scene(space: &Space) -> Scene2d {
+fn create_scene(space: &Space, resource_manager: &ResourceManager) -> Scene2d {
     let mut scene = Scene2d::new();
+
+    let camera = CameraBuilder::new(BaseBuilder::new()).build(&mut scene.graph);
 
     for body in &space.bodies {
         SpriteBuilder::new(
@@ -159,8 +166,22 @@ fn create_scene(space: &Space) -> Scene2d {
                     .with_position(Vector2::new(0.0, 0.0))
                     .build(),
             ),
-        );
+        )
+        .with_texture(resource_manager.request_texture("planet.png", None))
+        .with_size(10.0)
+        .build(&mut scene.graph);
     }
+
+
+    let spot_light = SpotLightBuilder::new(BaseLightBuilder::new(
+        BaseBuilder::new().with_local_transform(
+            TransformBuilder::new()
+                .with_position(Vector2::new(500.0, 400.0))
+                .build(),
+        ),
+    ))
+    .with_radius(200.0)
+    .build(&mut scene.graph);
 
     scene
 }
