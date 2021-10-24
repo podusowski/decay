@@ -14,7 +14,7 @@ use rg3d::core::color::Color;
 use rg3d::core::math::Rect;
 use rg3d::core::pool::Handle;
 use rg3d::engine::framework::{Framework, GameState};
-use rg3d::engine::resource_manager::ResourceManager;
+use rg3d::engine::resource_manager::{MaterialSearchOptions, ResourceManager};
 use rg3d::scene::base::BaseBuilder;
 use rg3d::scene::camera::CameraBuilder;
 use rg3d::scene::Scene;
@@ -142,7 +142,8 @@ impl GameState for Decay {
 
         println!("Space: {:?}", space);
 
-        let scene = create_scene(&space, &engine.resource_manager);
+        let scene =
+            rg3d::core::futures::executor::block_on(create_scene(&space, &engine.resource_manager));
 
         Self {
             space: space,
@@ -151,7 +152,7 @@ impl GameState for Decay {
     }
 }
 
-fn create_scene(space: &Space, resource_manager: &ResourceManager) -> Scene {
+async fn create_scene(space: &Space, resource_manager: &ResourceManager) -> Scene {
     let mut scene = Scene::new();
 
     scene.ambient_lighting_color = Color::opaque(200, 200, 200);
@@ -159,6 +160,15 @@ fn create_scene(space: &Space, resource_manager: &ResourceManager) -> Scene {
     let camera = CameraBuilder::new(BaseBuilder::new()).build(&mut scene.graph);
 
     for body in &space.bodies {
+        let planet = resource_manager
+            .request_model(
+                "data/AlienPlanet2/AlienPlanet2.fbx",
+                MaterialSearchOptions::RecursiveUp,
+            )
+            .await;
+
+        let planet = planet.unwrap().instantiate_geometry(&mut scene);
+
         //SpriteBuilder::new(
         //    BaseBuilder::new().with_local_transform(
         //        TransformBuilder::new()
