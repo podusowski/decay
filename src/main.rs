@@ -181,51 +181,11 @@ async fn create_scene(space: &Space, resource_manager: &ResourceManager) -> Scen
                 body.position().y as f32,
                 body.position().z as f32,
             ));
-
-        //SpriteBuilder::new(
-        //    BaseBuilder::new().with_local_transform(
-        //        TransformBuilder::new()
-        //            .with_position(Vector2::new(
-        //                body.position().x as f32,
-        //                body.position.y as f32,
-        //            ))
-        //            .build(),
-        //    ),
-        //)
-        //.with_texture(resource_manager.request_texture("planet.png", None))
-        //.with_size(10.0)
-        //.build(&mut scene.graph);
     }
 
     scene
 }
 
 fn main() {
-    //let mut window: PistonWindow = WindowSettings::new("Decay", [1280, 720])
-    //    .exit_on_esc(true)
-    //    .build()
-    //    .unwrap();
-
-    //let mut glyphs = window.load_font("./Rajdhani-Light.ttf").unwrap();
-
-    //let mut observer = Observer::default();
-
-    //while let Some(event) = window.next() {
-    //    handle_event(&event, &mut observer, &mut space);
-
-    //    window.draw_2d(&event, |context, graphics, device| {
-    //        let mut frame = Frame {
-    //            space: &space,
-    //            observer: &observer,
-    //            context: &context,
-    //            graphics: graphics,
-    //            device: device,
-    //            glyphs: &mut glyphs,
-    //        };
-
-    //        frame.draw();
-    //    });
-    //}
-
     Framework::<Decay>::new().unwrap().run();
 }
