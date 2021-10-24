@@ -174,6 +174,14 @@ async fn create_scene(space: &Space, resource_manager: &ResourceManager) -> Scen
 
         let planet = planet.unwrap().instantiate_geometry(&mut scene);
 
+        scene.graph[planet]
+            .local_transform_mut()
+            .set_position(Vector3::new(
+                body.position().x as f32,
+                body.position().y as f32,
+                body.position().z as f32,
+            ));
+
         //SpriteBuilder::new(
         //    BaseBuilder::new().with_local_transform(
         //        TransformBuilder::new()
