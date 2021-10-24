@@ -162,7 +162,7 @@ async fn create_scene(space: &Space, resource_manager: &ResourceManager) -> Scen
     for body in &space.bodies {
         let planet = resource_manager
             .request_model(
-                "data/AlienPlanet2/AlienPlanet2.fbx",
+                "data/ball.fbx",
                 MaterialSearchOptions::RecursiveUp,
             )
             .await;
