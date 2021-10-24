@@ -207,7 +207,7 @@ async fn create_scene(space: &Space, resource_manager: &ResourceManager) -> (Sce
                 .with_local_position(Vector3::new(
                     0.0, 0.0,
                     -400000.0, //-Distance::from_aus(2.0).as_meters() as f32,
-                             // AU: 149597870700
+                              // AU: 149597870700
                 ))
                 .build(),
         ),
@@ -220,21 +220,21 @@ async fn create_scene(space: &Space, resource_manager: &ResourceManager) -> (Sce
         .as_camera_mut()
         .set_z_far(Distance::from_aus(10.0).as_meters() as f32);
 
+    let planet = resource_manager
+        .request_model("data/ball.fbx", MaterialSearchOptions::RecursiveUp)
+        .await;
+    let planet = planet.unwrap();
+
     for body in &space.bodies {
-        let planet = resource_manager
-            .request_model("data/ball.fbx", MaterialSearchOptions::RecursiveUp)
-            .await;
-
-        let planet = planet.unwrap().instantiate_geometry(&mut scene);
-
-        let scale = 1000.0;
+        let scale = 600.0;
+        let planet = planet.instantiate_geometry(&mut scene);
         scene.graph[planet]
             .local_transform_mut()
             .set_position(Vector3::new(
                 // in 1000km
-                (body.position().x / 1000_000.0) as f32,
-                (body.position().y / 1000_000.0) as f32,
-                (body.position().z / 1000_000.0) as f32,
+                (body.position().x / 500_000.0) as f32,
+                (body.position().y / 500_000.0) as f32,
+                (body.position().z / 500_000.0) as f32,
             ))
             .set_scale(Vector3::new(scale, scale, scale));
     }
