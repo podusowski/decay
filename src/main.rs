@@ -15,6 +15,7 @@ use rg3d::core::math::Rect;
 use rg3d::core::pool::Handle;
 use rg3d::engine::framework::{Framework, GameState};
 use rg3d::engine::resource_manager::ResourceManager;
+use rg3d::scene::base::BaseBuilder;
 use rg3d::scene::camera::CameraBuilder;
 use rg3d::scene::Scene;
 
@@ -145,7 +146,7 @@ impl GameState for Decay {
 
         Self {
             space: space,
-            scene: engine.scenes2d.add(scene),
+            scene: engine.scenes.add(scene),
         }
     }
 }
@@ -158,19 +159,19 @@ fn create_scene(space: &Space, resource_manager: &ResourceManager) -> Scene {
     let camera = CameraBuilder::new(BaseBuilder::new()).build(&mut scene.graph);
 
     for body in &space.bodies {
-        SpriteBuilder::new(
-            BaseBuilder::new().with_local_transform(
-                TransformBuilder::new()
-                    .with_position(Vector2::new(
-                        body.position().x as f32,
-                        body.position.y as f32,
-                    ))
-                    .build(),
-            ),
-        )
-        .with_texture(resource_manager.request_texture("planet.png", None))
-        .with_size(10.0)
-        .build(&mut scene.graph);
+        //SpriteBuilder::new(
+        //    BaseBuilder::new().with_local_transform(
+        //        TransformBuilder::new()
+        //            .with_position(Vector2::new(
+        //                body.position().x as f32,
+        //                body.position.y as f32,
+        //            ))
+        //            .build(),
+        //    ),
+        //)
+        //.with_texture(resource_manager.request_texture("planet.png", None))
+        //.with_size(10.0)
+        //.build(&mut scene.graph);
     }
 
     scene
