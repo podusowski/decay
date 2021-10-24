@@ -205,9 +205,9 @@ async fn create_scene(space: &Space, resource_manager: &ResourceManager) -> (Sce
         BaseBuilder::new().with_local_transform(
             TransformBuilder::new()
                 .with_local_position(Vector3::new(
-                    0.0,
-                    0.0,
-                    -1200.0 //-Distance::from_aus(2.0).as_meters() as f32,
+                    0.0, 0.0,
+                    -12000.0, //-Distance::from_aus(2.0).as_meters() as f32,
+                             // AU: 149597870700
                 ))
                 .build(),
         ),
@@ -227,14 +227,16 @@ async fn create_scene(space: &Space, resource_manager: &ResourceManager) -> (Sce
 
         let planet = planet.unwrap().instantiate_geometry(&mut scene);
 
+        let scale = 1000.0;
         scene.graph[planet]
             .local_transform_mut()
             .set_position(Vector3::new(
-                body.position().x as f32,
-                body.position().y as f32,
-                body.position().z as f32,
-            ));
-            //.set_scale(Vector3::new(100.0, 100.0, 100.0));
+                // in 1000km
+                (body.position().x / 1000_000.0) as f32,
+                (body.position().y / 1000_000.0) as f32,
+                (body.position().z / 1000_000.0) as f32,
+            ))
+            .set_scale(Vector3::new(scale, scale, scale));
     }
 
     (scene, camera)
