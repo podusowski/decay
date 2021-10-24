@@ -9,19 +9,14 @@ mod physics;
 mod units;
 
 use physics::*;
-use rg3d::core::math::Rect;
 use rg3d::core::algebra::Vector2;
+use rg3d::core::color::Color;
+use rg3d::core::math::Rect;
 use rg3d::core::pool::Handle;
 use rg3d::engine::framework::{Framework, GameState};
 use rg3d::engine::resource_manager::ResourceManager;
-use rg3d::scene2d::base::BaseBuilder;
-use rg3d::scene2d::camera::CameraBuilder;
-use rg3d::scene2d::light::point::PointLightBuilder;
-use rg3d::scene2d::light::spot::SpotLightBuilder;
-use rg3d::scene2d::light::BaseLightBuilder;
-use rg3d::scene2d::sprite::SpriteBuilder;
-use rg3d::scene2d::transform::TransformBuilder;
-use rg3d::scene2d::Scene2d;
+use rg3d::scene::camera::CameraBuilder;
+use rg3d::scene::Scene;
 
 use crate::graphics::{Frame, Observer};
 use crate::units::Distance;
@@ -124,7 +119,7 @@ fn handle_event(event: &Event, observer: &mut graphics::Observer, space: &mut Sp
 
 struct Decay {
     space: Space,
-    scene: Handle<Scene2d>,
+    scene: Handle<Scene>,
 }
 
 impl GameState for Decay {
@@ -155,12 +150,12 @@ impl GameState for Decay {
     }
 }
 
-fn create_scene(space: &Space, resource_manager: &ResourceManager) -> Scene2d {
-    let mut scene = Scene2d::new();
+fn create_scene(space: &Space, resource_manager: &ResourceManager) -> Scene {
+    let mut scene = Scene::new();
 
-    let camera = CameraBuilder::new(BaseBuilder::new())
-        //.with_viewport(Rect::new(.0, 0, 100, 100))
-        .build(&mut scene.graph);
+    scene.ambient_lighting_color = Color::opaque(200, 200, 200);
+
+    let camera = CameraBuilder::new(BaseBuilder::new()).build(&mut scene.graph);
 
     for body in &space.bodies {
         SpriteBuilder::new(
