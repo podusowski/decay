@@ -9,7 +9,7 @@ mod physics;
 mod units;
 
 use physics::*;
-use rg3d::core::algebra::Vector2;
+use rg3d::core::algebra::{Vector2, Vector3};
 use rg3d::core::color::Color;
 use rg3d::core::math::Rect;
 use rg3d::core::pool::Handle;
@@ -17,6 +17,7 @@ use rg3d::engine::framework::{Framework, GameState};
 use rg3d::engine::resource_manager::{MaterialSearchOptions, ResourceManager};
 use rg3d::scene::base::BaseBuilder;
 use rg3d::scene::camera::CameraBuilder;
+use rg3d::scene::transform::TransformBuilder;
 use rg3d::scene::Scene;
 
 use crate::graphics::{Frame, Observer};
@@ -157,14 +158,18 @@ async fn create_scene(space: &Space, resource_manager: &ResourceManager) -> Scen
 
     scene.ambient_lighting_color = Color::opaque(200, 200, 200);
 
-    let camera = CameraBuilder::new(BaseBuilder::new()).build(&mut scene.graph);
+    let camera = CameraBuilder::new(
+        BaseBuilder::new().with_local_transform(
+            TransformBuilder::new()
+                .with_local_position(Vector3::new(0.0, 0.0, -1200.0))
+                .build(),
+        ),
+    )
+    .build(&mut scene.graph);
 
     for body in &space.bodies {
         let planet = resource_manager
-            .request_model(
-                "data/ball.fbx",
-                MaterialSearchOptions::RecursiveUp,
-            )
+            .request_model("data/ball.fbx", MaterialSearchOptions::RecursiveUp)
             .await;
 
         let planet = planet.unwrap().instantiate_geometry(&mut scene);
