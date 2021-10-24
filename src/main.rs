@@ -13,10 +13,14 @@ use rg3d::core::algebra::{Vector2, Vector3};
 use rg3d::core::color::Color;
 use rg3d::core::math::Rect;
 use rg3d::core::pool::Handle;
-use rg3d::engine::framework::{Framework, GameState};
+use rg3d::engine::framework::{Framework, GameEngine, GameState};
 use rg3d::engine::resource_manager::{MaterialSearchOptions, ResourceManager};
+use rg3d::engine::Engine;
+use rg3d::event::{ElementState, VirtualKeyCode, WindowEvent};
+use rg3d::event_loop::ControlFlow;
 use rg3d::scene::base::BaseBuilder;
 use rg3d::scene::camera::CameraBuilder;
+use rg3d::scene::node::Node;
 use rg3d::scene::transform::TransformBuilder;
 use rg3d::scene::Scene;
 
@@ -119,9 +123,16 @@ fn handle_event(event: &Event, observer: &mut graphics::Observer, space: &mut Sp
     }
 }
 
+enum Zooming {
+    In,
+    Out,
+}
+
 struct Decay {
     space: Space,
     scene: Handle<Scene>,
+    camera: Handle<Node>,
+    zooming: Option<Zooming>,
 }
 
 impl GameState for Decay {
@@ -143,17 +154,39 @@ impl GameState for Decay {
 
         println!("Space: {:?}", space);
 
-        let scene =
+        let (scene, camera) =
             rg3d::core::futures::executor::block_on(create_scene(&space, &engine.resource_manager));
 
         Self {
             space: space,
             scene: engine.scenes.add(scene),
+            camera: camera,
+            zooming: None,
+        }
+    }
+
+    fn on_tick(&mut self, engine: &mut GameEngine, _dt: f32, _: &mut ControlFlow) {
+        let scene = &mut engine.scenes[self.scene];
+
+        scene.graph[self.camera]
+            .local_transform_mut()
+            .offset(Vector3::new(0.0, 0.0, -0.1));
+    }
+
+    fn on_window_event(&mut self, _engine: &mut GameEngine, event: WindowEvent) {
+        if let WindowEvent::KeyboardInput { input, .. } = event {
+            if let Some(key_code) = input.virtual_keycode {
+                self.zooming = match key_code {
+                    VirtualKeyCode::W => Some(Zooming::In),
+                    VirtualKeyCode::S => Some(Zooming::Out),
+                    _ => None,
+                }
+            }
         }
     }
 }
 
-async fn create_scene(space: &Space, resource_manager: &ResourceManager) -> Scene {
+async fn create_scene(space: &Space, resource_manager: &ResourceManager) -> (Scene, Handle<Node>) {
     let mut scene = Scene::new();
 
     scene.ambient_lighting_color = Color::opaque(200, 200, 200);
@@ -183,7 +216,7 @@ async fn create_scene(space: &Space, resource_manager: &ResourceManager) -> Scen
             ));
     }
 
-    scene
+    (scene, camera)
 }
 
 fn main() {
