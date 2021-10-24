@@ -128,6 +128,16 @@ enum Zooming {
     Out,
 }
 
+impl Zooming {
+    fn multiplier(&self) -> f32 {
+        let amount = 1.0;
+        match self {
+            Self::In => amount,
+            Self::Out => -amount,
+        }
+    }
+}
+
 struct Decay {
     space: Space,
     scene: Handle<Scene>,
@@ -168,19 +178,19 @@ impl GameState for Decay {
     fn on_tick(&mut self, engine: &mut GameEngine, _dt: f32, _: &mut ControlFlow) {
         let scene = &mut engine.scenes[self.scene];
 
-        scene.graph[self.camera]
-            .local_transform_mut()
-            .offset(Vector3::new(0.0, 0.0, -0.1));
+        if let Some(zooming) = &self.zooming {
+            scene.graph[self.camera]
+                .local_transform_mut()
+                .offset(Vector3::new(0.0, 0.0, zooming.multiplier()));
+        }
     }
 
     fn on_window_event(&mut self, _engine: &mut GameEngine, event: WindowEvent) {
         if let WindowEvent::KeyboardInput { input, .. } = event {
-            if let Some(key_code) = input.virtual_keycode {
-                self.zooming = match key_code {
-                    VirtualKeyCode::W => Some(Zooming::In),
-                    VirtualKeyCode::S => Some(Zooming::Out),
-                    _ => None,
-                }
+            self.zooming = match (input.state, input.virtual_keycode) {
+                (ElementState::Pressed, Some(VirtualKeyCode::W)) => Some(Zooming::In),
+                (ElementState::Pressed, Some(VirtualKeyCode::S)) => Some(Zooming::Out),
+                _ => None,
             }
         }
     }
