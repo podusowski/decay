@@ -206,7 +206,7 @@ async fn create_scene(space: &Space, resource_manager: &ResourceManager) -> (Sce
             TransformBuilder::new()
                 .with_local_position(Vector3::new(
                     0.0, 0.0,
-                    -12000.0, //-Distance::from_aus(2.0).as_meters() as f32,
+                    -400000.0, //-Distance::from_aus(2.0).as_meters() as f32,
                              // AU: 149597870700
                 ))
                 .build(),
