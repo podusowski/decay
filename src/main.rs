@@ -1,25 +1,43 @@
+use std::sync::{Arc, Mutex, RwLock};
+
 use algebra::Vector;
 
 mod algebra;
 mod ephemeris;
 mod physics;
 mod units;
+mod frameworks;
 
+use frameworks::{Framework, GameState};
 use physics::*;
-use rg3d::core::algebra::{Vector2, Vector3};
+use rg3d::core::algebra::{Matrix4, Vector2, Vector3};
 use rg3d::core::color::Color;
+use rg3d::core::instant::Instant;
 use rg3d::core::math::Rect;
 use rg3d::core::pool::Handle;
-use rg3d::engine::framework::{Framework, GameEngine, GameState};
+use rg3d::engine::error::EngineError;
+use rg3d::engine::framework::{GameEngine, UiNode};
 use rg3d::engine::resource_manager::{MaterialSearchOptions, ResourceManager};
 use rg3d::engine::Engine;
-use rg3d::event::{ElementState, VirtualKeyCode, WindowEvent};
-use rg3d::event_loop::ControlFlow;
+use rg3d::event::{ElementState, Event, VirtualKeyCode, WindowEvent};
+use rg3d::event_loop::{ControlFlow, EventLoop};
+use rg3d::gui::node::StubNode;
+use rg3d::gui::text::TextBuilder;
+use rg3d::gui::widget::WidgetBuilder;
+use rg3d::gui::UserInterface;
+use rg3d::material::shader::SamplerFallback;
+use rg3d::material::{Material, PropertyValue};
+use rg3d::resource::texture::Texture;
 use rg3d::scene::base::BaseBuilder;
 use rg3d::scene::camera::CameraBuilder;
+use rg3d::scene::mesh::surface::{SurfaceBuilder, SurfaceData};
+use rg3d::scene::mesh::{MeshBuilder, RenderPath};
 use rg3d::scene::node::Node;
 use rg3d::scene::transform::TransformBuilder;
 use rg3d::scene::Scene;
+use rg3d::utils::log::{Log, MessageKind};
+use rg3d::utils::translate_event;
+use rg3d::window::WindowBuilder;
 
 use crate::units::Distance;
 
@@ -134,11 +152,36 @@ impl Zooming {
     }
 }
 
+/// Label of a body. For example, name of a planet.
+struct Label {
+    ui: UserInterface<(), StubNode>,
+    render_target: rg3d::resource::texture::Texture,
+    node: Handle<UiNode>,
+}
+
+impl Label {
+    fn new(engine: &mut GameEngine) -> Self {
+        //let mut ctx = engine.user_interface.build_ctx();
+        let (width, height) = (100, 100);
+        let mut ui = UserInterface::<(), StubNode>::new(Vector2::new(width as f32, height as f32));
+        let mut ctx = ui.build_ctx();
+        let node = TextBuilder::new(WidgetBuilder::new())
+            .with_text("dupa")
+            .build(&mut ctx);
+        Label {
+            ui,
+            render_target: Texture::new_render_target(width, height),
+            node,
+        }
+    }
+}
+
 struct Decay {
     space: Space,
     scene: Handle<Scene>,
     camera: Handle<Node>,
     zooming: Option<Zooming>,
+    label: Label,
 }
 
 impl GameState for Decay {
@@ -159,15 +202,20 @@ impl GameState for Decay {
         });
 
         println!("Space: {:?}", space);
+        let label = Label::new(engine);
 
-        let (scene, camera) =
-            rg3d::core::futures::executor::block_on(create_scene(&space, &engine.resource_manager));
+        let (scene, camera) = rg3d::core::futures::executor::block_on(create_scene(
+            &space,
+            &engine.resource_manager,
+            &label,
+        ));
 
         Self {
             space: space,
             scene: engine.scenes.add(scene),
             camera: camera,
             zooming: None,
+            label,
         }
     }
 
@@ -179,6 +227,11 @@ impl GameState for Decay {
                 .local_transform_mut()
                 .offset(Vector3::new(0.0, 0.0, zooming.multiplier()));
         }
+
+        engine
+            .renderer
+            .render_ui_to_texture(self.label.render_target.clone(), &mut self.label.ui)
+            .unwrap();
     }
 
     fn on_window_event(&mut self, _engine: &mut GameEngine, event: WindowEvent) {
@@ -192,7 +245,27 @@ impl GameState for Decay {
     }
 }
 
-async fn create_scene(space: &Space, resource_manager: &ResourceManager) -> (Scene, Handle<Node>) {
+pub fn create_display_material(display_texture: Texture) -> Arc<Mutex<Material>> {
+    let mut material = Material::standard();
+
+    material
+        .set_property(
+            "diffuseTexture",
+            PropertyValue::Sampler {
+                value: Some(display_texture),
+                fallback: SamplerFallback::White,
+            },
+        )
+        .unwrap();
+
+    Arc::new(Mutex::new(material))
+}
+
+async fn create_scene(
+    space: &Space,
+    resource_manager: &ResourceManager,
+    label: &Label,
+) -> (Scene, Handle<Node>) {
     let mut scene = Scene::new();
 
     scene.ambient_lighting_color = Color::opaque(200, 200, 200);
@@ -212,7 +285,7 @@ async fn create_scene(space: &Space, resource_manager: &ResourceManager) -> (Sce
     let planet = planet.unwrap();
 
     for body in &space.bodies {
-        let scale = 0.005;
+        let scale = 0.001;
         let planet = planet.instantiate_geometry(&mut scene);
         scene.graph[planet]
             .local_transform_mut()
@@ -222,10 +295,30 @@ async fn create_scene(space: &Space, resource_manager: &ResourceManager) -> (Sce
                 Distance::from_meters(body.position().z).as_au() as f32,
             ))
             .set_scale(Vector3::new(scale, scale, scale));
+
+        let label = MeshBuilder::new(
+            BaseBuilder::new().with_local_transform(
+                TransformBuilder::new()
+                    .with_local_position(Vector3::new(0.0, 20.0, -100.0))
+                    .build(),
+            ),
+        )
+        .with_surfaces(vec![SurfaceBuilder::new(Arc::new(RwLock::new(
+            SurfaceData::make_quad(&Matrix4::new_scaling(0.07)),
+        )))
+        .with_material(create_display_material(label.render_target.clone()))
+        .build()])
+        .with_cast_shadows(false)
+        .with_render_path(RenderPath::Forward)
+        .build(&mut scene.graph);
+
+        scene.graph.link_nodes(label, planet);
     }
 
     (scene, camera)
 }
+
+
 
 fn main() {
     Framework::<Decay>::new().unwrap().run();
