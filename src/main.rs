@@ -182,6 +182,7 @@ struct Decay {
     camera: Handle<Node>,
     zooming: Option<Zooming>,
     label: Label,
+    label_node: Handle<Node>
 }
 
 impl GameState for Decay {
@@ -204,7 +205,7 @@ impl GameState for Decay {
         println!("Space: {:?}", space);
         let label = Label::new(engine);
 
-        let (scene, camera) = rg3d::core::futures::executor::block_on(create_scene(
+        let (scene, camera, label_node) = rg3d::core::futures::executor::block_on(create_scene(
             &space,
             &engine.resource_manager,
             &label,
@@ -216,7 +217,33 @@ impl GameState for Decay {
             camera: camera,
             zooming: None,
             label,
+            label_node
         }
+    }
+
+    fn on_render(&mut self, engine: &mut frameworks::GameEngine) {
+        engine
+            .renderer
+            .render_ui_to_texture(self.label.render_target.clone(), &mut self.label.ui)
+            .unwrap();
+
+        let scene = &mut engine.scenes[self.scene];
+        scene.graph[self.label_node]
+            .as_mesh_mut()
+            .surfaces_mut()
+            .first_mut()
+            .unwrap()
+            .material()
+            .lock()
+            .unwrap()
+            .set_property(
+                "diffuseTexture",
+                PropertyValue::Sampler {
+                    value: Some(self.label.render_target.clone()),
+                    fallback: SamplerFallback::White,
+                },
+            )
+            .unwrap();
     }
 
     fn on_tick(&mut self, engine: &mut GameEngine, _dt: f32, _: &mut ControlFlow) {
@@ -228,10 +255,7 @@ impl GameState for Decay {
                 .offset(Vector3::new(0.0, 0.0, zooming.multiplier()));
         }
 
-        engine
-            .renderer
-            .render_ui_to_texture(self.label.render_target.clone(), &mut self.label.ui)
-            .unwrap();
+        self.label.ui.update(Vector2::new(100.0, 100.0), _dt);
     }
 
     fn on_window_event(&mut self, _engine: &mut GameEngine, event: WindowEvent) {
@@ -265,7 +289,7 @@ async fn create_scene(
     space: &Space,
     resource_manager: &ResourceManager,
     label: &Label,
-) -> (Scene, Handle<Node>) {
+) -> (Scene, Handle<Node>, Handle<Node>) {
     let mut scene = Scene::new();
 
     scene.ambient_lighting_color = Color::opaque(200, 200, 200);
@@ -284,27 +308,27 @@ async fn create_scene(
         .await;
     let planet = planet.unwrap();
 
-    for body in &space.bodies {
+    //for body in &space.bodies {
         let scale = 0.001;
         let planet = planet.instantiate_geometry(&mut scene);
         scene.graph[planet]
             .local_transform_mut()
             .set_position(Vector3::new(
-                Distance::from_meters(body.position().x).as_au() as f32,
-                Distance::from_meters(body.position().y).as_au() as f32,
-                Distance::from_meters(body.position().z).as_au() as f32,
+                Distance::from_meters(space.bodies[0].position().x).as_au() as f32,
+                Distance::from_meters(space.bodies[0].position().y).as_au() as f32,
+                Distance::from_meters(space.bodies[0].position().z).as_au() as f32,
             ))
             .set_scale(Vector3::new(scale, scale, scale));
 
-        let label = MeshBuilder::new(
+        let label_node = MeshBuilder::new(
             BaseBuilder::new().with_local_transform(
                 TransformBuilder::new()
-                    .with_local_position(Vector3::new(0.0, 20.0, -100.0))
+                    .with_local_position(Vector3::new(10.0, 100.0, -10.0))
                     .build(),
             ),
         )
         .with_surfaces(vec![SurfaceBuilder::new(Arc::new(RwLock::new(
-            SurfaceData::make_quad(&Matrix4::new_scaling(0.07)),
+            SurfaceData::make_quad(&Matrix4::new_scaling(1000.0)),
         )))
         .with_material(create_display_material(label.render_target.clone()))
         .build()])
@@ -312,10 +336,10 @@ async fn create_scene(
         .with_render_path(RenderPath::Forward)
         .build(&mut scene.graph);
 
-        scene.graph.link_nodes(label, planet);
-    }
+        scene.graph.link_nodes(label_node, planet);
+    //}
 
-    (scene, camera)
+    (scene, camera, label_node)
 }
 
 
