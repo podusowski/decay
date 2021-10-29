@@ -226,24 +226,6 @@ impl GameState for Decay {
             .renderer
             .render_ui_to_texture(self.label.render_target.clone(), &mut self.label.ui)
             .unwrap();
-
-        let scene = &mut engine.scenes[self.scene];
-        scene.graph[self.label_node]
-            .as_mesh_mut()
-            .surfaces_mut()
-            .first_mut()
-            .unwrap()
-            .material()
-            .lock()
-            .unwrap()
-            .set_property(
-                "diffuseTexture",
-                PropertyValue::Sampler {
-                    value: Some(self.label.render_target.clone()),
-                    fallback: SamplerFallback::White,
-                },
-            )
-            .unwrap();
     }
 
     fn on_tick(&mut self, engine: &mut GameEngine, _dt: f32, _: &mut ControlFlow) {
