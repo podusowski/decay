@@ -4,9 +4,9 @@ use algebra::Vector;
 
 mod algebra;
 mod ephemeris;
+mod frameworks;
 mod physics;
 mod units;
-mod frameworks;
 
 use frameworks::{Framework, GameState};
 use physics::*;
@@ -182,7 +182,6 @@ struct Decay {
     camera: Handle<Node>,
     zooming: Option<Zooming>,
     label: Label,
-    label_node: Handle<Node>
 }
 
 impl GameState for Decay {
@@ -217,7 +216,6 @@ impl GameState for Decay {
             camera: camera,
             zooming: None,
             label,
-            label_node
         }
     }
 
@@ -291,40 +289,38 @@ async fn create_scene(
     let planet = planet.unwrap();
 
     //for body in &space.bodies {
-        let scale = 0.001;
-        let planet = planet.instantiate_geometry(&mut scene);
-        scene.graph[planet]
-            .local_transform_mut()
-            .set_position(Vector3::new(
-                Distance::from_meters(space.bodies[0].position().x).as_au() as f32,
-                Distance::from_meters(space.bodies[0].position().y).as_au() as f32,
-                Distance::from_meters(space.bodies[0].position().z).as_au() as f32,
-            ))
-            .set_scale(Vector3::new(scale, scale, scale));
+    let scale = 0.001;
+    let planet = planet.instantiate_geometry(&mut scene);
+    scene.graph[planet]
+        .local_transform_mut()
+        .set_position(Vector3::new(
+            Distance::from_meters(space.bodies[0].position().x).as_au() as f32,
+            Distance::from_meters(space.bodies[0].position().y).as_au() as f32,
+            Distance::from_meters(space.bodies[0].position().z).as_au() as f32,
+        ))
+        .set_scale(Vector3::new(scale, scale, scale));
 
-        let label_node = MeshBuilder::new(
-            BaseBuilder::new().with_local_transform(
-                TransformBuilder::new()
-                    .with_local_position(Vector3::new(10.0, 100.0, -10.0))
-                    .build(),
-            ),
-        )
-        .with_surfaces(vec![SurfaceBuilder::new(Arc::new(RwLock::new(
-            SurfaceData::make_quad(&Matrix4::new_scaling(1000.0)),
-        )))
-        .with_material(create_display_material(label.render_target.clone()))
-        .build()])
-        .with_cast_shadows(false)
-        .with_render_path(RenderPath::Forward)
-        .build(&mut scene.graph);
+    let label_node = MeshBuilder::new(
+        BaseBuilder::new().with_local_transform(
+            TransformBuilder::new()
+                .with_local_position(Vector3::new(10.0, 100.0, -10.0))
+                .build(),
+        ),
+    )
+    .with_surfaces(vec![SurfaceBuilder::new(Arc::new(RwLock::new(
+        SurfaceData::make_quad(&Matrix4::new_scaling(1000.0)),
+    )))
+    .with_material(create_display_material(label.render_target.clone()))
+    .build()])
+    .with_cast_shadows(false)
+    .with_render_path(RenderPath::Forward)
+    .build(&mut scene.graph);
 
-        scene.graph.link_nodes(label_node, planet);
+    scene.graph.link_nodes(label_node, planet);
     //}
 
     (scene, camera, label_node)
 }
-
-
 
 fn main() {
     Framework::<Decay>::new().unwrap().run();
