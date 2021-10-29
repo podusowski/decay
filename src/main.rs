@@ -174,6 +174,13 @@ impl Label {
             node,
         }
     }
+
+    fn render(&mut self, engine: &mut frameworks::GameEngine) {
+        engine
+            .renderer
+            .render_ui_to_texture(self.render_target.clone(), &mut self.ui)
+            .unwrap();
+    }
 }
 
 struct Decay {
@@ -220,10 +227,7 @@ impl GameState for Decay {
     }
 
     fn on_render(&mut self, engine: &mut frameworks::GameEngine) {
-        engine
-            .renderer
-            .render_ui_to_texture(self.label.render_target.clone(), &mut self.label.ui)
-            .unwrap();
+        self.label.render(engine);
     }
 
     fn on_tick(&mut self, engine: &mut GameEngine, _dt: f32, _: &mut ControlFlow) {
