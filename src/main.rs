@@ -204,7 +204,7 @@ impl GameState for Decay {
         println!("Space: {:?}", space);
         let label = Label::new(engine);
 
-        let (scene, camera, label_node) = rg3d::core::futures::executor::block_on(create_scene(
+        let (scene, camera) = rg3d::core::futures::executor::block_on(create_scene(
             &space,
             &engine.resource_manager,
             &label,
@@ -269,7 +269,7 @@ async fn create_scene(
     space: &Space,
     resource_manager: &ResourceManager,
     label: &Label,
-) -> (Scene, Handle<Node>, Handle<Node>) {
+) -> (Scene, Handle<Node>) {
     let mut scene = Scene::new();
 
     scene.ambient_lighting_color = Color::opaque(200, 200, 200);
@@ -319,7 +319,7 @@ async fn create_scene(
     scene.graph.link_nodes(label_node, planet);
     //}
 
-    (scene, camera, label_node)
+    (scene, camera)
 }
 
 fn main() {
