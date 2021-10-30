@@ -61,14 +61,23 @@ impl MassObject for Ship {
 
 const G: f64 = 6.67408e-11f64;
 
+/// A trait that can be implemented to watch for changes in objects in space.
+pub trait SpaceObserver {
+    fn update(&mut self) {}
+}
+
 #[derive(Debug)]
-pub struct Space /* perhaps time some day... */ {
+pub struct Space<Observer>
+/* perhaps time some day... */
+where
+    Observer: SpaceObserver,
+{
     pub time: chrono::DateTime<chrono::Utc>,
     pub bodies: Vec<Body>,
     pub ships: Vec<Ship>,
 }
 
-impl Default for Space {
+impl<UserData> Default for Space<UserData> {
     fn default() -> Self {
         Space {
             time: chrono::Utc::now(),
@@ -78,7 +87,7 @@ impl Default for Space {
     }
 }
 
-impl Space {
+impl<UserData> Space<UserData> {
     fn cumulative_gravity_force(&self, body: &impl MassObject) -> Vector {
         self.bodies
             .iter()
