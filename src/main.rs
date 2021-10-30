@@ -276,7 +276,7 @@ async fn create_scene(
     let camera = CameraBuilder::new(
         BaseBuilder::new().with_local_transform(
             TransformBuilder::new()
-                .with_local_position(Vector3::new(0.0, 0.0, -50.0))
+                .with_local_position(Vector3::new(0.0, 0.0, -30.0))
                 .build(),
         ),
     )
@@ -292,10 +292,6 @@ async fn create_scene(
         let planet = planet.instantiate_geometry(&mut scene);
         scene.graph[planet]
             .local_transform_mut()
-            .set_position(Vector3::new(
-                // using AUs
-                0.0, 0.0, 0.0,
-            ))
             .set_scale(Vector3::new(scale, scale, scale));
 
         let label_node = MeshBuilder::new(
