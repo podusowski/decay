@@ -183,19 +183,9 @@ impl Label {
     }
 }
 
-/// Links physics simulation [physics::Space] with rg3d graphic engine.
-#[derive(Debug)]
-struct GraphicUpdater;
-
-impl SpaceObserver for GraphicUpdater {
-    fn update(&mut self, position: Vector) {
-        println!("{:?}", position);
-    }
-}
-
 /// Main bucket holding top-level game systems like physics and graphics engines.
 struct Decay {
-    space: Space<GraphicUpdater>,
+    space: Space<Handle<Node>>,
     scene: Handle<Scene>,
     camera: Handle<Node>,
     zooming: Option<Zooming>,
@@ -226,7 +216,9 @@ impl GameState for Decay {
     }
 
     fn on_tick(&mut self, engine: &mut GameEngine, _dt: f32, _: &mut ControlFlow) {
-        self.space.tick(chrono::Duration::hours(1));
+        self.space.tick(chrono::Duration::hours(1), |body| {
+            println!("{:?}", body.position);
+        });
 
         let scene = &mut engine.scenes[self.scene];
 
@@ -269,7 +261,7 @@ pub fn create_display_material(display_texture: Texture) -> Arc<Mutex<Material>>
 async fn create_scene(
     resource_manager: &ResourceManager,
     label: &Label,
-) -> (Space<GraphicUpdater>, Scene, Handle<Node>) {
+) -> (Space<Handle<Node>>, Scene, Handle<Node>) {
     let mut scene = Scene::new();
 
     scene.ambient_lighting_color = Color::opaque(200, 200, 200);
@@ -288,9 +280,7 @@ async fn create_scene(
         .await;
     let planet = planet.unwrap();
 
-    //for body in &space.bodies {
-
-    let create_graphic_object = || -> GraphicUpdater {
+    let create_graphic_object = || -> Handle<Node> {
         let scale = 0.001;
         let planet = planet.instantiate_geometry(&mut scene);
         scene.graph[planet]
@@ -318,8 +308,8 @@ async fn create_scene(
         .build(&mut scene.graph);
 
         scene.graph.link_nodes(label_node, planet);
-        GraphicUpdater{}
-        //}
+
+        planet
     };
 
     let mut space = Space::solar_system(create_graphic_object);

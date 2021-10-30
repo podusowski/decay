@@ -1,13 +1,13 @@
-use crate::physics::{Body, Space, SpaceObserver};
+use crate::physics::{Body, Space};
 use crate::{algebra::Vector, units::Distance, units::Mass};
 use chrono::prelude::*;
 
 const SECONDS_IN_DAY: f64 = 24.0 * 60.0 * 60.0;
 
-impl<Observer: SpaceObserver> Space<Observer> {
+impl<UserData> Space<UserData> {
     /// Taken from JPL's HORIZONS for A.D. 2016-Oct-15 00:00:00.0000 TDB
-    pub fn solar_system(observer_factory: impl FnMut() -> Observer) -> Self {
-        let mut observer_factory = observer_factory;
+    pub fn solar_system(user_data_factory: impl FnMut() -> UserData) -> Self {
+        let mut user_data_factory = user_data_factory;
         let mut space = Self::default();
         space.time = Utc.ymd(2016, 10, 15).and_hms(0, 0, 0);
 
@@ -16,7 +16,7 @@ impl<Observer: SpaceObserver> Space<Observer> {
             velocity: Vector::default(),
             mass: Mass::from_kgs(1988500e24),
             name: "Sun",
-            observer: observer_factory(),
+            user_data: user_data_factory(),
         });
 
         space.bodies.push(Body {
@@ -32,7 +32,7 @@ impl<Observer: SpaceObserver> Space<Observer> {
             },
             mass: Mass::from_kgs(3.302e23),
             name: "Mercury",
-            observer: observer_factory(),
+            user_data: user_data_factory(),
         });
 
         space.bodies.push(Body {
@@ -48,7 +48,7 @@ impl<Observer: SpaceObserver> Space<Observer> {
             },
             mass: Mass::from_kgs(48.685e23),
             name: "Venus",
-            observer: observer_factory(),
+            user_data: user_data_factory(),
         });
 
         space.bodies.push(Body {
@@ -64,7 +64,7 @@ impl<Observer: SpaceObserver> Space<Observer> {
             },
             mass: Mass::from_kgs(5.97219e24),
             name: "Earth",
-            observer: observer_factory()
+            user_data: user_data_factory()
         });
 
         space.bodies.push(Body {
@@ -80,7 +80,7 @@ impl<Observer: SpaceObserver> Space<Observer> {
             },
             mass: Mass::from_kgs(7.349e22),
             name: "Moon",
-            observer: observer_factory()
+            user_data: user_data_factory()
         });
 
         space.bodies.push(Body {
@@ -96,7 +96,7 @@ impl<Observer: SpaceObserver> Space<Observer> {
             },
             mass: Mass::from_kgs(6.4171e23),
             name: "Mars",
-            observer: observer_factory()
+            user_data: user_data_factory()
         });
 
         space.bodies.push(Body {
@@ -112,7 +112,7 @@ impl<Observer: SpaceObserver> Space<Observer> {
             },
             mass: Mass::from_kgs(189818722e19),
             name: "Jupiter",
-            observer: observer_factory()
+            user_data: user_data_factory()
         });
 
         space.bodies.push(Body {
@@ -128,7 +128,7 @@ impl<Observer: SpaceObserver> Space<Observer> {
             },
             mass: Mass::from_kgs(5.6834E26),
             name: "Saturn",
-            observer: observer_factory()
+            user_data: user_data_factory()
         });
 
         space.bodies.push(Body {
@@ -144,7 +144,7 @@ impl<Observer: SpaceObserver> Space<Observer> {
             },
             mass: Mass::from_kgs(1.024e26),
             name: "Neptune",
-            observer: observer_factory()
+            user_data: user_data_factory()
         });
 
         space

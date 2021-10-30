@@ -23,15 +23,15 @@ pub trait MassObject {
 }
 
 #[derive(Debug)]
-pub struct Body<Observer: SpaceObserver> {
-    pub observer: Observer,
+pub struct Body<UserData> {
+    pub user_data: UserData,
     pub position: Vector,
     pub velocity: Vector,
     pub mass: Mass,
     pub name: &'static str,
 }
 
-impl<Observer: SpaceObserver> MassObject for Body<Observer> {
+impl<UserData> MassObject for Body<UserData> {
     fn mass(&self) -> Mass {
         self.mass
     }
@@ -62,21 +62,14 @@ impl MassObject for Ship {
 
 const G: f64 = 6.67408e-11f64;
 
-/// Observes changes in object in space.
-pub trait SpaceObserver {
-    fn update(&mut self, position: Vector) {
-        println!("update: {:?}", position);
-    }
-}
-
 #[derive(Debug)]
-pub struct Space<Observer: SpaceObserver> /* perhaps time some day... */ {
+pub struct Space<UserData> /* perhaps time some day... */ {
     pub time: chrono::DateTime<chrono::Utc>,
-    pub bodies: Vec<Body<Observer>>,
+    pub bodies: Vec<Body<UserData>>,
     pub ships: Vec<Ship>,
 }
 
-impl<Observer: SpaceObserver> Default for Space<Observer> {
+impl<UserData> Default for Space<UserData> {
     fn default() -> Self {
         Space {
             time: chrono::Utc::now(),
@@ -86,7 +79,7 @@ impl<Observer: SpaceObserver> Default for Space<Observer> {
     }
 }
 
-impl<Observer: SpaceObserver> Space<Observer> {
+impl<UserData> Space<UserData> {
     fn cumulative_gravity_force(&self, body: &impl MassObject) -> Vector {
         self.bodies
             .iter()
@@ -94,7 +87,7 @@ impl<Observer: SpaceObserver> Space<Observer> {
             .fold(Vector::default(), std::ops::Add::add)
     }
 
-    pub fn tick(&mut self, delta_time: chrono::Duration) {
+    pub fn tick(&mut self, delta_time: chrono::Duration, on_change: impl Fn(&Body<UserData>)) {
         println!("tick");
         // Need to use this barbaric loop to trick the borrow checker a bit.
         for i in 0..self.bodies.len() {
@@ -112,7 +105,7 @@ impl<Observer: SpaceObserver> Space<Observer> {
             body.velocity = acceleration * delta_time.num_seconds() as f64 + body.velocity;
             body.position =
                 body.position + offset_ensued_from_velocity + offset_ensued_from_acceleration;
-            body.observer.update(body.position);
+            on_change(body);
         }
 
         // Now update velocities and positions of ships.
