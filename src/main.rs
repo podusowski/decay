@@ -243,6 +243,8 @@ impl GameState for Decay {
                 .ui
                 .update(Vector2::new(100.0, 100.0), _dt);
             body.user_data.label.render(engine);
+
+            while let Some(_) = body.user_data.label.ui.poll_message() {}
         }
     }
 
