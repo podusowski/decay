@@ -194,7 +194,6 @@ struct Decay {
     scene: Handle<Scene>,
     camera: Handle<Node>,
     zooming: Option<Zooming>,
-    label: Label,
 }
 
 impl GameState for Decay {
@@ -202,8 +201,6 @@ impl GameState for Decay {
     where
         Self: Sized,
     {
-        let label = Label::new("dupa");
-
         let (space, scene, camera) =
             rg3d::core::futures::executor::block_on(create_scene(&engine.resource_manager));
 
@@ -212,7 +209,6 @@ impl GameState for Decay {
             scene: engine.scenes.add(scene),
             camera: camera,
             zooming: None,
-            label,
         }
     }
 
@@ -248,9 +244,6 @@ impl GameState for Decay {
                 .update(Vector2::new(100.0, 100.0), _dt);
             body.user_data.label.render(engine);
         }
-
-        //self.label.ui.update(Vector2::new(100.0, 100.0), _dt);
-        //self.label.render(engine);
     }
 
     fn on_window_event(&mut self, _engine: &mut GameEngine, event: WindowEvent) {
