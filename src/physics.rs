@@ -62,7 +62,7 @@ impl MassObject for Ship {
 
 const G: f64 = 6.67408e-11f64;
 
-/// A trait that can be implemented to watch for changes in objects in space.
+/// Observes changes in object in space.
 pub trait SpaceObserver {
     fn update(&mut self, position: Vector) {
         println!("update: {:?}", position);

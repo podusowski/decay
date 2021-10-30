@@ -193,12 +193,6 @@ impl SpaceObserver for GraphicUpdater {
     }
 }
 
-impl Default for GraphicUpdater {
-    fn default() -> Self {
-        Self
-    }
-}
-
 /// Main bucket holding top-level game systems like physics and graphics engines.
 struct Decay {
     space: Space<GraphicUpdater>,
@@ -324,7 +318,7 @@ async fn create_scene(
         .build(&mut scene.graph);
 
         scene.graph.link_nodes(label_node, planet);
-        GraphicUpdater::default()
+        GraphicUpdater{}
         //}
     };
 
