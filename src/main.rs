@@ -204,7 +204,7 @@ impl GameState for Decay {
         let label = Label::new("dupa");
 
         let (space, scene, camera) =
-            rg3d::core::futures::executor::block_on(create_scene(&engine.resource_manager, &label));
+            rg3d::core::futures::executor::block_on(create_scene(&engine.resource_manager));
 
         Self {
             space: space,
@@ -213,10 +213,6 @@ impl GameState for Decay {
             zooming: None,
             label,
         }
-    }
-
-    fn on_render(&mut self, engine: &mut frameworks::GameEngine) {
-        self.label.render(engine);
     }
 
     fn on_tick(&mut self, engine: &mut GameEngine, _dt: f32, _: &mut ControlFlow) {
@@ -239,7 +235,13 @@ impl GameState for Decay {
                 .offset(Vector3::new(0.0, 0.0, zooming.multiplier()));
         }
 
-        self.label.ui.update(Vector2::new(100.0, 100.0), _dt);
+        for body in &mut self.space.bodies {
+            body.user_data.label.ui.update(Vector2::new(100.0, 100.0), _dt);
+            body.user_data.label.render(engine);
+        }
+
+        //self.label.ui.update(Vector2::new(100.0, 100.0), _dt);
+        //self.label.render(engine);
     }
 
     fn on_window_event(&mut self, _engine: &mut GameEngine, event: WindowEvent) {
@@ -271,7 +273,6 @@ pub fn create_display_material(display_texture: Texture) -> Arc<Mutex<Material>>
 
 async fn create_scene(
     resource_manager: &ResourceManager,
-    label: &Label,
 ) -> (Space<VisualObject>, Scene, Handle<Node>) {
     let mut scene = Scene::new();
 
@@ -298,6 +299,8 @@ async fn create_scene(
             .local_transform_mut()
             .set_scale(Vector3::new(scale, scale, scale));
 
+        let label = Label::new("dupa");
+
         let label_node = MeshBuilder::new(
             BaseBuilder::new().with_local_transform(
                 TransformBuilder::new()
@@ -318,7 +321,7 @@ async fn create_scene(
 
         VisualObject {
             node: planet,
-            label: Label::new("dupa"),
+            label: label
         }
     };
 
