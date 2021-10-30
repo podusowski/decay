@@ -64,7 +64,9 @@ const G: f64 = 6.67408e-11f64;
 
 /// A trait that can be implemented to watch for changes in objects in space.
 pub trait SpaceObserver {
-    fn update(&mut self) {}
+    fn update(&mut self, position: Vector) {
+        println!("update: {:?}", position);
+    }
 }
 
 #[derive(Debug)]
@@ -93,6 +95,7 @@ impl<Observer: SpaceObserver> Space<Observer> {
     }
 
     pub fn tick(&mut self, delta_time: chrono::Duration) {
+        println!("tick");
         // Need to use this barbaric loop to trick the borrow checker a bit.
         for i in 0..self.bodies.len() {
             let body = &self.bodies[i];
@@ -109,6 +112,7 @@ impl<Observer: SpaceObserver> Space<Observer> {
             body.velocity = acceleration * delta_time.num_seconds() as f64 + body.velocity;
             body.position =
                 body.position + offset_ensued_from_velocity + offset_ensued_from_acceleration;
+            body.observer.update(body.position);
         }
 
         // Now update velocities and positions of ships.

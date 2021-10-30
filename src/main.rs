@@ -188,7 +188,9 @@ impl Label {
 struct GraphicUpdater;
 
 impl SpaceObserver for GraphicUpdater {
-    fn update(&mut self) {}
+    fn update(&mut self, position: Vector) {
+        println!("{:?}", position);
+    }
 }
 
 impl Default for GraphicUpdater {
@@ -230,6 +232,8 @@ impl GameState for Decay {
     }
 
     fn on_tick(&mut self, engine: &mut GameEngine, _dt: f32, _: &mut ControlFlow) {
+        self.space.tick(chrono::Duration::hours(1));
+
         let scene = &mut engine.scenes[self.scene];
 
         if let Some(zooming) = &self.zooming {
@@ -274,20 +278,6 @@ async fn create_scene(
 ) -> (Space<GraphicUpdater>, Scene, Handle<Node>) {
     let mut scene = Scene::new();
 
-    let mut space = Space::solar_system(|| GraphicUpdater::default());
-    space.ships.push(Ship {
-        position: Vector {
-            x: Distance::from_aus(1.0).as_meters(),
-            y: Distance::from_aus(1.0).as_meters(),
-            z: Default::default(),
-        },
-        velocity: Default::default(),
-        thrust: Default::default(),
-        name: "Rocinante",
-    });
-
-    println!("Space: {:?}", space);
-
     scene.ambient_lighting_color = Color::opaque(200, 200, 200);
 
     let camera = CameraBuilder::new(
@@ -305,35 +295,53 @@ async fn create_scene(
     let planet = planet.unwrap();
 
     //for body in &space.bodies {
-    let scale = 0.001;
-    let planet = planet.instantiate_geometry(&mut scene);
-    scene.graph[planet]
-        .local_transform_mut()
-        .set_position(Vector3::new(
-            Distance::from_meters(space.bodies[0].position().x).as_au() as f32,
-            Distance::from_meters(space.bodies[0].position().y).as_au() as f32,
-            Distance::from_meters(space.bodies[0].position().z).as_au() as f32,
-        ))
-        .set_scale(Vector3::new(scale, scale, scale));
 
-    let label_node = MeshBuilder::new(
-        BaseBuilder::new().with_local_transform(
-            TransformBuilder::new()
-                .with_local_position(Vector3::new(10.0, 100.0, -10.0))
-                .build(),
-        ),
-    )
-    .with_surfaces(vec![SurfaceBuilder::new(Arc::new(RwLock::new(
-        SurfaceData::make_quad(&Matrix4::new_scaling(1000.0)),
-    )))
-    .with_material(create_display_material(label.render_target.clone()))
-    .build()])
-    .with_cast_shadows(false)
-    .with_render_path(RenderPath::Forward)
-    .build(&mut scene.graph);
+    let create_graphic_object = || -> GraphicUpdater {
+        let scale = 0.001;
+        let planet = planet.instantiate_geometry(&mut scene);
+        scene.graph[planet]
+            .local_transform_mut()
+            .set_position(Vector3::new(
+                // using AUs
+                0.0, 0.0, 0.0,
+            ))
+            .set_scale(Vector3::new(scale, scale, scale));
 
-    scene.graph.link_nodes(label_node, planet);
-    //}
+        let label_node = MeshBuilder::new(
+            BaseBuilder::new().with_local_transform(
+                TransformBuilder::new()
+                    .with_local_position(Vector3::new(10.0, 100.0, -10.0))
+                    .build(),
+            ),
+        )
+        .with_surfaces(vec![SurfaceBuilder::new(Arc::new(RwLock::new(
+            SurfaceData::make_quad(&Matrix4::new_scaling(1000.0)),
+        )))
+        .with_material(create_display_material(label.render_target.clone()))
+        .build()])
+        .with_cast_shadows(false)
+        .with_render_path(RenderPath::Forward)
+        .build(&mut scene.graph);
+
+        scene.graph.link_nodes(label_node, planet);
+        GraphicUpdater::default()
+        //}
+    };
+
+    let mut space = Space::solar_system(create_graphic_object);
+
+    space.ships.push(Ship {
+        position: Vector {
+            x: Distance::from_aus(1.0).as_meters(),
+            y: Distance::from_aus(1.0).as_meters(),
+            z: Default::default(),
+        },
+        velocity: Default::default(),
+        thrust: Default::default(),
+        name: "Rocinante",
+    });
+
+    println!("Space: {:?}", space);
 
     (space, scene, camera)
 }
