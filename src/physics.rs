@@ -87,8 +87,9 @@ impl<UserData> Space<UserData> {
             .fold(Vector::default(), std::ops::Add::add)
     }
 
-    pub fn tick(&mut self, delta_time: chrono::Duration, on_change: impl Fn(&Body<UserData>)) {
-        println!("tick");
+    pub fn tick(&mut self, delta_time: chrono::Duration, on_change: impl FnMut(&Body<UserData>)) {
+        let mut on_change = on_change;
+
         // Need to use this barbaric loop to trick the borrow checker a bit.
         for i in 0..self.bodies.len() {
             let body = &self.bodies[i];
@@ -105,6 +106,7 @@ impl<UserData> Space<UserData> {
             body.velocity = acceleration * delta_time.num_seconds() as f64 + body.velocity;
             body.position =
                 body.position + offset_ensued_from_velocity + offset_ensued_from_acceleration;
+
             on_change(body);
         }
 

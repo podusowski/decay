@@ -216,11 +216,18 @@ impl GameState for Decay {
     }
 
     fn on_tick(&mut self, engine: &mut GameEngine, _dt: f32, _: &mut ControlFlow) {
+        let scene = &mut engine.scenes[self.scene];
+
         self.space.tick(chrono::Duration::hours(1), |body| {
+            scene.graph[body.user_data]
+                .local_transform_mut()
+                .set_position(Vector3::new(
+                    Distance::from_meters(body.position().x).as_au() as f32,
+                    Distance::from_meters(body.position().y).as_au() as f32,
+                    Distance::from_meters(body.position().z).as_au() as f32,
+                ));
             println!("{:?}", body.position);
         });
-
-        let scene = &mut engine.scenes[self.scene];
 
         if let Some(zooming) = &self.zooming {
             scene.graph[self.camera]
