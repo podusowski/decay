@@ -303,7 +303,7 @@ async fn create_scene(
             .local_transform_mut()
             .set_scale(Vector3::new(scale, scale, scale));
 
-        let label = Label::new("dupa");
+        let label = Label::new("");
 
         let label_node = MeshBuilder::new(
             BaseBuilder::new().with_local_transform(
