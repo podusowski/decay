@@ -23,14 +23,15 @@ pub trait MassObject {
 }
 
 #[derive(Debug)]
-pub struct Body {
+pub struct Body<Observer: SpaceObserver> {
+    pub observer: Observer,
     pub position: Vector,
     pub velocity: Vector,
     pub mass: Mass,
     pub name: &'static str,
 }
 
-impl MassObject for Body {
+impl<Observer: SpaceObserver> MassObject for Body<Observer> {
     fn mass(&self) -> Mass {
         self.mass
     }
@@ -67,17 +68,13 @@ pub trait SpaceObserver {
 }
 
 #[derive(Debug)]
-pub struct Space<Observer>
-/* perhaps time some day... */
-where
-    Observer: SpaceObserver,
-{
+pub struct Space<Observer: SpaceObserver> /* perhaps time some day... */ {
     pub time: chrono::DateTime<chrono::Utc>,
-    pub bodies: Vec<Body>,
+    pub bodies: Vec<Body<Observer>>,
     pub ships: Vec<Ship>,
 }
 
-impl<UserData> Default for Space<UserData> {
+impl<Observer: SpaceObserver> Default for Space<Observer> {
     fn default() -> Self {
         Space {
             time: chrono::Utc::now(),
@@ -87,7 +84,7 @@ impl<UserData> Default for Space<UserData> {
     }
 }
 
-impl<UserData> Space<UserData> {
+impl<Observer: SpaceObserver> Space<Observer> {
     fn cumulative_gravity_force(&self, body: &impl MassObject) -> Vector {
         self.bodies
             .iter()

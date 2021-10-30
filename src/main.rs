@@ -184,10 +184,17 @@ impl Label {
 }
 
 /// Links physics simulation [physics::Space] with rg3d graphic engine.
+#[derive(Debug)]
 struct GraphicUpdater;
 
 impl SpaceObserver for GraphicUpdater {
     fn update(&mut self) {}
+}
+
+impl Default for GraphicUpdater {
+    fn default() -> Self {
+        Self
+    }
 }
 
 /// Main bucket holding top-level game systems like physics and graphics engines.
@@ -277,11 +284,11 @@ pub fn create_display_material(display_texture: Texture) -> Arc<Mutex<Material>>
     Arc::new(Mutex::new(material))
 }
 
-async fn create_scene(
-    space: &Space,
+async fn create_scene<Observer>(
+    space: &Space<Observer>,
     resource_manager: &ResourceManager,
     label: &Label,
-) -> (Scene, Handle<Node>) {
+) -> (Scene, Handle<Node>) where Observer: SpaceObserver {
     let mut scene = Scene::new();
 
     scene.ambient_lighting_color = Color::opaque(200, 200, 200);
