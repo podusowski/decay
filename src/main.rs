@@ -211,7 +211,7 @@ impl GameState for Decay {
     where
         Self: Sized,
     {
-        let mut space = Space::solar_system();
+        let mut space = Space::solar_system(|| GraphicUpdater::default());
         space.ships.push(Ship {
             position: Vector {
                 x: Distance::from_aus(1.0).as_meters(),
