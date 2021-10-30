@@ -160,13 +160,13 @@ struct Label {
 }
 
 impl Label {
-    fn new(engine: &mut GameEngine) -> Self {
+    fn new(engine: &mut GameEngine, name: &str) -> Self {
         //let mut ctx = engine.user_interface.build_ctx();
         let (width, height) = (100, 100);
         let mut ui = UserInterface::<(), StubNode>::new(Vector2::new(width as f32, height as f32));
         let mut ctx = ui.build_ctx();
         let node = TextBuilder::new(WidgetBuilder::new())
-            .with_text("dupa")
+            .with_text(name)
             .build(&mut ctx);
         Label {
             ui,
@@ -197,7 +197,7 @@ impl GameState for Decay {
     where
         Self: Sized,
     {
-        let label = Label::new(engine);
+        let label = Label::new(engine, "dupa");
 
         let (space, scene, camera) =
             rg3d::core::futures::executor::block_on(create_scene(&engine.resource_manager, &label));
