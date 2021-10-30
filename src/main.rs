@@ -236,7 +236,7 @@ impl GameState for Decay {
             body.user_data.label.ui.send_message(TextMessage::text(
                 body.user_data.label.node,
                 MessageDirection::ToWidget,
-                "a".to_string(),
+                body.name.to_string(),
             ));
             body.user_data
                 .label
