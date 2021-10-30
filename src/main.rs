@@ -211,26 +211,10 @@ impl GameState for Decay {
     where
         Self: Sized,
     {
-        let mut space = Space::solar_system(|| GraphicUpdater::default());
-        space.ships.push(Ship {
-            position: Vector {
-                x: Distance::from_aus(1.0).as_meters(),
-                y: Distance::from_aus(1.0).as_meters(),
-                z: Default::default(),
-            },
-            velocity: Default::default(),
-            thrust: Default::default(),
-            name: "Rocinante",
-        });
-
-        println!("Space: {:?}", space);
         let label = Label::new(engine);
 
-        let (scene, camera) = rg3d::core::futures::executor::block_on(create_scene(
-            &space,
-            &engine.resource_manager,
-            &label,
-        ));
+        let (space, scene, camera) =
+            rg3d::core::futures::executor::block_on(create_scene(&engine.resource_manager, &label));
 
         Self {
             space: space,
@@ -284,12 +268,25 @@ pub fn create_display_material(display_texture: Texture) -> Arc<Mutex<Material>>
     Arc::new(Mutex::new(material))
 }
 
-async fn create_scene<Observer>(
-    space: &Space<Observer>,
+async fn create_scene(
     resource_manager: &ResourceManager,
     label: &Label,
-) -> (Scene, Handle<Node>) where Observer: SpaceObserver {
+) -> (Space<GraphicUpdater>, Scene, Handle<Node>) {
     let mut scene = Scene::new();
+
+    let mut space = Space::solar_system(|| GraphicUpdater::default());
+    space.ships.push(Ship {
+        position: Vector {
+            x: Distance::from_aus(1.0).as_meters(),
+            y: Distance::from_aus(1.0).as_meters(),
+            z: Default::default(),
+        },
+        velocity: Default::default(),
+        thrust: Default::default(),
+        name: "Rocinante",
+    });
+
+    println!("Space: {:?}", space);
 
     scene.ambient_lighting_color = Color::opaque(200, 200, 200);
 
@@ -338,7 +335,7 @@ async fn create_scene<Observer>(
     scene.graph.link_nodes(label_node, planet);
     //}
 
-    (scene, camera)
+    (space, scene, camera)
 }
 
 fn main() {
