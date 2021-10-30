@@ -152,6 +152,11 @@ impl Zooming {
     }
 }
 
+struct VisualObject {
+    node: Handle<Node>,
+    label: Label,
+}
+
 /// Label of a body. For example, name of a planet.
 struct Label {
     ui: UserInterface<(), StubNode>,
@@ -160,13 +165,12 @@ struct Label {
 }
 
 impl Label {
-    fn new(engine: &mut GameEngine, name: &str) -> Self {
-        //let mut ctx = engine.user_interface.build_ctx();
+    fn new(text: &str) -> Self {
         let (width, height) = (100, 100);
         let mut ui = UserInterface::<(), StubNode>::new(Vector2::new(width as f32, height as f32));
         let mut ctx = ui.build_ctx();
         let node = TextBuilder::new(WidgetBuilder::new())
-            .with_text(name)
+            .with_text(text)
             .build(&mut ctx);
         Label {
             ui,
@@ -185,7 +189,7 @@ impl Label {
 
 /// Main bucket holding top-level game systems like physics and graphics engines.
 struct Decay {
-    space: Space<Handle<Node>>,
+    space: Space<VisualObject>,
     scene: Handle<Scene>,
     camera: Handle<Node>,
     zooming: Option<Zooming>,
@@ -197,7 +201,7 @@ impl GameState for Decay {
     where
         Self: Sized,
     {
-        let label = Label::new(engine, "dupa");
+        let label = Label::new("dupa");
 
         let (space, scene, camera) =
             rg3d::core::futures::executor::block_on(create_scene(&engine.resource_manager, &label));
@@ -219,7 +223,7 @@ impl GameState for Decay {
         let scene = &mut engine.scenes[self.scene];
 
         self.space.tick(chrono::Duration::hours(1), |body| {
-            scene.graph[body.user_data]
+            scene.graph[body.user_data.node]
                 .local_transform_mut()
                 .set_position(Vector3::new(
                     Distance::from_meters(body.position().x).as_au() as f32,
@@ -268,7 +272,7 @@ pub fn create_display_material(display_texture: Texture) -> Arc<Mutex<Material>>
 async fn create_scene(
     resource_manager: &ResourceManager,
     label: &Label,
-) -> (Space<Handle<Node>>, Scene, Handle<Node>) {
+) -> (Space<VisualObject>, Scene, Handle<Node>) {
     let mut scene = Scene::new();
 
     scene.ambient_lighting_color = Color::opaque(200, 200, 200);
@@ -287,7 +291,7 @@ async fn create_scene(
         .await;
     let planet = planet.unwrap();
 
-    let create_graphic_object = || -> Handle<Node> {
+    let create_graphic_object = || -> VisualObject {
         let scale = 0.001;
         let planet = planet.instantiate_geometry(&mut scene);
         scene.graph[planet]
@@ -312,7 +316,10 @@ async fn create_scene(
 
         scene.graph.link_nodes(label_node, planet);
 
-        planet
+        VisualObject {
+            node: planet,
+            label: Label::new("dupa"),
+        }
     };
 
     let mut space = Space::solar_system(create_graphic_object);
@@ -327,8 +334,6 @@ async fn create_scene(
         thrust: Default::default(),
         name: "Rocinante",
     });
-
-    println!("Space: {:?}", space);
 
     (space, scene, camera)
 }
