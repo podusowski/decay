@@ -21,6 +21,7 @@ use rg3d::engine::resource_manager::{MaterialSearchOptions, ResourceManager};
 use rg3d::engine::Engine;
 use rg3d::event::{ElementState, Event, VirtualKeyCode, WindowEvent};
 use rg3d::event_loop::{ControlFlow, EventLoop};
+use rg3d::gui::message::{MessageDirection, TextMessage};
 use rg3d::gui::node::StubNode;
 use rg3d::gui::text::TextBuilder;
 use rg3d::gui::widget::WidgetBuilder;
@@ -236,7 +237,15 @@ impl GameState for Decay {
         }
 
         for body in &mut self.space.bodies {
-            body.user_data.label.ui.update(Vector2::new(100.0, 100.0), _dt);
+            body.user_data.label.ui.send_message(TextMessage::text(
+                body.user_data.label.node,
+                MessageDirection::ToWidget,
+                "a".to_string(),
+            ));
+            body.user_data
+                .label
+                .ui
+                .update(Vector2::new(100.0, 100.0), _dt);
             body.user_data.label.render(engine);
         }
 
@@ -321,7 +330,7 @@ async fn create_scene(
 
         VisualObject {
             node: planet,
-            label: label
+            label: label,
         }
     };
 
