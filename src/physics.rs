@@ -169,12 +169,14 @@ mod tests {
     #[test]
     fn two_bodies_fly_towards_each_other() {
         let mut space = Space::default();
+
         space.bodies.push(Body {
             position: Vector::default(),
             velocity: Vector::default(),
             mass: Mass::from_kgs(1.0),
-            name: "Earth",
+            name: "first body",
         });
+
         space.bodies.push(Body {
             position: Vector {
                 x: 1.0,
@@ -183,7 +185,7 @@ mod tests {
             },
             velocity: Vector::default(),
             mass: Mass::from_kgs(1.0),
-            name: "Earth",
+            name: "second body",
         });
 
         space.tick(Duration::seconds(1));

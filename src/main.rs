@@ -183,8 +183,16 @@ impl Label {
     }
 }
 
+/// Links physics simulation [physics::Space] with rg3d graphic engine.
+struct GraphicUpdater;
+
+impl SpaceObserver for GraphicUpdater {
+    fn update(&mut self) {}
+}
+
+/// Main bucket holding top-level game systems like physics and graphics engines.
 struct Decay {
-    space: Space,
+    space: Space<GraphicUpdater>,
     scene: Handle<Scene>,
     camera: Handle<Node>,
     zooming: Option<Zooming>,
