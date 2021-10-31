@@ -166,22 +166,28 @@ struct Label {
 }
 
 impl Label {
+    const WIDTH: u32 = 100;
+    const HEIGHT: u32 = 100;
+
     fn new(text: &str) -> Self {
-        let (width, height) = (100, 100);
-        let mut ui = UserInterface::<(), StubNode>::new(Vector2::new(width as f32, height as f32));
+        let mut ui = UserInterface::<(), StubNode>::new(Vector2::new(
+            Self::WIDTH as f32,
+            Self::HEIGHT as f32,
+        ));
         let mut ctx = ui.build_ctx();
         let node = TextBuilder::new(WidgetBuilder::new())
             .with_text(text)
             .build(&mut ctx);
         Label {
             ui,
-            render_target: Texture::new_render_target(width, height),
+            render_target: Texture::new_render_target(Self::WIDTH, Self::HEIGHT),
             node,
         }
     }
 
     fn update(&mut self, engine: &mut frameworks::GameEngine, dt: f32) {
-        self.ui.update(Vector2::new(100.0, 100.0), dt);
+        self.ui
+            .update(Vector2::new(Self::WIDTH as f32, Self::HEIGHT as f32), dt);
         engine
             .renderer
             .render_ui_to_texture(self.render_target.clone(), &mut self.ui)
