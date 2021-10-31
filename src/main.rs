@@ -180,7 +180,8 @@ impl Label {
         }
     }
 
-    fn render(&mut self, engine: &mut frameworks::GameEngine) {
+    fn update(&mut self, engine: &mut frameworks::GameEngine, dt: f32) {
+        self.ui.update(Vector2::new(100.0, 100.0), dt);
         engine
             .renderer
             .render_ui_to_texture(self.render_target.clone(), &mut self.ui)
@@ -212,7 +213,7 @@ impl GameState for Decay {
         }
     }
 
-    fn on_tick(&mut self, engine: &mut GameEngine, _dt: f32, _: &mut ControlFlow) {
+    fn on_tick(&mut self, engine: &mut GameEngine, dt: f32, _: &mut ControlFlow) {
         let scene = &mut engine.scenes[self.scene];
 
         self.space.tick(chrono::Duration::hours(1), |body| {
@@ -238,11 +239,7 @@ impl GameState for Decay {
                 MessageDirection::ToWidget,
                 body.name.to_string(),
             ));
-            body.user_data
-                .label
-                .ui
-                .update(Vector2::new(100.0, 100.0), _dt);
-            body.user_data.label.render(engine);
+            body.user_data.label.update(engine, dt);
 
             while let Some(_) = body.user_data.label.ui.poll_message() {}
         }
