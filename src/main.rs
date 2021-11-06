@@ -311,7 +311,7 @@ async fn create_scene(
         let label_node = MeshBuilder::new(
             BaseBuilder::new().with_local_transform(
                 TransformBuilder::new()
-                    .with_local_position(Vector3::new(10.0, 100.0, -10.0))
+                    .with_local_position(Vector3::new(-700.0, -350.0, 0.0))
                     .build(),
             ),
         )
