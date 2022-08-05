@@ -349,5 +349,4 @@ async fn create_scene(
 }
 
 fn main() {
-    Framework::<Decay>::new().unwrap().run();
 }
