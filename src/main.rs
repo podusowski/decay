@@ -11,6 +11,8 @@ use physics::*;
 
 use crate::units::Distance;
 
+use bevy::prelude::*;
 
 fn main() {
+    App::new().add_plugins(DefaultPlugins).run();
 }
