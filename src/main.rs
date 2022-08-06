@@ -13,7 +13,19 @@ use crate::units::Distance;
 
 use bevy::prelude::*;
 
-fn create_solar_system() {}
+#[derive(Component)]
+struct Body;
+
+#[derive(Component)]
+struct Name(String);
+
+fn create_solar_system(mut commands: Commands) {
+    let space = Space::<()>::solar_system(|| ());
+
+    for body in space.bodies {
+        commands.spawn().insert(Body).insert(Name(body.name.into()));
+    }
+}
 
 fn main() {
     App::new()
