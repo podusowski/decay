@@ -13,6 +13,11 @@ use crate::units::Distance;
 
 use bevy::prelude::*;
 
+fn create_solar_system() {}
+
 fn main() {
-    App::new().add_plugins(DefaultPlugins).run();
+    App::new()
+        .add_plugins(DefaultPlugins)
+        .add_startup_system(create_solar_system)
+        .run();
 }
