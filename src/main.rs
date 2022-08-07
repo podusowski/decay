@@ -38,12 +38,18 @@ struct GravitationalForce(Vector);
 #[derive(Component)]
 struct Name(String);
 
-fn create_solar_system(mut commands: Commands) {
+fn create_solar_system(mut commands: Commands, ass: Res<AssetServer>) {
     let space = Space::<()>::solar_system(|| ());
 
     for body in space.bodies {
+        let ball = ass.load("ball.glb");
+
         commands
             .spawn()
+            .insert_bundle(SceneBundle {
+                scene: ball,
+                ..Default::default()
+            })
             .insert(Body {
                 position: body.position,
                 velocity: body.velocity,
