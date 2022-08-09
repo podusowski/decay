@@ -56,7 +56,7 @@ fn create_solar_system(
             //    ..Default::default()
             //})
             .insert_bundle(PbrBundle {
-                mesh: meshes.add(Mesh::from(shape::Icosphere{ radius: 10.0, subdivisions: 50 })),
+                mesh: meshes.add(Mesh::from(shape::Icosphere{ radius: 50000000000.0, subdivisions: 50 })),
                 material: materials.add(Color::rgb(0.3, 0.5, 0.3).into()),
                 transform: Transform::from_xyz(body.position.x as f32, body.position.y as f32, body.position.z as f32),
                 ..default()
@@ -88,7 +88,7 @@ fn create_solar_system(
     //});
 
     commands.spawn_bundle(Camera3dBundle {
-        transform: Transform::from_xyz(-2.0, -2.5, 500.0).looking_at(Vec3::ZERO, Vec3::Y),
+        transform: Transform::from_xyz(-2.0, -2.5, 5000000000000.0).looking_at(Vec3::ZERO, Vec3::Y),
         ..default()
     });
 }
