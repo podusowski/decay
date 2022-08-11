@@ -15,6 +15,7 @@ struct Body {
     pub position: Vector,
     pub velocity: Vector,
     pub mass: Mass,
+    pub name: String,
 }
 
 impl MassObject for Body {
@@ -61,6 +62,7 @@ fn create_solar_system(
                 position: body.position,
                 velocity: body.velocity,
                 mass: body.mass,
+                name: body.name.into(),
             })
             .insert(GravitationalForce::default())
             .insert(Name(body.name.into()));
@@ -88,9 +90,39 @@ fn gravitational_force(mut forces: Query<(&mut GravitationalForce, &Body)>, quer
     }
 }
 
-fn newtownian_movement(time: Res<Time>, query: Query<&Body>) {
-    for body in &query {
-        //let force = ;
+fn newtownian_gravity(time: Res<Time>, mut query: Query<(&mut Body, &mut Transform)>) {
+    let mut combinations = query.iter_combinations_mut();
+    while let Some([(mut first, mut first_transform), (second, seocnd_transform)]) =
+        combinations.fetch_next()
+    {
+        let force = first.newtonian_gravity(&*second);
+
+        let acceleration_of_first = force / first.mass().as_kgs();
+        let offset_ensued_from_velocity = first.velocity * time.delta_seconds_f64() as f64;
+        let offset_ensued_from_acceleration =
+            acceleration_of_first * time.delta_seconds_f64().powf(2.) as f64 / 2.0;
+
+        first.velocity = acceleration_of_first * time.delta_seconds_f64() + first.velocity;
+
+        if first.name == "Mercury" {
+            //eprintln!("force {:?}", force);
+            //eprintln!("velocity {:?}", first.velocity);
+        }
+
+        first.position =
+            first.position + offset_ensued_from_acceleration + offset_ensued_from_velocity;
+
+        let new_t = Transform::from_xyz(
+            first.position.x as f32,
+            first.position.y as f32,
+            first.position.z as f32,
+        );
+
+        if first.name == "Mercury" {
+            //eprintln!("{:?} -> {:?}", first_transform, new_t);
+        }
+
+        *first_transform = new_t;
     }
 }
 
@@ -99,6 +131,6 @@ fn main() {
         .add_plugins(DefaultPlugins)
         .add_startup_system(create_solar_system)
         .insert_resource(ClearColor(Color::rgb(0., 0., 0.)))
-        .add_system(gravitational_force)
+        .add_system(newtownian_gravity)
         .run();
 }
