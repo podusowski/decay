@@ -1,353 +1,143 @@
-use std::sync::{Arc, Mutex, RwLock};
-
 use algebra::Vector;
 
 mod algebra;
 mod ephemeris;
-mod frameworks;
 mod physics;
 mod units;
 
-use frameworks::{Framework, GameState};
 use physics::*;
-use rg3d::core::algebra::{Matrix4, Vector2, Vector3};
-use rg3d::core::color::Color;
-use rg3d::core::instant::Instant;
-use rg3d::core::math::Rect;
-use rg3d::core::pool::Handle;
-use rg3d::engine::error::EngineError;
-use rg3d::engine::framework::{GameEngine, UiNode};
-use rg3d::engine::resource_manager::{MaterialSearchOptions, ResourceManager};
-use rg3d::engine::Engine;
-use rg3d::event::{ElementState, Event, VirtualKeyCode, WindowEvent};
-use rg3d::event_loop::{ControlFlow, EventLoop};
-use rg3d::gui::message::{MessageDirection, TextMessage};
-use rg3d::gui::node::StubNode;
-use rg3d::gui::text::TextBuilder;
-use rg3d::gui::widget::WidgetBuilder;
-use rg3d::gui::UserInterface;
-use rg3d::material::shader::SamplerFallback;
-use rg3d::material::{Material, PropertyValue};
-use rg3d::resource::texture::Texture;
-use rg3d::scene::base::BaseBuilder;
-use rg3d::scene::camera::CameraBuilder;
-use rg3d::scene::mesh::surface::{SurfaceBuilder, SurfaceData};
-use rg3d::scene::mesh::{MeshBuilder, RenderPath};
-use rg3d::scene::node::Node;
-use rg3d::scene::transform::TransformBuilder;
-use rg3d::scene::Scene;
-use rg3d::utils::log::{Log, MessageKind};
-use rg3d::utils::translate_event;
-use rg3d::window::WindowBuilder;
+use units::Mass;
 
-use crate::units::Distance;
+use bevy::prelude::*;
 
-//fn handle_event(event: &Event, observer: &mut graphics::Observer, space: &mut Space) {
-//    if let Event::Input(Input::Move(Motion::MouseScroll(zoom_amount)), _) = event {
-//        observer.zoom_in_out(zoom_amount[1]);
-//    };
-//
-//    // Record position of the mouse to know where the click happened later on.
-//    if let Event::Input(Input::Move(Motion::MouseCursor(cursor)), _) = event {
-//        observer.mouse_cursor = (cursor[0], cursor[1]);
-//    }
-//
-//    // Handle clicks.
-//    if let Event::Input(
-//        Input::Button(ButtonArgs {
-//            state: ButtonState::Press,
-//            button: Button::Mouse(MouseButton::Left),
-//            scancode: _,
-//        }),
-//        _,
-//    ) = event
-//    {
-//        let position = observer.to_world_coords(observer.mouse_cursor);
-//        let body = space.body_at(position);
-//        println!(
-//            "click {:?}, position: {:?}, body: {:?}",
-//            observer.mouse_cursor, position, body
-//        );
-//        if let Some(body) = body {
-//            observer.selected_body = body;
-//        }
-//    };
-//
-//    if let Event::Input(
-//        Input::Button(ButtonArgs {
-//            state: ButtonState::Press,
-//            button: Button::Keyboard(Key::Q),
-//            scancode: _,
-//        }),
-//        _,
-//    ) = event
-//    {
-//        observer.ship_wide_zoom();
-//    };
-//
-//    if let Event::Input(
-//        Input::Button(ButtonArgs {
-//            state: ButtonState::Press,
-//            button: Button::Keyboard(Key::W),
-//            scancode: _,
-//        }),
-//        _,
-//    ) = event
-//    {
-//        observer.system_wide_zoom();
-//    };
-//
-//    if let Event::Input(
-//        Input::Button(ButtonArgs {
-//            state: ButtonState::Press,
-//            button: Button::Keyboard(Key::E),
-//            scancode: _,
-//        }),
-//        _,
-//    ) = event
-//    {
-//        let ship = &mut space.ships[0];
-//        ship.thrust = ship.thrust
-//            + Vector {
-//                x: 0.0,
-//                y: -10.0,
-//                z: 0.0,
-//            };
-//    };
-//
-//    if let Event::Input(
-//        Input::Button(ButtonArgs {
-//            state: ButtonState::Press,
-//            button: Button::Keyboard(Key::R),
-//            scancode: _,
-//        }),
-//        _,
-//    ) = event
-//    {
-//        let ship = &mut space.ships[0];
-//        ship.thrust = Vector {
-//            x: 0.0,
-//            y: 0.0,
-//            z: 0.0,
-//        };
-//    };
-//
-//    if let Event::Loop(Loop::Update(_)) = event {
-//        space.tick(chrono::Duration::hours(1));
-//        observer.look_at(space.bodies[observer.selected_body].position);
-//    }
-//}
-
-enum Zooming {
-    In,
-    Out,
+#[derive(Component)]
+struct Body {
+    pub position: Vector,
+    pub velocity: Vector,
+    pub mass: Mass,
+    pub name: String,
 }
 
-impl Zooming {
-    fn multiplier(&self) -> f32 {
-        let amount = 1.0;
-        match self {
-            Self::In => amount,
-            Self::Out => -amount,
-        }
+impl MassObject for Body {
+    fn mass(&self) -> Mass {
+        self.mass
+    }
+
+    fn position(&self) -> Vector {
+        self.position
     }
 }
 
-struct VisualObject {
-    node: Handle<Node>,
-    label: Label,
-}
+/// The force that all other bodies act on this body.
+#[derive(Component, Default)]
+struct GravitationalForce(Vector);
 
-/// Label of a body. For example, name of a planet.
-struct Label {
-    ui: UserInterface<(), StubNode>,
-    render_target: rg3d::resource::texture::Texture,
-    node: Handle<UiNode>,
-}
+#[derive(Component)]
+struct Name(String);
 
-impl Label {
-    const WIDTH: u32 = 100;
-    const HEIGHT: u32 = 100;
+fn create_solar_system(
+    mut commands: Commands,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut materials: ResMut<Assets<StandardMaterial>>,
+) {
+    let space = Space::<()>::solar_system(|| ());
 
-    fn new(text: &str) -> Self {
-        let mut ui = UserInterface::<(), StubNode>::new(Vector2::new(
-            Self::WIDTH as f32,
-            Self::HEIGHT as f32,
-        ));
-        let mut ctx = ui.build_ctx();
-        let node = TextBuilder::new(WidgetBuilder::new())
-            .with_text(text)
-            .build(&mut ctx);
-        Label {
-            ui,
-            render_target: Texture::new_render_target(Self::WIDTH, Self::HEIGHT),
-            node,
-        }
+    for body in space.bodies {
+        commands
+            .spawn()
+            .insert_bundle(PbrBundle {
+                mesh: meshes.add(Mesh::from(shape::Icosphere {
+                    radius: 30000000000.0,
+                    subdivisions: 50,
+                })),
+                material: materials.add(Color::rgb(0.5, 0.5, 0.5).into()),
+                transform: Transform::from_xyz(
+                    body.position.x as f32,
+                    body.position.y as f32,
+                    body.position.z as f32,
+                ),
+                ..default()
+            })
+            .insert(Body {
+                position: body.position,
+                velocity: body.velocity,
+                mass: body.mass,
+                name: body.name.into(),
+            })
+            .insert(GravitationalForce::default())
+            .insert(Name(body.name.into()));
     }
 
-    fn update(&mut self, engine: &mut frameworks::GameEngine, dt: f32) {
-        self.ui
-            .update(Vector2::new(Self::WIDTH as f32, Self::HEIGHT as f32), dt);
-        engine
-            .renderer
-            .render_ui_to_texture(self.render_target.clone(), &mut self.ui)
-            .unwrap();
-    }
-}
-
-/// Main bucket holding top-level game systems like physics and graphics engines.
-struct Decay {
-    space: Space<VisualObject>,
-    scene: Handle<Scene>,
-    camera: Handle<Node>,
-    zooming: Option<Zooming>,
-}
-
-impl GameState for Decay {
-    fn init(engine: &mut rg3d::engine::framework::GameEngine) -> Self
-    where
-        Self: Sized,
-    {
-        let (space, scene, camera) =
-            rg3d::core::futures::executor::block_on(create_scene(&engine.resource_manager));
-
-        Self {
-            space: space,
-            scene: engine.scenes.add(scene),
-            camera: camera,
-            zooming: None,
-        }
-    }
-
-    fn on_tick(&mut self, engine: &mut GameEngine, dt: f32, _: &mut ControlFlow) {
-        let scene = &mut engine.scenes[self.scene];
-
-        self.space.tick(chrono::Duration::hours(1), |body| {
-            scene.graph[body.user_data.node]
-                .local_transform_mut()
-                .set_position(Vector3::new(
-                    Distance::from_meters(body.position().x).as_au() as f32,
-                    Distance::from_meters(body.position().y).as_au() as f32,
-                    Distance::from_meters(body.position().z).as_au() as f32,
-                ));
-            println!("{:?}", body.position);
-        });
-
-        if let Some(zooming) = &self.zooming {
-            scene.graph[self.camera]
-                .local_transform_mut()
-                .offset(Vector3::new(0.0, 0.0, zooming.multiplier()));
-        }
-
-        for body in &mut self.space.bodies {
-            body.user_data.label.ui.send_message(TextMessage::text(
-                body.user_data.label.node,
-                MessageDirection::ToWidget,
-                body.name.to_string(),
-            ));
-            body.user_data.label.update(engine, dt);
-
-            while let Some(_) = body.user_data.label.ui.poll_message() {}
-        }
-    }
-
-    fn on_window_event(&mut self, _engine: &mut GameEngine, event: WindowEvent) {
-        if let WindowEvent::KeyboardInput { input, .. } = event {
-            self.zooming = match (input.state, input.virtual_keycode) {
-                (ElementState::Pressed, Some(VirtualKeyCode::W)) => Some(Zooming::In),
-                (ElementState::Pressed, Some(VirtualKeyCode::S)) => Some(Zooming::Out),
-                _ => None,
-            }
-        }
-    }
-}
-
-pub fn create_display_material(display_texture: Texture) -> Arc<Mutex<Material>> {
-    let mut material = Material::standard();
-
-    material
-        .set_property(
-            "diffuseTexture",
-            PropertyValue::Sampler {
-                value: Some(display_texture),
-                fallback: SamplerFallback::White,
-            },
-        )
-        .unwrap();
-
-    Arc::new(Mutex::new(material))
-}
-
-async fn create_scene(
-    resource_manager: &ResourceManager,
-) -> (Space<VisualObject>, Scene, Handle<Node>) {
-    let mut scene = Scene::new();
-
-    scene.ambient_lighting_color = Color::opaque(200, 200, 200);
-
-    let camera = CameraBuilder::new(
-        BaseBuilder::new().with_local_transform(
-            TransformBuilder::new()
-                .with_local_position(Vector3::new(0.0, 0.0, -30.0))
-                .build(),
-        ),
-    )
-    .build(&mut scene.graph);
-
-    let planet = resource_manager
-        .request_model("data/ball.fbx", MaterialSearchOptions::RecursiveUp)
-        .await;
-    let planet = planet.unwrap();
-
-    let create_graphic_object = || -> VisualObject {
-        let scale = 0.001;
-        let planet = planet.instantiate_geometry(&mut scene);
-        scene.graph[planet]
-            .local_transform_mut()
-            .set_scale(Vector3::new(scale, scale, scale));
-
-        let label = Label::new("");
-
-        let label_node = MeshBuilder::new(
-            BaseBuilder::new().with_local_transform(
-                TransformBuilder::new()
-                    .with_local_position(Vector3::new(-700.0, -350.0, 0.0))
-                    .build(),
-            ),
-        )
-        .with_surfaces(vec![SurfaceBuilder::new(Arc::new(RwLock::new(
-            SurfaceData::make_quad(&Matrix4::new_scaling(1000.0)),
-        )))
-        .with_material(create_display_material(label.render_target.clone()))
-        .build()])
-        .with_cast_shadows(false)
-        .with_render_path(RenderPath::Forward)
-        .build(&mut scene.graph);
-
-        scene.graph.link_nodes(label_node, planet);
-
-        VisualObject {
-            node: planet,
-            label: label,
-        }
-    };
-
-    let mut space = Space::solar_system(create_graphic_object);
-
-    space.ships.push(Ship {
-        position: Vector {
-            x: Distance::from_aus(1.0).as_meters(),
-            y: Distance::from_aus(1.0).as_meters(),
-            z: Default::default(),
-        },
-        velocity: Default::default(),
-        thrust: Default::default(),
-        name: "Rocinante",
+    commands.spawn_bundle(Camera3dBundle {
+        transform: Transform::from_xyz(-2.0, -2.5, 5000000000000.0).looking_at(Vec3::ZERO, Vec3::Y),
+        ..default()
     });
 
-    (space, scene, camera)
+    commands.insert_resource(AmbientLight {
+        color: Color::WHITE,
+        brightness: 0.5,
+    });
+}
+
+/// Calculates gravitational forces of all bodies. The forces can be then used
+/// by other system to calculate the movements.
+fn gravitational_force(mut forces: Query<(&mut GravitationalForce, &Body)>, query: Query<&Body>) {
+    for (mut force, body) in forces.iter_mut() {
+        force.0 = query
+            .iter()
+            .map(|other| body.newtonian_gravity(other))
+            .fold(Vector::default(), std::ops::Add::add)
+    }
+}
+
+fn move_single(time: f64, force: Vector, body: &mut Body) {
+    let acceleration = force / body.mass().as_kgs();
+    let offset_ensued_from_velocity = body.velocity * time as f64;
+    let offset_ensued_from_acceleration = acceleration * time.powf(2.) as f64 / 2.0;
+
+    body.velocity = acceleration * time + body.velocity;
+    //body.position = body.position + offset_ensued_from_acceleration + offset_ensued_from_velocity;
+}
+
+fn newtownian_gravity(time: Res<Time>, mut query: Query<(&mut Body, &mut Transform)>) {
+    let mut combinations = query.iter_combinations_mut();
+    while let Some([(mut body1, mut transform1), (mut body2, mut transform2)]) =
+        combinations.fetch_next()
+    {
+        let time = time.delta_seconds_f64() * 1000000.;
+        let force = body1.newtonian_gravity(&*body2);
+
+        move_single(time, force, &mut body1);
+        move_single(time, -force, &mut body2);
+
+        *transform1 = Transform::from_xyz(
+            body1.position.x as f32,
+            body1.position.y as f32,
+            body1.position.z as f32,
+        );
+
+        *transform2 = Transform::from_xyz(
+            body2.position.x as f32,
+            body2.position.y as f32,
+            body2.position.z as f32,
+        );
+    }
+}
+
+fn move_bodies(time: Res<Time>, mut query: Query<&mut Body>) {
+    let time = time.delta_seconds_f64() * 1000000.;
+    for mut body in query.iter_mut() {
+        let offset_ensued_from_velocity = body.velocity * time as f64;
+        body.position = body.position + offset_ensued_from_velocity;
+    }
 }
 
 fn main() {
-    Framework::<Decay>::new().unwrap().run();
+    App::new()
+        .add_plugins(DefaultPlugins)
+        .add_startup_system(create_solar_system)
+        .insert_resource(ClearColor(Color::rgb(0., 0., 0.)))
+        .add_system(newtownian_gravity)
+        .add_system(move_bodies)
+        .run();
 }
