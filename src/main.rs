@@ -91,32 +91,36 @@ fn gravitational_force(mut forces: Query<(&mut GravitationalForce, &Body)>, quer
 }
 
 fn move_single(time: f64, force: Vector, body: &mut Body) {
-    let acceleration_of_first = force / body.mass().as_kgs();
+    let acceleration = force / body.mass().as_kgs();
     let offset_ensued_from_velocity = body.velocity * time as f64;
-    let offset_ensued_from_acceleration = acceleration_of_first * time.powf(2.) as f64 / 2.0;
+    let offset_ensued_from_acceleration = acceleration * time.powf(2.) as f64 / 2.0;
 
-    body.velocity = acceleration_of_first * time + body.velocity;
-
+    body.velocity = acceleration * time + body.velocity;
     body.position = body.position + offset_ensued_from_acceleration + offset_ensued_from_velocity;
 }
 
 fn newtownian_gravity(time: Res<Time>, mut query: Query<(&mut Body, &mut Transform)>) {
     let mut combinations = query.iter_combinations_mut();
-    while let Some([(mut first, mut first_transform), (second, seocnd_transform)]) =
+    while let Some([(mut body1, mut transform1), (mut body2, mut transform2)]) =
         combinations.fetch_next()
     {
         let time = time.delta_seconds_f64() * 1000000.;
-        let force = first.newtonian_gravity(&*second);
+        let force = body1.newtonian_gravity(&*body2);
 
-        move_single(time, force, &mut first);
+        move_single(time, force, &mut body1);
+        move_single(time, -force, &mut body2);
 
-        let new_t = Transform::from_xyz(
-            first.position.x as f32,
-            first.position.y as f32,
-            first.position.z as f32,
+        *transform1 = Transform::from_xyz(
+            body1.position.x as f32,
+            body1.position.y as f32,
+            body1.position.z as f32,
         );
 
-        *first_transform = new_t;
+        *transform2 = Transform::from_xyz(
+            body2.position.x as f32,
+            body2.position.y as f32,
+            body2.position.z as f32,
+        );
     }
 }
 

@@ -80,3 +80,15 @@ impl std::ops::Sub for Vector {
         }
     }
 }
+
+impl std::ops::Neg for Vector {
+    type Output = Self;
+
+    fn neg(self) -> Self::Output {
+        Self::Output {
+            x: -self.x,
+            y: -self.y,
+            z: -self.z
+        }
+    }
+}
