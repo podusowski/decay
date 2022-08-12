@@ -110,15 +110,6 @@ fn newtownian_gravity(time: Res<Time>, mut query: Query<(&mut Body, &mut Transfo
 
         move_single(time, force, &mut first);
 
-        //let acceleration_of_first = force / first.mass().as_kgs();
-        //let offset_ensued_from_velocity = first.velocity * time as f64;
-        //let offset_ensued_from_acceleration = acceleration_of_first * time.powf(2.) as f64 / 2.0;
-
-        //first.velocity = acceleration_of_first * time + first.velocity;
-
-        //first.position =
-        //    first.position + offset_ensued_from_acceleration + offset_ensued_from_velocity;
-
         let new_t = Transform::from_xyz(
             first.position.x as f32,
             first.position.y as f32,
