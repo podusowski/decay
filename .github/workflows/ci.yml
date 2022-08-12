@@ -13,6 +13,7 @@ jobs:
           profile: minimal
           toolchain: stable
           override: true
+      - run: sudo apt install libalsa-dev
       - uses: actions-rs/cargo@v1
         with:
           command: check
