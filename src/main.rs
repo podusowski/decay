@@ -90,6 +90,16 @@ fn gravitational_force(mut forces: Query<(&mut GravitationalForce, &Body)>, quer
     }
 }
 
+fn move_single(time: f64, force: Vector, body: &mut Body) {
+    let acceleration_of_first = force / body.mass().as_kgs();
+    let offset_ensued_from_velocity = body.velocity * time as f64;
+    let offset_ensued_from_acceleration = acceleration_of_first * time.powf(2.) as f64 / 2.0;
+
+    body.velocity = acceleration_of_first * time + body.velocity;
+
+    body.position = body.position + offset_ensued_from_acceleration + offset_ensued_from_velocity;
+}
+
 fn newtownian_gravity(time: Res<Time>, mut query: Query<(&mut Body, &mut Transform)>) {
     let mut combinations = query.iter_combinations_mut();
     while let Some([(mut first, mut first_transform), (second, seocnd_transform)]) =
@@ -98,29 +108,22 @@ fn newtownian_gravity(time: Res<Time>, mut query: Query<(&mut Body, &mut Transfo
         let time = time.delta_seconds_f64() * 1000000.;
         let force = first.newtonian_gravity(&*second);
 
-        let acceleration_of_first = force / first.mass().as_kgs();
-        let offset_ensued_from_velocity = first.velocity * time as f64;
-        let offset_ensued_from_acceleration = acceleration_of_first * time.powf(2.) as f64 / 2.0;
+        move_single(time, force, &mut first);
 
-        first.velocity = acceleration_of_first * time + first.velocity;
+        //let acceleration_of_first = force / first.mass().as_kgs();
+        //let offset_ensued_from_velocity = first.velocity * time as f64;
+        //let offset_ensued_from_acceleration = acceleration_of_first * time.powf(2.) as f64 / 2.0;
 
-        if first.name == "Mercury" {
-            //eprintln!("force {:?}", force);
-            //eprintln!("velocity {:?}", first.velocity);
-        }
+        //first.velocity = acceleration_of_first * time + first.velocity;
 
-        first.position =
-            first.position + offset_ensued_from_acceleration + offset_ensued_from_velocity;
+        //first.position =
+        //    first.position + offset_ensued_from_acceleration + offset_ensued_from_velocity;
 
         let new_t = Transform::from_xyz(
             first.position.x as f32,
             first.position.y as f32,
             first.position.z as f32,
         );
-
-        if first.name == "Mercury" {
-            //eprintln!("{:?} -> {:?}", first_transform, new_t);
-        }
 
         *first_transform = new_t;
     }
