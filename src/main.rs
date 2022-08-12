@@ -95,14 +95,14 @@ fn newtownian_gravity(time: Res<Time>, mut query: Query<(&mut Body, &mut Transfo
     while let Some([(mut first, mut first_transform), (second, seocnd_transform)]) =
         combinations.fetch_next()
     {
+        let time = time.delta_seconds_f64() * 1000000.;
         let force = first.newtonian_gravity(&*second);
 
         let acceleration_of_first = force / first.mass().as_kgs();
-        let offset_ensued_from_velocity = first.velocity * time.delta_seconds_f64() as f64;
-        let offset_ensued_from_acceleration =
-            acceleration_of_first * time.delta_seconds_f64().powf(2.) as f64 / 2.0;
+        let offset_ensued_from_velocity = first.velocity * time as f64;
+        let offset_ensued_from_acceleration = acceleration_of_first * time.powf(2.) as f64 / 2.0;
 
-        first.velocity = acceleration_of_first * time.delta_seconds_f64() + first.velocity;
+        first.velocity = acceleration_of_first * time + first.velocity;
 
         if first.name == "Mercury" {
             //eprintln!("force {:?}", force);
