@@ -96,7 +96,7 @@ fn move_single(time: f64, force: Vector, body: &mut Body) {
     let offset_ensued_from_acceleration = acceleration * time.powf(2.) as f64 / 2.0;
 
     body.velocity = acceleration * time + body.velocity;
-    body.position = body.position + offset_ensued_from_acceleration + offset_ensued_from_velocity;
+    //body.position = body.position + offset_ensued_from_acceleration + offset_ensued_from_velocity;
 }
 
 fn newtownian_gravity(time: Res<Time>, mut query: Query<(&mut Body, &mut Transform)>) {
@@ -124,11 +124,20 @@ fn newtownian_gravity(time: Res<Time>, mut query: Query<(&mut Body, &mut Transfo
     }
 }
 
+fn move_bodies(time: Res<Time>, mut query: Query<&mut Body>) {
+    let time = time.delta_seconds_f64() * 1000000.;
+    for mut body in query.iter_mut() {
+        let offset_ensued_from_velocity = body.velocity * time as f64;
+        body.position = body.position + offset_ensued_from_velocity;
+    }
+}
+
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
         .add_startup_system(create_solar_system)
         .insert_resource(ClearColor(Color::rgb(0., 0., 0.)))
         .add_system(newtownian_gravity)
+        .add_system(move_bodies)
         .run();
 }
