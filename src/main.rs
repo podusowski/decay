@@ -128,13 +128,7 @@ fn move_bodies(time: Res<Time>, mut query: Query<&mut Body>) {
     let time = time.delta_seconds_f64() * 1000000.;
     for mut body in query.iter_mut() {
         let offset_ensued_from_velocity = body.velocity * time as f64;
-        body.position = body.position
-            + offset_ensued_from_velocity
-            + Vector {
-                x: 1.,
-                y: 1.,
-                z: 1.,
-            };
+        body.position = body.position + offset_ensued_from_velocity;
     }
 }
 
@@ -150,6 +144,8 @@ fn main() {
 
 #[cfg(test)]
 mod tests {
+    use std::time::Duration;
+
     use super::Body;
     use super::*;
 
@@ -159,6 +155,10 @@ mod tests {
 
         app.add_system(newtownian_gravity);
         app.add_system(move_bodies);
+
+        let mut time = Time::default();
+        time.update();
+        app.insert_resource(time);
 
         let id = app
             .world
@@ -171,13 +171,26 @@ mod tests {
             })
             .id();
 
+        app.update();
+
+        // See if position is still the same.
+
         assert_eq!(
             Vector::default(),
             app.world.get::<Body>(id).unwrap().position
         );
 
-        //space.tick(Duration::seconds(1));
-        //assert_eq!(Vector::default(), space.bodies[0].position);
-        //assert_eq!(Vector::default(), space.bodies[0].velocity);
+        // Now let's see if position is still the same after another second.
+
+        let mut time = app.world.resource_mut::<Time>();
+        let last_update = time.last_update().unwrap();
+        time.update_with_instant(last_update + Duration::from_secs(1));
+
+        app.update();
+
+        assert_eq!(
+            Vector::default(),
+            app.world.get::<Body>(id).unwrap().position
+        );
     }
 }
