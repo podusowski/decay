@@ -64,6 +64,8 @@ jobs:
           profile: minimal
           toolchain: stable
           override: true
+      - name: install system packages
+        run: sudo apt-get update; sudo apt-get install --no-install-recommends ${{ env.system_packages }}
       - run: rustup component add clippy
       - uses: actions-rs/cargo@v1
         with:
