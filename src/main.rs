@@ -141,3 +141,26 @@ fn main() {
         .add_system(move_bodies)
         .run();
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use super::Body;
+
+    #[test]
+    fn one_body_stays_in_place() {
+        //let mut space = Space::default();
+        let mut app = App::new();
+
+        //app.world.spawn().insert(Body {
+        //    position: Vector::default(),
+        //    velocity: Vector::default(),
+        //    mass: Mass::from_kgs(1.0),
+        //    name: "Earth",
+        //})
+
+        //space.tick(Duration::seconds(1));
+        //assert_eq!(Vector::default(), space.bodies[0].position);
+        //assert_eq!(Vector::default(), space.bodies[0].velocity);
+    }
+}

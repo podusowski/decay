@@ -141,64 +141,64 @@ impl<UserData> Space<UserData> {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use crate::units::Mass;
-    use approx::assert_abs_diff_eq;
-    use chrono::Duration;
-
-    #[test]
-    fn one_body_stays_in_place() {
-        let mut space = Space::default();
-        space.bodies.push(Body {
-            position: Vector::default(),
-            velocity: Vector::default(),
-            mass: Mass::from_kgs(1.0),
-            name: "Earth",
-        });
-        space.tick(Duration::seconds(1));
-        assert_eq!(Vector::default(), space.bodies[0].position);
-        assert_eq!(Vector::default(), space.bodies[0].velocity);
-    }
-
-    #[test]
-    fn two_bodies_fly_towards_each_other() {
-        let mut space = Space::default();
-
-        space.bodies.push(Body {
-            position: Vector::default(),
-            velocity: Vector::default(),
-            mass: Mass::from_kgs(1.0),
-            name: "first body",
-        });
-
-        space.bodies.push(Body {
-            position: Vector {
-                x: 1.0,
-                y: 0.0,
-                z: 0.0,
-            },
-            velocity: Vector::default(),
-            mass: Mass::from_kgs(1.0),
-            name: "second body",
-        });
-
-        space.tick(Duration::seconds(1));
-
-        // Distance between the two, their mass product and square of distance, all equals 1.
-        // This gives a gravity force equal to G. With the mass of 1, such force will give
-        // the acceleration of G [m per sec per sec]. After one second such acceleration should
-        // give the velocity of G.
-        assert_abs_diff_eq!(G, space.bodies[0].velocity.x);
-
-        // For both bodies.
-        assert_abs_diff_eq!(-G, space.bodies[1].velocity.x);
-
-        // Distance traveled should be:
-        // a * t ^ 2 / 2
-        // G * 1 ^ 2 / 2
-        // G / 2
-        assert_abs_diff_eq!(G / 2.0, space.bodies[0].position.x);
-    }
-}
+//#[cfg(test)]
+//mod tests {
+//    use super::*;
+//    use crate::units::Mass;
+//    use approx::assert_abs_diff_eq;
+//    use chrono::Duration;
+//
+//    #[test]
+//    fn one_body_stays_in_place() {
+//        let mut space = Space::default();
+//        space.bodies.push(Body {
+//            position: Vector::default(),
+//            velocity: Vector::default(),
+//            mass: Mass::from_kgs(1.0),
+//            name: "Earth",
+//        });
+//        space.tick(Duration::seconds(1));
+//        assert_eq!(Vector::default(), space.bodies[0].position);
+//        assert_eq!(Vector::default(), space.bodies[0].velocity);
+//    }
+//
+//    #[test]
+//    fn two_bodies_fly_towards_each_other() {
+//        let mut space = Space::default();
+//
+//        space.bodies.push(Body {
+//            position: Vector::default(),
+//            velocity: Vector::default(),
+//            mass: Mass::from_kgs(1.0),
+//            name: "first body",
+//        });
+//
+//        space.bodies.push(Body {
+//            position: Vector {
+//                x: 1.0,
+//                y: 0.0,
+//                z: 0.0,
+//            },
+//            velocity: Vector::default(),
+//            mass: Mass::from_kgs(1.0),
+//            name: "second body",
+//        });
+//
+//        space.tick(Duration::seconds(1));
+//
+//        // Distance between the two, their mass product and square of distance, all equals 1.
+//        // This gives a gravity force equal to G. With the mass of 1, such force will give
+//        // the acceleration of G [m per sec per sec]. After one second such acceleration should
+//        // give the velocity of G.
+//        assert_abs_diff_eq!(G, space.bodies[0].velocity.x);
+//
+//        // For both bodies.
+//        assert_abs_diff_eq!(-G, space.bodies[1].velocity.x);
+//
+//        // Distance traveled should be:
+//        // a * t ^ 2 / 2
+//        // G * 1 ^ 2 / 2
+//        // G / 2
+//        assert_abs_diff_eq!(G / 2.0, space.bodies[0].position.x);
+//    }
+//}
