@@ -79,7 +79,7 @@ fn move_single(time: f64, force: Vector, body: &mut Body) {
     body.velocity = acceleration * time + body.velocity;
 }
 
-fn newtownian_gravity(time: Res<Time>, mut query: Query<(&mut Body, &mut Transform)>) {
+fn newtonian_gravity(time: Res<Time>, mut query: Query<(&mut Body, &mut Transform)>) {
     let mut combinations = query.iter_combinations_mut();
     while let Some([(mut body1, mut transform1), (mut body2, mut transform2)]) =
         combinations.fetch_next()
@@ -117,7 +117,7 @@ fn main() {
         .add_plugins(DefaultPlugins)
         .add_startup_system(create_solar_system)
         .insert_resource(ClearColor(Color::rgb(0., 0., 0.)))
-        .add_system(newtownian_gravity)
+        .add_system(newtonian_gravity)
         .add_system(move_bodies)
         .run();
 }
@@ -141,7 +141,7 @@ mod tests {
     fn one_body_stays_in_place() {
         let mut app = App::new();
 
-        app.add_system(newtownian_gravity);
+        app.add_system(newtonian_gravity);
         app.add_system(move_bodies);
 
         let mut time = Time::default();
@@ -181,7 +181,7 @@ mod tests {
     fn two_bodies_fly_towards_each_other() {
         let mut app = App::new();
 
-        app.add_system(newtownian_gravity);
+        app.add_system(newtonian_gravity);
         app.add_system(move_bodies);
 
         let mut time = Time::default();
