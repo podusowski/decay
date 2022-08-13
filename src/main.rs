@@ -96,6 +96,7 @@ fn move_single(time: f64, force: Vector, body: &mut Body) {
     let offset_ensued_from_acceleration = acceleration * time.powf(2.) as f64 / 2.0;
 
     body.velocity = acceleration * time + body.velocity;
+    eprintln!("vel {:?}", body.velocity);
     //body.position = body.position + offset_ensued_from_acceleration + offset_ensued_from_velocity;
 }
 
@@ -130,6 +131,7 @@ fn move_bodies(time: Res<Time>, mut query: Query<&mut Body>) {
         let offset_ensued_from_velocity = body.velocity * time as f64;
         body.position = body.position + offset_ensued_from_velocity;
     }
+    eprintln!("dupa {}", time);
 }
 
 fn main() {
@@ -145,6 +147,8 @@ fn main() {
 #[cfg(test)]
 mod tests {
     use std::time::Duration;
+
+    use approx::assert_abs_diff_eq;
 
     use super::Body;
     use super::*;
@@ -193,5 +197,62 @@ mod tests {
             Vector::default(),
             app.world.get::<Body>(id).unwrap().position
         );
+    }
+
+    #[test]
+    fn two_bodies_fly_towards_each_other() {
+        let mut app = App::new();
+
+        app.add_system(newtownian_gravity);
+        app.add_system(move_bodies);
+
+        let mut time = Time::default();
+        time.update();
+        app.world.insert_resource(time);
+
+        let id1 = app
+            .world
+            .spawn()
+            .insert(Body {
+                position: Vector::default(),
+                velocity: Vector::default(),
+                mass: Mass::from_kgs(1.0),
+                name: "first".into(),
+            })
+            .id();
+
+        let id2 = app
+            .world
+            .spawn()
+            .insert(Body {
+                position: Vector {
+                    x: 1.,
+                    ..Default::default()
+                },
+                velocity: Vector::default(),
+                mass: Mass::from_kgs(1.0),
+                name: "second".into(),
+            })
+            .id();
+
+        rewind_time(&mut app.world, Duration::from_secs(1));
+        app.update();
+        rewind_time(&mut app.world, Duration::from_secs(1));
+        app.update();
+
+        // Distance between the two, their mass product and square of distance, all equals 1.
+        // This gives a gravity force equal to G. With the mass of 1, such force will give
+        // the acceleration of G [m per sec per sec]. After one second such acceleration should
+        // give the velocity of G.
+        assert_abs_diff_eq!(G, app.world.get::<Body>(id1).unwrap().velocity.x);
+
+        // For both bodies.
+        assert_abs_diff_eq!(-G, app.world.get::<Body>(id2).unwrap().velocity.x);
+
+        // Distance traveled should be:
+        // a * t ^ 2 / 2
+        // G * 1 ^ 2 / 2
+        // G / 2
+        //assert_abs_diff_eq!(G / 2.0, space.bodies[0].position.x);
     }
 }

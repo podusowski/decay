@@ -60,7 +60,7 @@ impl MassObject for Ship {
     }
 }
 
-const G: f64 = 6.67408e-11f64;
+pub const G: f64 = 6.67408e-11f64;
 
 #[derive(Debug)]
 pub struct Space<UserData> /* perhaps time some day... */ {
