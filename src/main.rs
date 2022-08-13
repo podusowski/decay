@@ -28,10 +28,6 @@ impl MassObject for Body {
     }
 }
 
-/// The force that all other bodies act on this body.
-#[derive(Component, Default)]
-struct GravitationalForce(Vector);
-
 #[derive(Component)]
 struct Name(String);
 
@@ -64,7 +60,6 @@ fn create_solar_system(
                 mass: body.mass,
                 name: body.name.into(),
             })
-            .insert(GravitationalForce::default())
             .insert(Name(body.name.into()));
     }
 
@@ -79,24 +74,9 @@ fn create_solar_system(
     });
 }
 
-/// Calculates gravitational forces of all bodies. The forces can be then used
-/// by other system to calculate the movements.
-fn gravitational_force(mut forces: Query<(&mut GravitationalForce, &Body)>, query: Query<&Body>) {
-    for (mut force, body) in forces.iter_mut() {
-        force.0 = query
-            .iter()
-            .map(|other| body.newtonian_gravity(other))
-            .fold(Vector::default(), std::ops::Add::add)
-    }
-}
-
 fn move_single(time: f64, force: Vector, body: &mut Body) {
     let acceleration = force / body.mass().as_kgs();
-    let offset_ensued_from_velocity = body.velocity * time as f64;
-    let offset_ensued_from_acceleration = acceleration * time.powf(2.) as f64 / 2.0;
-
     body.velocity = acceleration * time + body.velocity;
-    //body.position = body.position + offset_ensued_from_acceleration + offset_ensued_from_velocity;
 }
 
 fn newtownian_gravity(time: Res<Time>, mut query: Query<(&mut Body, &mut Transform)>) {
