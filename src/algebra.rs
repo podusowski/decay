@@ -88,7 +88,7 @@ impl std::ops::Neg for Vector {
         Self::Output {
             x: -self.x,
             y: -self.y,
-            z: -self.z
+            z: -self.z,
         }
     }
 }

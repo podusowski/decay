@@ -64,7 +64,7 @@ impl<UserData> Space<UserData> {
             },
             mass: Mass::from_kgs(5.97219e24),
             name: "Earth",
-            user_data: user_data_factory()
+            user_data: user_data_factory(),
         });
 
         space.bodies.push(Body {
@@ -80,7 +80,7 @@ impl<UserData> Space<UserData> {
             },
             mass: Mass::from_kgs(7.349e22),
             name: "Moon",
-            user_data: user_data_factory()
+            user_data: user_data_factory(),
         });
 
         space.bodies.push(Body {
@@ -96,7 +96,7 @@ impl<UserData> Space<UserData> {
             },
             mass: Mass::from_kgs(6.4171e23),
             name: "Mars",
-            user_data: user_data_factory()
+            user_data: user_data_factory(),
         });
 
         space.bodies.push(Body {
@@ -112,7 +112,7 @@ impl<UserData> Space<UserData> {
             },
             mass: Mass::from_kgs(189818722e19),
             name: "Jupiter",
-            user_data: user_data_factory()
+            user_data: user_data_factory(),
         });
 
         space.bodies.push(Body {
@@ -128,7 +128,7 @@ impl<UserData> Space<UserData> {
             },
             mass: Mass::from_kgs(5.6834E26),
             name: "Saturn",
-            user_data: user_data_factory()
+            user_data: user_data_factory(),
         });
 
         space.bodies.push(Body {
@@ -144,7 +144,7 @@ impl<UserData> Space<UserData> {
             },
             mass: Mass::from_kgs(1.024e26),
             name: "Neptune",
-            user_data: user_data_factory()
+            user_data: user_data_factory(),
         });
 
         space
