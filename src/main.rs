@@ -128,7 +128,13 @@ fn move_bodies(time: Res<Time>, mut query: Query<&mut Body>) {
     let time = time.delta_seconds_f64() * 1000000.;
     for mut body in query.iter_mut() {
         let offset_ensued_from_velocity = body.velocity * time as f64;
-        body.position = body.position + offset_ensued_from_velocity;
+        body.position = body.position
+            + offset_ensued_from_velocity
+            + Vector {
+                x: 1.,
+                y: 1.,
+                z: 1.,
+            };
     }
 }
 
@@ -144,20 +150,31 @@ fn main() {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use super::Body;
+    use super::*;
 
     #[test]
     fn one_body_stays_in_place() {
-        //let mut space = Space::default();
         let mut app = App::new();
 
-        //app.world.spawn().insert(Body {
-        //    position: Vector::default(),
-        //    velocity: Vector::default(),
-        //    mass: Mass::from_kgs(1.0),
-        //    name: "Earth",
-        //})
+        app.add_system(newtownian_gravity);
+        app.add_system(move_bodies);
+
+        let id = app
+            .world
+            .spawn()
+            .insert(Body {
+                position: Vector::default(),
+                velocity: Vector::default(),
+                mass: Mass::from_kgs(1.0),
+                name: "Earth".into(),
+            })
+            .id();
+
+        assert_eq!(
+            Vector::default(),
+            app.world.get::<Body>(id).unwrap().position
+        );
 
         //space.tick(Duration::seconds(1));
         //assert_eq!(Vector::default(), space.bodies[0].position);
