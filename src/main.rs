@@ -149,6 +149,12 @@ mod tests {
     use super::Body;
     use super::*;
 
+    fn rewind_time(world: &mut World, duration: Duration) {
+        let mut time = world.resource_mut::<Time>();
+        let last_update = time.last_update().unwrap();
+        time.update_with_instant(last_update + duration);
+    }
+
     #[test]
     fn one_body_stays_in_place() {
         let mut app = App::new();
@@ -158,7 +164,7 @@ mod tests {
 
         let mut time = Time::default();
         time.update();
-        app.insert_resource(time);
+        app.world.insert_resource(time);
 
         let id = app
             .world
@@ -174,18 +180,13 @@ mod tests {
         app.update();
 
         // See if position is still the same.
-
         assert_eq!(
             Vector::default(),
             app.world.get::<Body>(id).unwrap().position
         );
 
         // Now let's see if position is still the same after another second.
-
-        let mut time = app.world.resource_mut::<Time>();
-        let last_update = time.last_update().unwrap();
-        time.update_with_instant(last_update + Duration::from_secs(1));
-
+        rewind_time(&mut app.world, Duration::from_secs(1));
         app.update();
 
         assert_eq!(
