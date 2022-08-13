@@ -141,3 +141,129 @@ fn main() {
         .add_system(move_bodies)
         .run();
 }
+
+#[cfg(test)]
+mod tests {
+    use std::time::Duration;
+
+    use approx::assert_abs_diff_eq;
+
+    use super::Body;
+    use super::*;
+
+    fn rewind_time(world: &mut World, duration: Duration) {
+        let mut time = world.resource_mut::<Time>();
+        let last_update = time.last_update().unwrap();
+        time.update_with_instant(last_update + duration);
+    }
+
+    #[test]
+    fn one_body_stays_in_place() {
+        let mut app = App::new();
+
+        app.add_system(newtownian_gravity);
+        app.add_system(move_bodies);
+
+        let mut time = Time::default();
+        time.update();
+        app.world.insert_resource(time);
+
+        let id = app
+            .world
+            .spawn()
+            .insert(Body {
+                position: Vector::default(),
+                velocity: Vector::default(),
+                mass: Mass::from_kgs(1.0),
+                name: "Earth".into(),
+            })
+            .id();
+
+        app.update();
+
+        // See if position is still the same.
+        assert_eq!(
+            Vector::default(),
+            app.world.get::<Body>(id).unwrap().position
+        );
+
+        // Now let's see if position is still the same after another second.
+        rewind_time(&mut app.world, Duration::from_secs(1));
+        app.update();
+
+        assert_eq!(
+            Vector::default(),
+            app.world.get::<Body>(id).unwrap().position
+        );
+    }
+
+    #[test]
+    fn two_bodies_fly_towards_each_other() {
+        let mut app = App::new();
+
+        app.add_system(newtownian_gravity);
+        app.add_system(move_bodies);
+
+        let mut time = Time::default();
+        time.update();
+        app.world.insert_resource(time);
+
+        let id1 = app
+            .world
+            .spawn()
+            .insert(Body {
+                position: Vector::default(),
+                velocity: Vector::default(),
+                mass: Mass::from_kgs(1.0),
+                name: "first".into(),
+            })
+            .insert(Transform::default())
+            .id();
+
+        let id2 = app
+            .world
+            .spawn()
+            .insert(Body {
+                position: Vector {
+                    x: 1.,
+                    ..Default::default()
+                },
+                velocity: Vector::default(),
+                mass: Mass::from_kgs(1.0),
+                name: "second".into(),
+            })
+            .insert(Transform::default())
+            .id();
+
+        rewind_time(&mut app.world, Duration::from_secs(1));
+        app.update();
+
+        // Distance between the two, their mass product and square of distance, all equals 1.
+        // This gives a gravity force equal to G. With the mass of 1, such force will give
+        // the acceleration of G [m per sec per sec]. After one second such acceleration should
+        // give the velocity of G.
+        assert_abs_diff_eq!(
+            G,
+            app.world.get::<Body>(id1).unwrap().velocity.x,
+            epsilon = 0.01
+        );
+
+        // For both bodies.
+        assert_abs_diff_eq!(
+            -G,
+            app.world.get::<Body>(id2).unwrap().velocity.x,
+            epsilon = 0.01
+        );
+
+        // Distance traveled should be:
+        // a * t ^ 2 / 2
+        // G * 1 ^ 2 / 2
+        // G / 2
+        // TODO: Check Transform component instead of Body::position!!
+        assert_abs_diff_eq!(
+            G / 2.0,
+            app.world.get::<Body>(id1).unwrap().position.x,
+            epsilon = 0.01
+        );
+    }
+}
