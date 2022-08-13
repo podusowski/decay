@@ -96,7 +96,6 @@ fn move_single(time: f64, force: Vector, body: &mut Body) {
     let offset_ensued_from_acceleration = acceleration * time.powf(2.) as f64 / 2.0;
 
     body.velocity = acceleration * time + body.velocity;
-    eprintln!("vel {:?}", body.velocity);
     //body.position = body.position + offset_ensued_from_acceleration + offset_ensued_from_velocity;
 }
 
@@ -105,7 +104,6 @@ fn newtownian_gravity(time: Res<Time>, mut query: Query<(&mut Body, &mut Transfo
     while let Some([(mut body1, mut transform1), (mut body2, mut transform2)]) =
         combinations.fetch_next()
     {
-        eprintln!("combination");
         let time = time.delta_seconds_f64() * 1000000.;
         let force = body1.newtonian_gravity(&*body2);
 
@@ -132,7 +130,6 @@ fn move_bodies(time: Res<Time>, mut query: Query<&mut Body>) {
         let offset_ensued_from_velocity = body.velocity * time as f64;
         body.position = body.position + offset_ensued_from_velocity;
     }
-    eprintln!("dupa {}", time);
 }
 
 fn main() {
