@@ -2,6 +2,9 @@ on: [push, pull_request]
 
 name: Continuous integration
 
+env:
+  system_packages: libasound2-dev libudev-dev
+
 jobs:
   check:
     name: Check
@@ -13,6 +16,8 @@ jobs:
           profile: minimal
           toolchain: stable
           override: true
+      - name: install system packages
+        run: sudo apt-get update; sudo apt-get install --no-install-recommends ${{ env.system_packages }}
       - uses: actions-rs/cargo@v1
         with:
           command: check
@@ -27,6 +32,8 @@ jobs:
           profile: minimal
           toolchain: stable
           override: true
+      - name: install system packages
+        run: sudo apt-get update; sudo apt-get install --no-install-recommends ${{ env.system_packages }}
       - uses: actions-rs/cargo@v1
         with:
           command: test
@@ -57,6 +64,8 @@ jobs:
           profile: minimal
           toolchain: stable
           override: true
+      - name: install system packages
+        run: sudo apt-get update; sudo apt-get install --no-install-recommends ${{ env.system_packages }}
       - run: rustup component add clippy
       - uses: actions-rs/cargo@v1
         with:
