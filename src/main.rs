@@ -105,6 +105,7 @@ fn newtownian_gravity(time: Res<Time>, mut query: Query<(&mut Body, &mut Transfo
     while let Some([(mut body1, mut transform1), (mut body2, mut transform2)]) =
         combinations.fetch_next()
     {
+        eprintln!("combination");
         let time = time.delta_seconds_f64() * 1000000.;
         let force = body1.newtonian_gravity(&*body2);
 
@@ -219,6 +220,7 @@ mod tests {
                 mass: Mass::from_kgs(1.0),
                 name: "first".into(),
             })
+            .insert(Transform::default())
             .id();
 
         let id2 = app
@@ -233,10 +235,9 @@ mod tests {
                 mass: Mass::from_kgs(1.0),
                 name: "second".into(),
             })
+            .insert(Transform::default())
             .id();
 
-        rewind_time(&mut app.world, Duration::from_secs(1));
-        app.update();
         rewind_time(&mut app.world, Duration::from_secs(1));
         app.update();
 
@@ -244,15 +245,28 @@ mod tests {
         // This gives a gravity force equal to G. With the mass of 1, such force will give
         // the acceleration of G [m per sec per sec]. After one second such acceleration should
         // give the velocity of G.
-        assert_abs_diff_eq!(G, app.world.get::<Body>(id1).unwrap().velocity.x);
+        assert_abs_diff_eq!(
+            G,
+            app.world.get::<Body>(id1).unwrap().velocity.x,
+            epsilon = 0.01
+        );
 
         // For both bodies.
-        assert_abs_diff_eq!(-G, app.world.get::<Body>(id2).unwrap().velocity.x);
+        assert_abs_diff_eq!(
+            -G,
+            app.world.get::<Body>(id2).unwrap().velocity.x,
+            epsilon = 0.01
+        );
 
         // Distance traveled should be:
         // a * t ^ 2 / 2
         // G * 1 ^ 2 / 2
         // G / 2
-        //assert_abs_diff_eq!(G / 2.0, space.bodies[0].position.x);
+        // TODO: Check Transform component instead of Body::position!!
+        assert_abs_diff_eq!(
+            G / 2.0,
+            app.world.get::<Body>(id1).unwrap().position.x,
+            epsilon = 0.01
+        );
     }
 }
