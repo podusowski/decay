@@ -30,8 +30,6 @@ impl MassObject for Body {
 #[derive(Component)]
 struct Name(String);
 
-const SECONDS_IN_DAY: f64 = 24.0 * 60.0 * 60.0;
-
 impl Vector {
     // This is wrong and ugly in so many ways. Ultimate goal is to cleanup
     // all the units so they are safe and Bevy compatible.
@@ -42,15 +40,6 @@ impl Vector {
             x: Distance::from_aus(self.x).as_meters(),
             y: Distance::from_aus(self.y).as_meters(),
             z: Distance::from_aus(self.z).as_meters(),
-        }
-    }
-
-    /// Converts AU/day into meters/second.
-    fn aus_per_day_to_meters_per_second(self) -> Self {
-        Self {
-            x: Distance::from_aus(self.x).as_meters() / SECONDS_IN_DAY,
-            y: Distance::from_aus(self.y).as_meters() / SECONDS_IN_DAY,
-            z: Distance::from_aus(self.z).as_meters() / SECONDS_IN_DAY,
         }
     }
 
