@@ -36,7 +36,7 @@ fn create_solar_system(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
-    let space = Space::<()>::solar_system(|| ());
+    let space = Space::solar_system();
 
     for body in space.bodies {
         commands

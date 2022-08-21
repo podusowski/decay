@@ -4,10 +4,9 @@ use chrono::prelude::*;
 
 const SECONDS_IN_DAY: f64 = 24.0 * 60.0 * 60.0;
 
-impl<UserData> Space<UserData> {
+impl Space {
     /// Taken from JPL's HORIZONS for A.D. 2016-Oct-15 00:00:00.0000 TDB
-    pub fn solar_system(user_data_factory: impl FnMut() -> UserData) -> Self {
-        let mut user_data_factory = user_data_factory;
+    pub fn solar_system() -> Self {
         let mut space = Self::default();
         space.time = Utc.ymd(2016, 10, 15).and_hms(0, 0, 0);
 
@@ -16,7 +15,6 @@ impl<UserData> Space<UserData> {
             velocity: Vector::default(),
             mass: Mass::from_kgs(1988500e24),
             name: "Sun",
-            user_data: user_data_factory(),
         });
 
         space.bodies.push(Body {
@@ -32,7 +30,6 @@ impl<UserData> Space<UserData> {
             },
             mass: Mass::from_kgs(3.302e23),
             name: "Mercury",
-            user_data: user_data_factory(),
         });
 
         space.bodies.push(Body {
@@ -48,7 +45,6 @@ impl<UserData> Space<UserData> {
             },
             mass: Mass::from_kgs(48.685e23),
             name: "Venus",
-            user_data: user_data_factory(),
         });
 
         space.bodies.push(Body {
@@ -64,7 +60,6 @@ impl<UserData> Space<UserData> {
             },
             mass: Mass::from_kgs(5.97219e24),
             name: "Earth",
-            user_data: user_data_factory(),
         });
 
         space.bodies.push(Body {
@@ -80,7 +75,6 @@ impl<UserData> Space<UserData> {
             },
             mass: Mass::from_kgs(7.349e22),
             name: "Moon",
-            user_data: user_data_factory(),
         });
 
         space.bodies.push(Body {
@@ -96,7 +90,6 @@ impl<UserData> Space<UserData> {
             },
             mass: Mass::from_kgs(6.4171e23),
             name: "Mars",
-            user_data: user_data_factory(),
         });
 
         space.bodies.push(Body {
@@ -112,7 +105,6 @@ impl<UserData> Space<UserData> {
             },
             mass: Mass::from_kgs(189818722e19),
             name: "Jupiter",
-            user_data: user_data_factory(),
         });
 
         space.bodies.push(Body {
@@ -128,7 +120,6 @@ impl<UserData> Space<UserData> {
             },
             mass: Mass::from_kgs(5.6834E26),
             name: "Saturn",
-            user_data: user_data_factory(),
         });
 
         space.bodies.push(Body {
@@ -144,7 +135,6 @@ impl<UserData> Space<UserData> {
             },
             mass: Mass::from_kgs(1.024e26),
             name: "Neptune",
-            user_data: user_data_factory(),
         });
 
         space

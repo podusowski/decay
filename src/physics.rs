@@ -23,15 +23,14 @@ pub trait MassObject {
 }
 
 #[derive(Debug)]
-pub struct Body<UserData> {
-    pub user_data: UserData,
+pub struct Body {
     pub position: Vector,
     pub velocity: Vector,
     pub mass: Mass,
     pub name: &'static str,
 }
 
-impl<UserData> MassObject for Body<UserData> {
+impl MassObject for Body {
     fn mass(&self) -> Mass {
         self.mass
     }
@@ -63,13 +62,13 @@ impl MassObject for Ship {
 pub const G: f64 = 6.67408e-11f64;
 
 #[derive(Debug)]
-pub struct Space<UserData> /* perhaps time some day... */ {
+pub struct Space /* perhaps time some day... */ {
     pub time: chrono::DateTime<chrono::Utc>,
-    pub bodies: Vec<Body<UserData>>,
+    pub bodies: Vec<Body>,
     pub ships: Vec<Ship>,
 }
 
-impl<UserData> Default for Space<UserData> {
+impl Default for Space {
     fn default() -> Self {
         Space {
             time: chrono::Utc::now(),
@@ -78,5 +77,3 @@ impl<UserData> Default for Space<UserData> {
         }
     }
 }
-
-impl<UserData> Space<UserData> {}
