@@ -1,7 +1,6 @@
 use algebra::Vector;
 
 mod algebra;
-mod ephemeris;
 mod physics;
 mod units;
 
