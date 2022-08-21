@@ -11,3 +11,5 @@ edition = "2021"
 approx = "*"
 chrono = "*"
 bevy = "0.8"
+serde = { version = "1.0.144", features = ["derive"] }
+serde_yaml = "0.9.9"
