@@ -114,6 +114,9 @@ fn move_bodies(time: Res<Time>, mut query: Query<&mut Body>) {
 }
 
 fn main() {
+    let file = std::fs::File::create("ephemeris.yaml").unwrap();
+    serde_yaml::to_writer(file, &solar_system().1).unwrap();
+
     App::new()
         .add_plugins(DefaultPlugins)
         .add_startup_system(create_solar_system)

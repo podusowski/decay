@@ -1,3 +1,5 @@
+use serde::Serialize;
+
 pub struct Distance(f64);
 
 impl Distance {
@@ -20,7 +22,7 @@ impl Distance {
     }
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Serialize)]
 pub struct Mass(f64);
 
 impl Mass {
