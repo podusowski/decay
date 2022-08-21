@@ -5,7 +5,6 @@ mod ephemeris;
 mod physics;
 mod units;
 
-use ephemeris::solar_system;
 use physics::*;
 use units::{Distance, Mass};
 
