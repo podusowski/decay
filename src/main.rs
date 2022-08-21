@@ -7,7 +7,7 @@ mod units;
 
 use ephemeris::solar_system;
 use physics::*;
-use units::Mass;
+use units::{Distance, Mass};
 
 use bevy::prelude::*;
 
@@ -32,6 +32,19 @@ impl MassObject for Body {
 #[derive(Component)]
 struct Name(String);
 
+impl Vector {
+    /// Converts AUs into meters, assuming the values are AUs at first place.
+    // This is wrong and ugly in so many ways. Ultimate goal is to cleanup
+    // all the units so they are safe and Bevy compatible.
+    fn aus_to_meters(self) -> Self {
+        Self {
+            x: Distance::from_aus(self.x).as_meters(),
+            y: Distance::from_aus(self.y).as_meters(),
+            z: Distance::from_aus(self.z).as_meters(),
+        }
+    }
+}
+
 fn create_solar_system(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
@@ -49,14 +62,14 @@ fn create_solar_system(
                 })),
                 material: materials.add(Color::rgb(0.5, 0.5, 0.5).into()),
                 transform: Transform::from_xyz(
-                    body.position.x as f32,
-                    body.position.y as f32,
-                    body.position.z as f32,
+                    Distance::from_aus(body.position.x).as_meters() as f32,
+                    Distance::from_aus(body.position.y).as_meters() as f32,
+                    Distance::from_aus(body.position.z).as_meters() as f32,
                 ),
                 ..default()
             })
             .insert(Body {
-                position: body.position,
+                position: body.position.aus_to_meters(),
                 velocity: body.velocity,
                 mass: body.mass,
                 name: body.name.into(),

@@ -18,9 +18,9 @@ pub fn solar_system() -> (DateTime<Utc>, Vec<Body>) {
 
     bodies.push(Body {
         position: Vector {
-            x: Distance::from_aus(-3.610946582889994E-01).as_meters(),
-            y: Distance::from_aus(7.655753687572452E-02).as_meters(),
-            z: Distance::from_aus(3.938313941762204E-02).as_meters(),
+            x: -3.610946582889994E-01,
+            y: 7.655753687572452E-02,
+            z: 3.938313941762204E-02,
         },
         velocity: Vector {
             x: Distance::from_aus(-1.166921930880622E-02).as_meters() / SECONDS_IN_DAY,
@@ -33,9 +33,9 @@ pub fn solar_system() -> (DateTime<Utc>, Vec<Body>) {
 
     bodies.push(Body {
         position: Vector {
-            x: Distance::from_aus(1.973338103014433E-01).as_meters(),
-            y: Distance::from_aus(-7.001287841606206E-01).as_meters(),
-            z: Distance::from_aus(-2.098736267890693E-02).as_meters(),
+            x: 1.973338103014433E-01,
+            y: -7.001287841606206E-01,
+            z: -2.098736267890693E-02,
         },
         velocity: Vector {
             x: Distance::from_aus(1.933209186041313E-02).as_meters() / SECONDS_IN_DAY,
@@ -48,9 +48,9 @@ pub fn solar_system() -> (DateTime<Utc>, Vec<Body>) {
 
     bodies.push(Body {
         position: Vector {
-            x: Distance::from_aus(9.255531850624332E-01).as_meters(),
-            y: Distance::from_aus(3.708906496672169E-01).as_meters(),
-            z: Distance::from_aus(-1.740719250795340E-05).as_meters(),
+            x: 9.255531850624332E-01,
+            y: 3.708906496672169E-01,
+            z: -1.740719250795340E-05,
         },
         velocity: Vector {
             x: Distance::from_aus(-6.678671400247983E-03).as_meters() / SECONDS_IN_DAY,
@@ -63,9 +63,9 @@ pub fn solar_system() -> (DateTime<Utc>, Vec<Body>) {
 
     bodies.push(Body {
         position: Vector {
-            x: Distance::from_aus(9.279584884887349E-01).as_meters(),
-            y: Distance::from_aus(3.711104444050654E-01).as_meters(),
-            z: Distance::from_aus(-1.037121134101948E-04).as_meters(),
+            x: 9.279584884887349E-01,
+            y: 3.711104444050654E-01,
+            z: -1.037121134101948E-04,
         },
         velocity: Vector {
             x: Distance::from_aus(-6.761640228117041E-03).as_meters() / SECONDS_IN_DAY,
@@ -78,9 +78,9 @@ pub fn solar_system() -> (DateTime<Utc>, Vec<Body>) {
 
     bodies.push(Body {
         position: Vector {
-            x: Distance::from_aus(1.158495532744392E+00).as_meters(),
-            y: Distance::from_aus(-7.536556465639087E-01).as_meters(),
-            z: Distance::from_aus(-4.422526991966770E-02).as_meters(),
+            x: 1.158495532744392E+00,
+            y: -7.536556465639087E-01,
+            z: -4.422526991966770E-02,
         },
         velocity: Vector {
             x: Distance::from_aus(8.162919959786599E-03).as_meters() / SECONDS_IN_DAY,
@@ -93,9 +93,9 @@ pub fn solar_system() -> (DateTime<Utc>, Vec<Body>) {
 
     bodies.push(Body {
         position: Vector {
-            x: Distance::from_aus(-5.432121324842138E+00).as_meters(),
-            y: Distance::from_aus(-4.569844296390864E-01).as_meters(),
-            z: Distance::from_aus(1.234480663921852E-01).as_meters(),
+            x: -5.432121324842138E+00,
+            y: -4.569844296390864E-01,
+            z: 1.234480663921852E-01,
         },
         velocity: Vector {
             x: Distance::from_aus(5.420082489396598E-04).as_meters() / SECONDS_IN_DAY,
@@ -108,9 +108,9 @@ pub fn solar_system() -> (DateTime<Utc>, Vec<Body>) {
 
     bodies.push(Body {
         position: Vector {
-            x: Distance::from_aus(-2.270616615877762e+00).as_meters(),
-            y: Distance::from_aus(-9.778225136344251e+00).as_meters(),
-            z: Distance::from_aus(2.603431483798866e-01).as_meters(),
+            x: -2.270616615877762e+00,
+            y: -9.778225136344251e+00,
+            z: 2.603431483798866e-01,
         },
         velocity: Vector {
             x: Distance::from_aus(5.130339671553237E-03).as_meters() / SECONDS_IN_DAY,
@@ -123,9 +123,9 @@ pub fn solar_system() -> (DateTime<Utc>, Vec<Body>) {
 
     bodies.push(Body {
         position: Vector {
-            x: Distance::from_aus(2.825736958467999e+01).as_meters(),
-            y: Distance::from_aus(-9.925704611354977e+00).as_meters(),
-            z: Distance::from_aus(-4.468121470675587e-01).as_meters(),
+            x: 2.825736958467999e+01,
+            y: -9.925704611354977e+00,
+            z: -4.468121470675587e-01,
         },
         velocity: Vector {
             x: Distance::from_aus(1.020926560027260e-03).as_meters() / SECONDS_IN_DAY,
