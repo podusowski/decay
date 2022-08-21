@@ -5,6 +5,7 @@ mod ephemeris;
 mod physics;
 mod units;
 
+use ephemeris::solar_system;
 use physics::*;
 use units::Mass;
 
@@ -36,9 +37,9 @@ fn create_solar_system(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
-    let space = Space::solar_system();
+    let (_, bodies) = solar_system();
 
-    for body in space.bodies {
+    for body in bodies {
         commands
             .spawn()
             .insert_bundle(PbrBundle {
