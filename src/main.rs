@@ -73,11 +73,6 @@ fn create_solar_system(
                     subdivisions: 50,
                 })),
                 material: materials.add(Color::rgb(0.5, 0.5, 0.5).into()),
-                transform: Transform::from_xyz(
-                    Distance::from_aus(body.position.x).as_meters() as f32,
-                    Distance::from_aus(body.position.y).as_meters() as f32,
-                    Distance::from_aus(body.position.z).as_meters() as f32,
-                ),
                 ..default()
             })
             .insert(Body {
