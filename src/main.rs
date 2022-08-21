@@ -53,7 +53,17 @@ impl Vector {
             z: Distance::from_aus(self.z).as_meters() / SECONDS_IN_DAY,
         }
     }
+
+    fn km_per_second_to_meters_per_second(self) -> Self {
+        Self {
+            x: self.x * 1000.,
+            y: self.y * 1000.,
+            z: self.z * 1000.,
+        }
+    }
 }
+
+const TIME_SCALE: f64 = 1000000000.;
 
 fn create_solar_system(
     mut commands: Commands,
@@ -77,7 +87,7 @@ fn create_solar_system(
             })
             .insert(Body {
                 position: body.position.aus_to_meters(),
-                velocity: body.velocity.aus_per_day_to_meters_per_second(),
+                velocity: body.velocity.km_per_second_to_meters_per_second(),
                 mass: body.mass,
                 name: body.name.clone(),
             })
@@ -96,7 +106,7 @@ fn create_solar_system(
 }
 
 fn move_single(time: f64, force: Vector, body: &mut Body) {
-    let acceleration = force / body.mass().as_kgs();
+    let acceleration = force / body.mass().as_gs();
     body.velocity = acceleration * time + body.velocity;
 }
 
@@ -105,8 +115,8 @@ fn newtonian_gravity(time: Res<Time>, mut query: Query<(&mut Body, &mut Transfor
     while let Some([(mut body1, mut transform1), (mut body2, mut transform2)]) =
         combinations.fetch_next()
     {
-        let time = time.delta_seconds_f64() * 1000000.;
-        let force = body1.newtonian_gravity(&*body2);
+        let time = time.delta_seconds_f64() * TIME_SCALE;
+        let force = body1.newtonian_gravity(&*body2) * 0.001;
 
         move_single(time, force, &mut body1);
         move_single(time, -force, &mut body2);
@@ -126,7 +136,7 @@ fn newtonian_gravity(time: Res<Time>, mut query: Query<(&mut Body, &mut Transfor
 }
 
 fn move_bodies(time: Res<Time>, mut query: Query<&mut Body>) {
-    let time = time.delta_seconds_f64() * 1000000.;
+    let time = time.delta_seconds_f64() * TIME_SCALE;
     for mut body in query.iter_mut() {
         let offset_ensued_from_velocity = body.velocity * time as f64;
         body.position = body.position + offset_ensued_from_velocity;

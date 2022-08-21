@@ -33,4 +33,8 @@ impl Mass {
     pub fn as_kgs(&self) -> f64 {
         self.0 / 1000.0
     }
+
+    pub fn as_gs(&self) -> f64 {
+        self.0
+    }
 }
