@@ -82,7 +82,7 @@ fn create_solar_system(
             })
             .insert(Body {
                 position: body.position.aus_to_meters(),
-                velocity: body.velocity,
+                velocity: body.velocity.aus_per_day_to_meters_per_second(),
                 mass: body.mass,
                 name: body.name.into(),
             })
