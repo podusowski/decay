@@ -64,6 +64,9 @@ fn create_solar_system(
 ) {
     let (_, bodies) = solar_system();
 
+    let file = std::fs::File::open("ephemeris.yaml").expect("could not open ephemeris file");
+    let bodies: Vec<physics::Body> = serde_yaml::from_reader(file).expect("could not parse ephemeris file");
+
     for body in bodies {
         commands
             .spawn()
@@ -84,9 +87,9 @@ fn create_solar_system(
                 position: body.position.aus_to_meters(),
                 velocity: body.velocity.aus_per_day_to_meters_per_second(),
                 mass: body.mass,
-                name: body.name.into(),
+                name: body.name.clone(),
             })
-            .insert(Name(body.name.into()));
+            .insert(Name(body.name.clone()));
     }
 
     commands.spawn_bundle(Camera3dBundle {

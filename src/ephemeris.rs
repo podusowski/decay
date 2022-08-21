@@ -13,7 +13,7 @@ pub fn solar_system() -> (DateTime<Utc>, Vec<Body>) {
         position: Vector::default(),
         velocity: Vector::default(),
         mass: Mass::from_kgs(1988500e24),
-        name: "Sun",
+        name: "Sun".to_string(),
     });
 
     bodies.push(Body {
@@ -28,7 +28,7 @@ pub fn solar_system() -> (DateTime<Utc>, Vec<Body>) {
             z: -1.079745298798429E-03,
         },
         mass: Mass::from_kgs(3.302e23),
-        name: "Mercury",
+        name: "Mercury".to_string(),
     });
 
     bodies.push(Body {
@@ -43,7 +43,7 @@ pub fn solar_system() -> (DateTime<Utc>, Vec<Body>) {
             z: -1.041291312991296E-03,
         },
         mass: Mass::from_kgs(48.685e23),
-        name: "Venus",
+        name: "Venus".to_string(),
     });
 
     bodies.push(Body {
@@ -58,7 +58,7 @@ pub fn solar_system() -> (DateTime<Utc>, Vec<Body>) {
             z: 5.510397457798760E-08,
         },
         mass: Mass::from_kgs(5.97219e24),
-        name: "Earth",
+        name: "Earth".to_string(),
     });
 
     bodies.push(Body {
@@ -73,7 +73,7 @@ pub fn solar_system() -> (DateTime<Utc>, Vec<Body>) {
             z: -5.110814081371464E-05,
         },
         mass: Mass::from_kgs(7.349e22),
-        name: "Moon",
+        name: "Moon".to_string(),
     });
 
     bodies.push(Body {
@@ -88,7 +88,7 @@ pub fn solar_system() -> (DateTime<Utc>, Vec<Body>) {
             z: 7.059671810539333E-05,
         },
         mass: Mass::from_kgs(6.4171e23),
-        name: "Mars",
+        name: "Mars".to_string(),
     });
 
     bodies.push(Body {
@@ -103,7 +103,7 @@ pub fn solar_system() -> (DateTime<Utc>, Vec<Body>) {
             z: 1.762648657670620E-05,
         },
         mass: Mass::from_kgs(189818722e19),
-        name: "Jupiter",
+        name: "Jupiter".to_string(),
     });
 
     bodies.push(Body {
@@ -118,7 +118,7 @@ pub fn solar_system() -> (DateTime<Utc>, Vec<Body>) {
             z: -1.815947060563043E-04,
         },
         mass: Mass::from_kgs(5.6834E26),
-        name: "Saturn",
+        name: "Saturn".to_string(),
     });
 
     bodies.push(Body {
@@ -133,7 +133,7 @@ pub fn solar_system() -> (DateTime<Utc>, Vec<Body>) {
             z: -8.451314801496931e-05,
         },
         mass: Mass::from_kgs(1.024e26),
-        name: "Neptune",
+        name: "Neptune".to_string(),
     });
 
     (time, bodies)

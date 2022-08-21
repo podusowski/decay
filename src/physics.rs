@@ -1,4 +1,4 @@
-use serde::Serialize;
+use serde::{Serialize, Deserialize};
 
 use crate::algebra::Vector;
 use crate::units::Mass;
@@ -24,9 +24,9 @@ pub trait MassObject {
     }
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Body {
-    pub name: &'static str,
+    pub name: String,
     pub mass: Mass,
     pub position: Vector,
     pub velocity: Vector,
