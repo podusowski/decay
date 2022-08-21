@@ -62,10 +62,9 @@ fn create_solar_system(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
-    let (_, bodies) = solar_system();
-
     let file = std::fs::File::open("ephemeris.yaml").expect("could not open ephemeris file");
-    let bodies: Vec<physics::Body> = serde_yaml::from_reader(file).expect("could not parse ephemeris file");
+    let bodies: Vec<physics::Body> =
+        serde_yaml::from_reader(file).expect("could not parse ephemeris file");
 
     for body in bodies {
         commands
