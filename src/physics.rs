@@ -43,40 +43,4 @@ impl MassObject for Body {
     }
 }
 
-/// Ships are objects too, but unlike regular bodies they can move by their own.
-#[derive(Debug)]
-pub struct Ship {
-    pub position: Vector,
-    pub velocity: Vector,
-    pub thrust: Vector,
-    pub name: &'static str,
-}
-
-impl MassObject for Ship {
-    fn mass(&self) -> Mass {
-        Mass::from_kgs(10000.0)
-    }
-
-    fn position(&self) -> Vector {
-        self.position
-    }
-}
-
 pub const G: f64 = 6.67408e-11f64;
-
-#[derive(Debug)]
-pub struct Space /* perhaps time some day... */ {
-    pub time: chrono::DateTime<chrono::Utc>,
-    pub bodies: Vec<Body>,
-    pub ships: Vec<Ship>,
-}
-
-impl Default for Space {
-    fn default() -> Self {
-        Space {
-            time: chrono::Utc::now(),
-            bodies: Default::default(),
-            ships: Default::default(),
-        }
-    }
-}

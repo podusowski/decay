@@ -129,6 +129,8 @@ mod tests {
 
     use approx::assert_abs_diff_eq;
 
+    use crate::units::Mass;
+
     use super::Body;
     use super::*;
 
