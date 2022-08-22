@@ -8,6 +8,7 @@ use physics::*;
 use units::Distance;
 
 use bevy::prelude::*;
+use uom::si::mass::gram;
 
 #[derive(Component)]
 struct Name(String);
@@ -76,7 +77,7 @@ fn create_solar_system(
 }
 
 fn move_single(time: f64, force: Vector, body: &mut Body) {
-    let acceleration = force / body.mass().as_gs();
+    let acceleration = force / body.mass().get::<gram>();
     body.velocity = acceleration * time + body.velocity;
 }
 

@@ -1,8 +1,8 @@
 use bevy::prelude::Component;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
+use uom::si::{f64::Mass, mass::kilogram};
 
 use crate::algebra::Vector;
-use crate::units::Mass;
 
 // Object having a mass and position in space.
 pub trait MassObject {
@@ -19,7 +19,8 @@ pub trait MassObject {
             }
         } else {
             let offset = self.position() - other.position();
-            -G * ((self.mass().as_kgs() * other.mass().as_kgs()) / offset.length().powi(2))
+            -G * ((self.mass().get::<kilogram>() * other.mass().get::<kilogram>())
+                / offset.length().powi(2))
                 * offset.normalized()
         }
     }
