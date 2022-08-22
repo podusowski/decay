@@ -1,5 +1,5 @@
 use bevy::prelude::Component;
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 use uom::si::{f64::Mass, mass::kilogram};
 
 use crate::algebra::Vector;
@@ -26,9 +26,32 @@ pub trait MassObject {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize, Component)]
+/// While `uom` provides `serde` support, it only reads and writes the
+/// underlying unit-less value. For instance, if `uom::si::f64::Mass` is used,
+/// it assumes that value it reads holds kilograms (as kgs are base type for
+/// `uom::si::f64::Mass`.
+///
+/// See https://github.com/iliekturtles/uom/issues/110
+mod mass_serializer {
+    use serde::Deserialize;
+    use serde::Deserializer;
+    use uom::si::f64::Mass;
+    use uom::si::mass::gram;
+
+    pub fn deserialize<'de, D>(deserializer: D) -> Result<Mass, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let mass = f64::deserialize(deserializer)?;
+        // Encode unit in YAML.
+        Ok(Mass::new::<gram>(mass))
+    }
+}
+
+#[derive(Debug, Deserialize, Component)]
 pub struct Body {
     pub name: String,
+    #[serde(with = "mass_serializer")]
     pub mass: Mass,
     pub position: Vector,
     pub velocity: Vector,
