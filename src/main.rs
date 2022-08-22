@@ -5,27 +5,9 @@ mod physics;
 mod units;
 
 use physics::*;
-use units::{Distance, Mass};
+use units::Distance;
 
 use bevy::prelude::*;
-
-#[derive(Component)]
-struct Body {
-    pub position: Vector,
-    pub velocity: Vector,
-    pub mass: Mass,
-    pub name: String,
-}
-
-impl MassObject for Body {
-    fn mass(&self) -> Mass {
-        self.mass
-    }
-
-    fn position(&self) -> Vector {
-        self.position
-    }
-}
 
 #[derive(Component)]
 struct Name(String);
@@ -60,8 +42,7 @@ fn create_solar_system(
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
     let file = std::fs::File::open("ephemeris.yaml").expect("could not open ephemeris file");
-    let bodies: Vec<physics::Body> =
-        serde_yaml::from_reader(file).expect("could not parse ephemeris file");
+    let bodies: Vec<Body> = serde_yaml::from_reader(file).expect("could not parse ephemeris file");
 
     for body in bodies {
         commands

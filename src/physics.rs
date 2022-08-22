@@ -1,3 +1,4 @@
+use bevy::prelude::Component;
 use serde::{Serialize, Deserialize};
 
 use crate::algebra::Vector;
@@ -24,7 +25,7 @@ pub trait MassObject {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Component)]
 pub struct Body {
     pub name: String,
     pub mass: Mass,
