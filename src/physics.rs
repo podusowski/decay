@@ -1,6 +1,6 @@
 use bevy::prelude::Component;
 use serde::Deserialize;
-use uom::si::{f64::Mass, mass::kilogram};
+pub use uom::si::{f64::Mass, mass::kilogram};
 
 use crate::algebra::Vector;
 

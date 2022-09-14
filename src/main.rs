@@ -1,9 +1,12 @@
+use std::path::Path;
+
 use algebra::Vector;
 
 mod algebra;
 mod physics;
 mod units;
 
+use chrono::{Duration, Utc};
 use physics::*;
 use units::Distance;
 
@@ -114,7 +117,59 @@ fn move_bodies(time: Res<Time>, mut query: Query<&mut Body>) {
     }
 }
 
+async fn fetch_body(body: &rhorizons::MajorBody) -> Body {
+    // TODO: These should be constructed only once.
+    let start_time = Utc::now() - Duration::days(1);
+    let stop_time = Utc::now();
+
+    let vectors = rhorizons::ephemeris(body.id, start_time, stop_time).await;
+    Body {
+        name: body.name.clone(), // TODO: Try getting rid of it.
+        mass: physics::Mass::new::<physics::kilogram>(0.),
+        position: Vector {
+            x: vectors[0].position[0] as f64,
+            y: vectors[0].position[1] as f64,
+            z: vectors[0].position[2] as f64,
+        },
+        velocity: Vector {
+            x: vectors[0].velocity[0] as f64,
+            y: vectors[0].velocity[1] as f64,
+            z: vectors[0].velocity[2] as f64,
+        },
+    }
+}
+
+fn fetch_ephemeris() -> Vec<Body> {
+    // `rhorizons` crate is asynchronous, but Bevy isn't.
+    tokio::runtime::Builder::new_current_thread()
+        .enable_all()
+        .build()
+        .unwrap()
+        .block_on(async {
+            info!("Getting Solar System bodies from NASA JPL Horizons.");
+            // TODO: unuglyfy this!
+            let bodies = rhorizons::major_bodies().await;
+            let major_bodies = bodies
+                .iter()
+                .filter(|body| ["Mercury"].contains(&body.name.as_str()));
+
+            let mut bodies = Vec::new();
+            for major_body in major_bodies {
+                bodies.push(fetch_body(major_body).await);
+            }
+            bodies
+        })
+}
+
+fn ensure_ephemeris() {
+    for body in fetch_ephemeris() {
+        eprintln!("{:?}", body);
+    }
+}
+
 fn main() {
+    ensure_ephemeris();
+
     App::new()
         .add_plugins(DefaultPlugins)
         .add_startup_system(create_solar_system)
