@@ -5,6 +5,7 @@ use algebra::Vector;
 mod algebra;
 mod physics;
 mod units;
+mod ephemeris;
 
 use chrono::{Duration, Utc};
 use physics::*;
@@ -12,9 +13,6 @@ use units::Distance;
 
 use bevy::prelude::*;
 use uom::si::mass::gram;
-
-#[derive(Component)]
-struct Name(String);
 
 impl Vector {
     // This is wrong and ugly in so many ways. Ultimate goal is to cleanup
@@ -36,45 +34,6 @@ impl Vector {
             z: self.z * 1000.,
         }
     }
-}
-
-fn create_solar_system(
-    mut commands: Commands,
-    mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<StandardMaterial>>,
-) {
-    let file = std::fs::File::open("ephemeris.yaml").expect("could not open ephemeris file");
-    let bodies: Vec<Body> = serde_yaml::from_reader(file).expect("could not parse ephemeris file");
-
-    for body in bodies {
-        commands
-            .spawn()
-            .insert_bundle(PbrBundle {
-                mesh: meshes.add(Mesh::from(shape::Icosphere {
-                    radius: 30000000000.0,
-                    subdivisions: 50,
-                })),
-                material: materials.add(Color::rgb(0.5, 0.5, 0.5).into()),
-                ..default()
-            })
-            .insert(Body {
-                position: body.position.aus_to_meters(),
-                velocity: body.velocity.km_per_second_to_meters_per_second(),
-                mass: body.mass,
-                name: body.name.clone(),
-            })
-            .insert(Name(body.name.clone()));
-    }
-
-    commands.spawn_bundle(Camera3dBundle {
-        transform: Transform::from_xyz(-2.0, -2.5, 5000000000000.0).looking_at(Vec3::ZERO, Vec3::Y),
-        ..default()
-    });
-
-    commands.insert_resource(AmbientLight {
-        color: Color::WHITE,
-        brightness: 0.5,
-    });
 }
 
 async fn fetch_body(body: &rhorizons::MajorBody) -> Body {
@@ -132,7 +91,7 @@ fn main() {
 
     App::new()
         .add_plugins(DefaultPlugins)
-        .add_startup_system(create_solar_system)
+        .add_startup_system(ephemeris::create_solar_system)
         .insert_resource(ClearColor(Color::rgb(0., 0., 0.)))
         .add_system(physics::newtonian_gravity)
         .add_system(physics::move_bodies)
