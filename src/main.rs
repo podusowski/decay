@@ -1,5 +1,3 @@
-use std::path::Path;
-
 use algebra::Vector;
 
 mod algebra;
@@ -12,7 +10,6 @@ use physics::*;
 use units::Distance;
 
 use bevy::prelude::*;
-use uom::si::mass::gram;
 
 impl Vector {
     // This is wrong and ugly in so many ways. Ultimate goal is to cleanup
