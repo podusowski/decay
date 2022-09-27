@@ -1,8 +1,21 @@
-//! https://ssd.jpl.nasa.gov/planets/phys_par.html
+//! Couple of hardcoded physical properties of largest bodies in the
+//! Solar System. They are gathered from various places as JPL Horizons doesn't
+//! provide any systematic way of obtaining them.
+//!
+//! Sources:
+//! - <https://ssd.jpl.nasa.gov/planets/phys_par.html>
+//! - <https://nssdc.gsfc.nasa.gov/planetary/factsheet/sunfact.html>
+
+pub fn mass_of(name: &str) -> Option<f64> {
+    OBJECTS
+        .iter()
+        .find(|object| object.name == name)
+        .map(|object| object.mass)
+}
 
 struct Object {
     name: &'static str,
-    mass: f32,
+    mass: f64,
 }
 
 const OBJECTS: &[Object] = &[

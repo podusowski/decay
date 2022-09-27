@@ -73,7 +73,7 @@ pub trait MassObject {
 /// it assumes that value it reads holds kilograms (as kgs are base type for
 /// `uom::si::f64::Mass`.
 ///
-/// See https://github.com/iliekturtles/uom/issues/110
+/// See <https://github.com/iliekturtles/uom/issues/110>
 mod mass_serializer {
     use serde::Deserialize;
     use serde::Deserializer;
