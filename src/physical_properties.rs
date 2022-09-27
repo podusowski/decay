@@ -20,6 +20,10 @@ struct Object {
 
 const OBJECTS: &[Object] = &[
     Object {
+        name: "Sun",
+        mass: 1988500e24,
+    },
+    Object {
         name: "Mercury",
         mass: 0.330103e24,
     },

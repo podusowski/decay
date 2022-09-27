@@ -72,8 +72,10 @@ pub fn create_solar_system(
     //let file = std::fs::File::open("ephemeris.yaml").expect("could not open ephemeris file");
     //let bodies: Vec<Body> = serde_yaml::from_reader(file).expect("could not parse ephemeris file");
     let bodies = fetch_ephemeris();
+    info!("State of the world:");
 
     for body in bodies {
+        info!("{:?}", body);
         commands
             .spawn()
             .insert_bundle(PbrBundle {
@@ -85,8 +87,8 @@ pub fn create_solar_system(
                 ..default()
             })
             .insert(Body {
-                position: body.position.aus_to_meters(),
-                velocity: body.velocity.km_per_second_to_meters_per_second(),
+                position: body.position * 1000., //.aus_to_meters(),
+                velocity: body.velocity,         //.km_per_second_to_meters_per_second(),
                 mass: body.mass,
                 name: body.name.clone(),
             })
