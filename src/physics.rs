@@ -49,8 +49,6 @@ pub fn newtonian_gravity(time: Res<Time>, mut query: Query<(&mut Body, &mut Tran
     }
 }
 
-pub fn move_bodies(time: Res<Time>, mut query: Query<&mut Body>) {}
-
 // Object having a mass and position in space.
 pub trait MassObject {
     fn mass(&self) -> Mass;
