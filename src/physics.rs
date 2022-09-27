@@ -7,7 +7,7 @@ use crate::algebra::Vector;
 
 const TIME_SCALE: f64 = 1000000000.;
 
-fn move_single(time: f64, force: Vector, body: &mut Body) {
+fn update_velocity(time: f64, force: Vector, body: &mut Body) {
     let acceleration = force / body.mass().get::<gram>();
     body.velocity = acceleration * time + body.velocity;
 }
@@ -20,8 +20,8 @@ pub fn newtonian_gravity(time: Res<Time>, mut query: Query<(&mut Body, &mut Tran
         let time = time.delta_seconds_f64() * TIME_SCALE;
         let force = body1.newtonian_gravity(&*body2) * 0.001;
 
-        move_single(time, force, &mut body1);
-        move_single(time, -force, &mut body2);
+        update_velocity(time, force, &mut body1);
+        update_velocity(time, -force, &mut body2);
 
         *transform1 = Transform::from_xyz(
             body1.position.x as f32,
@@ -35,15 +35,21 @@ pub fn newtonian_gravity(time: Res<Time>, mut query: Query<(&mut Body, &mut Tran
             body2.position.z as f32,
         );
     }
-}
 
-pub fn move_bodies(time: Res<Time>, mut query: Query<&mut Body>) {
     let time = time.delta_seconds_f64() * TIME_SCALE;
-    for mut body in query.iter_mut() {
+    for (mut body, mut transform) in query.iter_mut() {
         let offset_ensued_from_velocity = body.velocity * time as f64;
         body.position = body.position + offset_ensued_from_velocity;
+
+        *transform = Transform::from_xyz(
+            body.position.x as f32,
+            body.position.y as f32,
+            body.position.z as f32,
+        );
     }
 }
+
+pub fn move_bodies(time: Res<Time>, mut query: Query<&mut Body>) {}
 
 // Object having a mass and position in space.
 pub trait MassObject {
@@ -132,7 +138,6 @@ mod tests {
         let mut app = App::new();
 
         app.add_system(newtonian_gravity);
-        app.add_system(move_bodies);
 
         let mut time = Time::default();
         time.update();
@@ -172,7 +177,6 @@ mod tests {
         let mut app = App::new();
 
         app.add_system(newtonian_gravity);
-        app.add_system(move_bodies);
 
         let mut time = Time::default();
         time.update();
@@ -225,13 +229,9 @@ mod tests {
             epsilon = 0.01
         );
 
-        // Distance traveled should be:
-        // a * t ^ 2 / 2
-        // G * 1 ^ 2 / 2
-        // G / 2
         // TODO: Check Transform component instead of Body::position!!
         assert_abs_diff_eq!(
-            G / 2.0,
+            G * TIME_SCALE * 1000.,
             app.world.get::<Body>(id1).unwrap().position.x,
             epsilon = 0.01
         );
