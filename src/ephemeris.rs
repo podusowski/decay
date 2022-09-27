@@ -43,9 +43,13 @@ fn fetch_ephemeris() -> Vec<Body> {
             info!("Getting Solar System bodies from NASA JPL Horizons.");
             // TODO: unuglyfy this!
             let bodies = rhorizons::major_bodies().await;
-            let major_bodies = bodies
-                .iter()
-                .filter(|body| ["Sun", "Mercury", "Venus", "Earth"].contains(&body.name.as_str()));
+            let major_bodies = bodies.iter().filter(|body| {
+                [
+                    "Sun", "Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn", "Uranus",
+                    "Neptune",
+                ]
+                .contains(&body.name.as_str())
+            });
 
             let mut bodies = Vec::new();
             for major_body in major_bodies {
