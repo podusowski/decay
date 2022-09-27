@@ -59,12 +59,6 @@ fn fetch_ephemeris() -> Vec<Body> {
         })
 }
 
-fn ensure_ephemeris() {
-    for body in fetch_ephemeris() {
-        eprintln!("{:?}", body);
-    }
-}
-
 #[derive(Component)]
 struct Name(String);
 
@@ -91,8 +85,8 @@ pub fn create_solar_system(
                 ..default()
             })
             .insert(Body {
-                position: body.position * 1000., //.aus_to_meters(),
-                velocity: body.velocity,         //.km_per_second_to_meters_per_second(),
+                position: body.position * 1000.,
+                velocity: body.velocity,
                 mass: body.mass,
                 name: body.name.clone(),
             })
