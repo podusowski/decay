@@ -12,6 +12,5 @@ fn main() {
         .add_startup_system(ephemeris::create_solar_system)
         .insert_resource(ClearColor(Color::rgb(0., 0., 0.)))
         .add_system(physics::newtonian_gravity)
-        .add_system(physics::move_bodies)
         .run();
 }

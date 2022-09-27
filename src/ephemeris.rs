@@ -18,7 +18,7 @@ async fn fetch_body(body: &rhorizons::MajorBody) -> Body {
     Body {
         name: body.name.clone(), // TODO: Try getting rid of it.
         mass: physics::Mass::new::<physics::kilogram>(
-            mass_of(&body.name).expect(&format!("no mass for '{}'", body.name)),
+            mass_of(&body.name).unwrap_or_else(|| panic!("no mass for '{}'", body.name)),
         ),
         position: Vector {
             x: vectors[0].position[0] as f64,
