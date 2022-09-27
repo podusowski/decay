@@ -45,7 +45,6 @@ pub fn move_bodies(time: Res<Time>, mut query: Query<&mut Body>) {
     }
 }
 
-
 // Object having a mass and position in space.
 pub trait MassObject {
     fn mass(&self) -> Mass;
@@ -117,7 +116,7 @@ mod tests {
 
     use approx::assert_abs_diff_eq;
 
-    use crate::units::Mass;
+    use crate::physics;
 
     use super::Body;
     use super::*;
@@ -145,7 +144,7 @@ mod tests {
             .insert(Body {
                 position: Vector::default(),
                 velocity: Vector::default(),
-                mass: Mass::from_kgs(1.0),
+                mass: Mass::new::<physics::kilogram>(1.0),
                 name: "Earth".into(),
             })
             .id();
@@ -185,7 +184,7 @@ mod tests {
             .insert(Body {
                 position: Vector::default(),
                 velocity: Vector::default(),
-                mass: Mass::from_kgs(1.0),
+                mass: Mass::new::<physics::kilogram>(1.0),
                 name: "first".into(),
             })
             .insert(Transform::default())
@@ -200,7 +199,7 @@ mod tests {
                     ..Default::default()
                 },
                 velocity: Vector::default(),
-                mass: Mass::from_kgs(1.0),
+                mass: Mass::new::<physics::kilogram>(1.0),
                 name: "second".into(),
             })
             .insert(Transform::default())
