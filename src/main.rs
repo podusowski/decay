@@ -4,6 +4,7 @@ mod algebra;
 mod physics;
 mod units;
 mod ephemeris;
+mod physical_properties;
 
 use chrono::{Duration, Utc};
 use physics::*;
