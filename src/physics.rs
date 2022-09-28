@@ -27,6 +27,9 @@ pub fn newtonian_gravity(time: Res<Time>, mut query: Query<(&mut Body, &mut Tran
         let offset_ensued_from_velocity = body.velocity * time as f64;
         body.position = body.position + offset_ensued_from_velocity;
 
+        // Synchronize internal (physics related) state with Bevy's metadata
+        // for the renderer. To be clarified whether it would be better if
+        // physics code have been operating on `Transform` component directly.
         *transform = Transform::from_xyz(
             body.position.x as f32,
             body.position.y as f32,
