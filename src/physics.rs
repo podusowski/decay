@@ -106,14 +106,10 @@ impl MassObject for Body {
 
 #[cfg(test)]
 mod tests {
-    use std::time::Duration;
-
-    use approx::assert_abs_diff_eq;
-
-    use crate::physics;
-
-    use super::Body;
     use super::*;
+    use crate::physics;
+    use approx::assert_abs_diff_eq;
+    use std::time::Duration;
 
     fn rewind_time(world: &mut World, duration: Duration) {
         let mut time = world.resource_mut::<Time>();
