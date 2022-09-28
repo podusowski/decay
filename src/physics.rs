@@ -14,26 +14,12 @@ fn update_velocity(time: f64, force: Vector, body: &mut Body) {
 
 pub fn newtonian_gravity(time: Res<Time>, mut query: Query<(&mut Body, &mut Transform)>) {
     let mut combinations = query.iter_combinations_mut();
-    while let Some([(mut body1, mut transform1), (mut body2, mut transform2)]) =
-        combinations.fetch_next()
-    {
+    while let Some([(mut body1, _), (mut body2, _)]) = combinations.fetch_next() {
         let time = time.delta_seconds_f64() * TIME_SCALE;
         let force = body1.newtonian_gravity(&*body2) * 0.001;
 
         update_velocity(time, force, &mut body1);
         update_velocity(time, -force, &mut body2);
-
-        *transform1 = Transform::from_xyz(
-            body1.position.x as f32,
-            body1.position.y as f32,
-            body1.position.z as f32,
-        );
-
-        *transform2 = Transform::from_xyz(
-            body2.position.x as f32,
-            body2.position.y as f32,
-            body2.position.z as f32,
-        );
     }
 
     let time = time.delta_seconds_f64() * TIME_SCALE;
