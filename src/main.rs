@@ -1,6 +1,6 @@
 mod algebra;
 mod ephemeris;
-mod physical_properties;
+mod knowledge;
 mod physics;
 mod units;
 

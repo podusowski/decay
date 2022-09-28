@@ -6,6 +6,7 @@ pub use uom::si::{f64::Mass, mass::kilogram};
 use crate::algebra::Vector;
 
 const TIME_SCALE: f64 = 1000000000.;
+const G: f64 = 6.67408e-11f64;
 
 impl Body {
     fn update_velocity(&mut self, time: f64, force: Vector) {
@@ -102,8 +103,6 @@ impl MassObject for Body {
         self.position
     }
 }
-
-pub const G: f64 = 6.67408e-11f64;
 
 #[cfg(test)]
 mod tests {

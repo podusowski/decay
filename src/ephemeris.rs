@@ -3,7 +3,7 @@ use chrono::{Duration, Utc};
 
 use crate::{
     algebra::Vector,
-    physical_properties::mass_of,
+    knowledge::mass_of,
     physics::{self, Body},
 };
 
