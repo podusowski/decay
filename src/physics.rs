@@ -16,16 +16,15 @@ impl Body {
 }
 
 pub fn newtonian_gravity(time: Res<Time>, mut query: Query<(&mut Body, &mut Transform)>) {
+    let time = time.delta_seconds_f64() * TIME_SCALE;
     let mut combinations = query.iter_combinations_mut();
     while let Some([(mut body1, _), (mut body2, _)]) = combinations.fetch_next() {
-        let time = time.delta_seconds_f64() * TIME_SCALE;
         let force = body1.newtonian_gravity(&*body2) * 0.001;
 
         body1.update_velocity(time, force);
         body2.update_velocity(time, -force);
     }
 
-    let time = time.delta_seconds_f64() * TIME_SCALE;
     for (mut body, mut transform) in query.iter_mut() {
         let offset_ensued_from_velocity = body.velocity * time as f64;
         body.position = body.position + offset_ensued_from_velocity;
