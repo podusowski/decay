@@ -67,8 +67,6 @@ pub fn create_solar_system(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
-    //let file = std::fs::File::open("ephemeris.yaml").expect("could not open ephemeris file");
-    //let bodies: Vec<Body> = serde_yaml::from_reader(file).expect("could not parse ephemeris file");
     let bodies = fetch_ephemeris();
     info!("State of the world:");
 
