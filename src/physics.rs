@@ -8,12 +8,6 @@ use crate::algebra::Vector;
 const TIME_SCALE: f64 = 1000000000.;
 const G: f64 = 6.67408e-11f64;
 
-// Object having a mass and position in space.
-pub trait MassObject {
-    fn mass(&self) -> Mass;
-    fn position(&self) -> Vector;
-}
-
 #[derive(Debug, Deserialize, Component)]
 pub struct Body {
     pub name: String,
@@ -23,19 +17,9 @@ pub struct Body {
     pub velocity: Vector,
 }
 
-impl MassObject for Body {
-    fn mass(&self) -> Mass {
-        self.mass
-    }
-
-    fn position(&self) -> Vector {
-        self.position
-    }
-}
-
 impl Body {
     fn update_velocity(&mut self, time: f64, force: Vector) {
-        let acceleration = force / self.mass().get::<gram>();
+        let acceleration = force / self.mass.get::<gram>();
         self.velocity = self.velocity + acceleration * time;
     }
 
@@ -49,7 +33,7 @@ impl Body {
             }
         } else {
             let offset = self.position - other.position;
-            -G * ((self.mass().get::<kilogram>() * other.mass().get::<kilogram>())
+            -G * ((self.mass.get::<kilogram>() * other.mass.get::<kilogram>())
                 / offset.length().powi(2))
                 * offset.normalized()
         }
