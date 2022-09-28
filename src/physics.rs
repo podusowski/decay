@@ -23,7 +23,8 @@ impl Body {
         self.velocity = self.velocity + acceleration * time;
     }
 
-    fn newtonian_gravity(&self, other: &Body) -> Vector {
+    /// Gravity force between this and other body.
+    fn gravity_force(&self, other: &Body) -> Vector {
         // Pauli exclusion principle FTW!
         if self.position == other.position {
             Vector {
@@ -44,14 +45,16 @@ impl Body {
 /// component. Computed positions are then written into `Transform` component.
 pub fn newtonian_gravity(time: Res<Time>, mut query: Query<(&mut Body, &mut Transform)>) {
     let time = time.delta_seconds_f64() * TIME_SCALE;
+
+    // Compute velocities.
     let mut combinations = query.iter_combinations_mut();
     while let Some([(mut body1, _), (mut body2, _)]) = combinations.fetch_next() {
-        let force = body1.newtonian_gravity(&*body2) * 0.001;
-
+        let force = body1.gravity_force(&*body2) * 0.001;
         body1.update_velocity(time, force);
         body2.update_velocity(time, -force);
     }
 
+    // Update positions with previously calculated velocities.
     for (mut body, mut transform) in query.iter_mut() {
         let offset_ensued_from_velocity = body.velocity * time as f64;
         body.position = body.position + offset_ensued_from_velocity;
