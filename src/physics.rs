@@ -56,6 +56,8 @@ impl Body {
     }
 }
 
+/// Bevy system which simulates newtonian physics for all entities with `Body`
+/// component. Computed positions are then written into `Transform` component.
 pub fn newtonian_gravity(time: Res<Time>, mut query: Query<(&mut Body, &mut Transform)>) {
     let time = time.delta_seconds_f64() * TIME_SCALE;
     let mut combinations = query.iter_combinations_mut();
