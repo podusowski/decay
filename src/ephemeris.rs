@@ -62,7 +62,7 @@ fn fetch_ephemeris() -> Vec<Body> {
 #[derive(Component)]
 struct Name(String);
 
-pub fn create_solar_system(
+pub fn spawn_solar_system(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
