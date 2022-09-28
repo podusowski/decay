@@ -1,4 +1,4 @@
-//! Couple of hardcoded physical properties of largest bodies in the
+//! Couple of hardcoded physical properties of the largest bodies in the
 //! Solar System. They are gathered from various places as JPL Horizons doesn't
 //! provide any systematic way of obtaining them.
 //!

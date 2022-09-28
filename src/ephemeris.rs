@@ -3,7 +3,7 @@ use chrono::{Duration, Utc};
 
 use crate::{
     algebra::Vector,
-    physical_properties::mass_of,
+    knowledge::mass_of,
     physics::{self, Body},
 };
 
@@ -62,13 +62,11 @@ fn fetch_ephemeris() -> Vec<Body> {
 #[derive(Component)]
 struct Name(String);
 
-pub fn create_solar_system(
+pub fn spawn_solar_system(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
-    //let file = std::fs::File::open("ephemeris.yaml").expect("could not open ephemeris file");
-    //let bodies: Vec<Body> = serde_yaml::from_reader(file).expect("could not parse ephemeris file");
     let bodies = fetch_ephemeris();
     info!("State of the world:");
 

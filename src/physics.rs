@@ -6,68 +6,67 @@ pub use uom::si::{f64::Mass, mass::kilogram};
 use crate::algebra::Vector;
 
 const TIME_SCALE: f64 = 1000000000.;
+const G: f64 = 6.67408e-11f64;
 
-fn update_velocity(time: f64, force: Vector, body: &mut Body) {
-    let acceleration = force / body.mass().get::<gram>();
-    body.velocity = acceleration * time + body.velocity;
+#[derive(Debug, Deserialize, Component)]
+pub struct Body {
+    pub name: String,
+    #[serde(with = "mass_serializer")]
+    pub mass: Mass,
+    pub position: Vector,
+    pub velocity: Vector,
 }
 
-pub fn newtonian_gravity(time: Res<Time>, mut query: Query<(&mut Body, &mut Transform)>) {
-    let mut combinations = query.iter_combinations_mut();
-    while let Some([(mut body1, mut transform1), (mut body2, mut transform2)]) =
-        combinations.fetch_next()
-    {
-        let time = time.delta_seconds_f64() * TIME_SCALE;
-        let force = body1.newtonian_gravity(&*body2) * 0.001;
-
-        update_velocity(time, force, &mut body1);
-        update_velocity(time, -force, &mut body2);
-
-        *transform1 = Transform::from_xyz(
-            body1.position.x as f32,
-            body1.position.y as f32,
-            body1.position.z as f32,
-        );
-
-        *transform2 = Transform::from_xyz(
-            body2.position.x as f32,
-            body2.position.y as f32,
-            body2.position.z as f32,
-        );
+impl Body {
+    fn update_velocity(&mut self, time: f64, force: Vector) {
+        let acceleration = force / self.mass.get::<gram>();
+        self.velocity = self.velocity + acceleration * time;
     }
 
-    let time = time.delta_seconds_f64() * TIME_SCALE;
-    for (mut body, mut transform) in query.iter_mut() {
-        let offset_ensued_from_velocity = body.velocity * time as f64;
-        body.position = body.position + offset_ensued_from_velocity;
-
-        *transform = Transform::from_xyz(
-            body.position.x as f32,
-            body.position.y as f32,
-            body.position.z as f32,
-        );
-    }
-}
-
-// Object having a mass and position in space.
-pub trait MassObject {
-    fn mass(&self) -> Mass;
-    fn position(&self) -> Vector;
-
-    fn newtonian_gravity(&self, other: &impl MassObject) -> Vector {
+    /// Gravity force between this and other body.
+    fn gravity_force(&self, other: &Body) -> Vector {
         // Pauli exclusion principle FTW!
-        if self.position() == other.position() {
+        if self.position == other.position {
             Vector {
                 x: 0.0,
                 y: 0.0,
                 z: 0.0,
             }
         } else {
-            let offset = self.position() - other.position();
-            -G * ((self.mass().get::<kilogram>() * other.mass().get::<kilogram>())
+            let offset = self.position - other.position;
+            -G * ((self.mass.get::<kilogram>() * other.mass.get::<kilogram>())
                 / offset.length().powi(2))
                 * offset.normalized()
         }
+    }
+}
+
+/// Bevy system which simulates newtonian physics for all entities with `Body`
+/// component. Computed positions are then written into `Transform` component.
+pub fn newtonian_gravity(time: Res<Time>, mut query: Query<(&mut Body, &mut Transform)>) {
+    let time = time.delta_seconds_f64() * TIME_SCALE;
+
+    // Compute velocities.
+    let mut combinations = query.iter_combinations_mut();
+    while let Some([(mut body1, _), (mut body2, _)]) = combinations.fetch_next() {
+        let force = body1.gravity_force(&*body2) * 0.001;
+        body1.update_velocity(time, force);
+        body2.update_velocity(time, -force);
+    }
+
+    // Update positions with previously calculated velocities.
+    for (mut body, mut transform) in query.iter_mut() {
+        let offset_ensued_from_velocity = body.velocity * time as f64;
+        body.position = body.position + offset_ensued_from_velocity;
+
+        // Synchronize internal (physics related) state with Bevy's metadata
+        // for the renderer. To be clarified whether it would be better if
+        // physics code have been operating on `Transform` component directly.
+        *transform = Transform::from_xyz(
+            body.position.x as f32,
+            body.position.y as f32,
+            body.position.z as f32,
+        );
     }
 }
 
@@ -93,37 +92,12 @@ mod mass_serializer {
     }
 }
 
-#[derive(Debug, Deserialize, Component)]
-pub struct Body {
-    pub name: String,
-    #[serde(with = "mass_serializer")]
-    pub mass: Mass,
-    pub position: Vector,
-    pub velocity: Vector,
-}
-
-impl MassObject for Body {
-    fn mass(&self) -> Mass {
-        self.mass
-    }
-
-    fn position(&self) -> Vector {
-        self.position
-    }
-}
-
-pub const G: f64 = 6.67408e-11f64;
-
 #[cfg(test)]
 mod tests {
-    use std::time::Duration;
-
-    use approx::assert_abs_diff_eq;
-
-    use crate::physics;
-
-    use super::Body;
     use super::*;
+    use crate::physics;
+    use approx::assert_abs_diff_eq;
+    use std::time::Duration;
 
     fn rewind_time(world: &mut World, duration: Duration) {
         let mut time = world.resource_mut::<Time>();
