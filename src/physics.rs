@@ -7,9 +7,11 @@ use crate::algebra::Vector;
 
 const TIME_SCALE: f64 = 1000000000.;
 
-fn update_velocity(time: f64, force: Vector, body: &mut Body) {
-    let acceleration = force / body.mass().get::<gram>();
-    body.velocity = acceleration * time + body.velocity;
+impl Body {
+    fn update_velocity(&mut self, time: f64, force: Vector) {
+        let acceleration = force / self.mass().get::<gram>();
+        self.velocity = self.velocity + acceleration * time;
+    }
 }
 
 pub fn newtonian_gravity(time: Res<Time>, mut query: Query<(&mut Body, &mut Transform)>) {
@@ -18,8 +20,8 @@ pub fn newtonian_gravity(time: Res<Time>, mut query: Query<(&mut Body, &mut Tran
         let time = time.delta_seconds_f64() * TIME_SCALE;
         let force = body1.newtonian_gravity(&*body2) * 0.001;
 
-        update_velocity(time, force, &mut body1);
-        update_velocity(time, -force, &mut body2);
+        body1.update_velocity(time, force);
+        body2.update_velocity(time, -force);
     }
 
     let time = time.delta_seconds_f64() * TIME_SCALE;
