@@ -22,9 +22,13 @@ fn zoom_in_out(
     mut mouse_wheel: EventReader<MouseWheel>,
     mut cameras: Query<&mut Transform, With<Camera3d>>,
 ) {
+    let min_z = 1000000000000.;
     for ev in mouse_wheel.iter() {
         for mut transform in cameras.iter_mut() {
             transform.translation += Vec3::new(0., 0., -1000000000000. * ev.y);
+            if transform.translation.z < min_z {
+                transform.translation.z = min_z;
+            }
         }
     }
 }
