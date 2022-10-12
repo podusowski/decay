@@ -2,7 +2,6 @@ mod algebra;
 mod ephemeris;
 mod knowledge;
 mod physics;
-mod units;
 
 use bevy::{input::mouse::MouseWheel, prelude::*};
 
