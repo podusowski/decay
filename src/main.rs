@@ -46,7 +46,7 @@ mod time {
 
     pub struct WorldTime {
         initial_time: chrono::DateTime<Utc>,
-        time: Option<chrono::DateTime<Utc>>,
+        time: chrono::DateTime<Utc>,
     }
 
     impl WorldTime {
@@ -54,22 +54,23 @@ mod time {
         fn new() -> Self {
             Self {
                 initial_time: Utc::now(),
-                time: None,
+                time: Utc::now(),
             }
         }
 
-        fn now(&self) -> DateTime<Utc>{
-            self.time.unwrap()
+        pub fn now(&self) -> DateTime<Utc>{
+            self.time
         }
     }
 
     fn world_time(time: Res<Time>, mut world_time: ResMut<WorldTime>) {
         eprintln!("Bevy time: {:?}", time.time_since_startup());
-        let world_duration_since_startup = time.seconds_since_startup() * TIME_SCALE;
-        world_time.time = Some(
+        // TODO: The time is broken.
+        let world_duration_since_startup = (time.seconds_since_startup() * TIME_SCALE / 3600.);
+        world_time.time = 
             world_time.initial_time
-                + chrono::Duration::seconds(world_duration_since_startup as i64),
-        );
+                + chrono::Duration::seconds(world_duration_since_startup as i64)
+        ;
 
         eprintln!("World time: {:?}", world_time.time);
     }
@@ -83,9 +84,9 @@ mod time {
     }
 }
 
-fn clock(mut egui_context: ResMut<EguiContext>, mut world_time: Res<time::WorldTime>) {
+fn clock(mut egui_context: ResMut<EguiContext>, world_time: Res<time::WorldTime>) {
     egui::Window::new("Time").show(egui_context.ctx_mut(), |ui| {
-        ui.label("clock");
+        ui.label(world_time.now().format("%d/%m/%Y %H:%M").to_string());
     });
 }
 
