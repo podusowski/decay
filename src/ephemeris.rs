@@ -59,6 +59,11 @@ fn fetch_ephemeris() -> Vec<Body> {
         })
 }
 
+fn cached_ephemeris() -> Option<Vec<Body>> {
+    let f = std::fs::File::open("ephemeris.yaml").ok()?;
+    serde_yaml::from_reader(f).ok()
+}
+
 #[derive(Component)]
 struct Name(String);
 
