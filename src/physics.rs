@@ -5,7 +5,6 @@ pub use uom::si::{f64::Mass, mass::kilogram};
 
 use crate::algebra::Vector;
 
-const TIME_SCALE: f64 = 1000000000.;
 const G: f64 = 6.67408e-11f64;
 
 #[derive(Debug, Serialize, Deserialize, Component)]
@@ -44,7 +43,7 @@ impl Body {
 /// Bevy system which simulates newtonian physics for all entities with `Body`
 /// component. Computed positions are then written into `Transform` component.
 pub fn newtonian_gravity(time: Res<Time>, mut query: Query<(&mut Body, &mut Transform)>) {
-    let time = time.delta_seconds_f64() * TIME_SCALE;
+    let time = time.delta_seconds_f64() * crate::time::TIME_SCALE;
 
     // Compute velocities.
     let mut combinations = query.iter_combinations_mut();
