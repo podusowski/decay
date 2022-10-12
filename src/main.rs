@@ -66,7 +66,7 @@ mod time {
     fn world_time(time: Res<Time>, mut world_time: ResMut<WorldTime>) {
         eprintln!("Bevy time: {:?}", time.time_since_startup());
         // TODO: The time is broken.
-        let world_duration_since_startup = (time.seconds_since_startup() * TIME_SCALE / 3600.);
+        let world_duration_since_startup = (time.seconds_since_startup() * TIME_SCALE / 1000.);
         world_time.time = 
             world_time.initial_time
                 + chrono::Duration::seconds(world_duration_since_startup as i64)
