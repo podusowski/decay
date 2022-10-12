@@ -63,7 +63,7 @@ mod cache {
     use super::*;
 
     type Error = Box<dyn std::error::Error>;
-    const PATH: &'static str = "ephemeris.yaml";
+    const PATH: &str = "ephemeris.yaml";
 
     pub(super) fn read() -> Result<Vec<Body>, Error> {
         let f = std::fs::File::open(PATH)?;
