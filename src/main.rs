@@ -5,6 +5,7 @@ mod physics;
 mod units;
 
 use bevy::{input::mouse::MouseWheel, prelude::*};
+use bevy_egui::{EguiContext, EguiPlugin};
 
 fn spawn_camera(mut commands: Commands) {
     commands.spawn_bundle(Camera3dBundle {
@@ -41,7 +42,7 @@ mod time {
     // TODO: This shouldn't be public
     pub const TIME_SCALE: f64 = 1000000000.;
 
-    struct WorldTime {
+    pub struct WorldTime {
         initial_time: std::time::Instant,
         time: Option<std::time::Instant>,
     }
@@ -77,10 +78,22 @@ mod time {
     }
 }
 
+fn clock(
+    mut commands: Commands,
+    mut egui_context: ResMut<EguiContext>,
+    mut world_time: Res<time::WorldTime>,
+) {
+    egui::Window::new("Time").show(egui_context.ctx_mut(), |ui| {
+        ui.label("clock");
+    });
+}
+
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
+        .add_plugin(EguiPlugin)
         .add_plugin(time::WorldTimePlugin)
+        .add_system(clock)
         .add_startup_system(spawn_camera)
         .add_system(zoom_in_out)
         .add_startup_system(ephemeris::spawn_solar_system)
