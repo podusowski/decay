@@ -37,34 +37,39 @@ fn zoom_in_out(
 mod time {
     use std::time::Instant;
 
+    use chrono::{Utc, DateTime};
+
     use super::*;
 
     // TODO: This shouldn't be public
     pub const TIME_SCALE: f64 = 1000000000.;
 
     pub struct WorldTime {
-        initial_time: std::time::Instant,
-        time: Option<std::time::Instant>,
+        initial_time: chrono::DateTime<Utc>,
+        time: Option<chrono::DateTime<Utc>>,
     }
 
     impl WorldTime {
         // TODO: Initial time should come externally
         fn new() -> Self {
             Self {
-                initial_time: std::time::Instant::now(),
+                initial_time: Utc::now(),
                 time: None,
             }
         }
 
-        fn now(&self) -> Instant {
+        fn now(&self) -> DateTime<Utc>{
             self.time.unwrap()
         }
     }
 
     fn world_time(time: Res<Time>, mut world_time: ResMut<WorldTime>) {
         eprintln!("Bevy time: {:?}", time.time_since_startup());
-        let world_duration_since_startup = time.time_since_startup() * TIME_SCALE as u32;
-        world_time.time = Some(world_time.initial_time + world_duration_since_startup);
+        let world_duration_since_startup = time.seconds_since_startup() * TIME_SCALE;
+        world_time.time = Some(
+            world_time.initial_time
+                + chrono::Duration::seconds(world_duration_since_startup as i64),
+        );
 
         eprintln!("World time: {:?}", world_time.time);
     }
