@@ -33,9 +33,28 @@ fn zoom_in_out(
     }
 }
 
+#[derive(Default)]
+struct WorldTime {
+    time: Option<std::time::Instant>,
+}
+
+fn world_time(time: Res<Time>, world_time: ResMut<WorldTime>) {
+    eprintln!("Bevy time: {:?}", time.time_since_startup());
+}
+
+struct WorldTimePlugin;
+
+impl Plugin for WorldTimePlugin {
+    fn build(&self, app: &mut App) {
+        app.insert_resource(WorldTime::default())
+            .add_system(world_time);
+    }
+}
+
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
+        .add_plugin(WorldTimePlugin)
         .add_startup_system(spawn_camera)
         .add_system(zoom_in_out)
         .add_startup_system(ephemeris::spawn_solar_system)
