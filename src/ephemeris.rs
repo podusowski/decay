@@ -63,14 +63,15 @@ mod cache {
     use super::*;
 
     type Error = Box<dyn std::error::Error>;
+    const PATH: &'static str = "ephemeris.yaml";
 
-    pub(super) fn cached_ephemeris() -> Result<Vec<Body>, Error> {
-        let f = std::fs::File::open("ephemeris.yaml")?;
+    pub(super) fn read() -> Result<Vec<Body>, Error> {
+        let f = std::fs::File::open(PATH)?;
         Ok(serde_yaml::from_reader(f)?)
     }
 
-    pub(super) fn save_to_cache(ephemeris: &Vec<Body>) -> Result<(), Error> {
-        let f = std::fs::File::create("ephemeris.yaml")?;
+    pub(super) fn write(ephemeris: &Vec<Body>) -> Result<(), Error> {
+        let f = std::fs::File::create(PATH)?;
         serde_yaml::to_writer(f, ephemeris)?;
         Ok(())
     }
@@ -84,10 +85,9 @@ pub fn spawn_solar_system(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
-    let bodies = cache::cached_ephemeris().unwrap_or_else(|_| fetch_ephemeris());
-    let _ = cache::save_to_cache(&bodies);
+    let bodies = cache::read().unwrap_or_else(|_| fetch_ephemeris());
+    let _ = cache::write(&bodies);
 
-    //let bodies = fetch_ephemeris();
     info!("State of the world:");
 
     for body in bodies {
