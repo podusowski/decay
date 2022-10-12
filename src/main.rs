@@ -39,21 +39,34 @@ mod time {
     // TODO: This shouldn't be public
     pub const TIME_SCALE: f64 = 1000000000.;
 
-    #[derive(Default)]
     struct WorldTime {
+        initial_time: std::time::Instant,
         time: Option<std::time::Instant>,
     }
 
-    fn world_time(time: Res<Time>, world_time: ResMut<WorldTime>) {
+    impl WorldTime {
+        // TODO: Initial time should come externally
+        fn new() -> Self {
+            Self {
+                initial_time: std::time::Instant::now(),
+                time: None,
+            }
+        }
+    }
+
+    fn world_time(time: Res<Time>, mut world_time: ResMut<WorldTime>) {
         eprintln!("Bevy time: {:?}", time.time_since_startup());
+        let world_duration_since_startup = time.time_since_startup() * TIME_SCALE as u32;
+        world_time.time = Some(world_time.initial_time + world_duration_since_startup);
+
+        eprintln!("World time: {:?}", world_time.time);
     }
 
     pub struct WorldTimePlugin;
 
     impl Plugin for WorldTimePlugin {
         fn build(&self, app: &mut App) {
-            app.insert_resource(WorldTime::default())
-                .add_system(world_time);
+            app.insert_resource(WorldTime::new()).add_system(world_time);
         }
     }
 }
