@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use uom::si::mass::gram;
 pub use uom::si::{f64::Mass, mass::kilogram};
 
@@ -8,10 +8,10 @@ use crate::algebra::Vector;
 const TIME_SCALE: f64 = 1000000000.;
 const G: f64 = 6.67408e-11f64;
 
-#[derive(Debug, Deserialize, Component)]
+#[derive(Debug, Serialize, Deserialize, Component)]
 pub struct Body {
     pub name: String,
-    #[serde(with = "mass_serializer")]
+    //#[serde(with = "mass_serializer")]
     pub mass: Mass,
     pub position: Vector,
     pub velocity: Vector,
@@ -67,28 +67,6 @@ pub fn newtonian_gravity(time: Res<Time>, mut query: Query<(&mut Body, &mut Tran
             body.position.y as f32,
             body.position.z as f32,
         );
-    }
-}
-
-/// While `uom` provides `serde` support, it only reads and writes the
-/// underlying unit-less value. For instance, if `uom::si::f64::Mass` is used,
-/// it assumes that value it reads holds kilograms (as kgs are base type for
-/// `uom::si::f64::Mass`.
-///
-/// See <https://github.com/iliekturtles/uom/issues/110>
-mod mass_serializer {
-    use serde::Deserialize;
-    use serde::Deserializer;
-    use uom::si::f64::Mass;
-    use uom::si::mass::gram;
-
-    pub fn deserialize<'de, D>(deserializer: D) -> Result<Mass, D::Error>
-    where
-        D: Deserializer<'de>,
-    {
-        let mass = f64::deserialize(deserializer)?;
-        // Encode unit in YAML.
-        Ok(Mass::new::<gram>(mass))
     }
 }
 
