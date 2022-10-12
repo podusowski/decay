@@ -59,9 +59,21 @@ fn fetch_ephemeris() -> Vec<Body> {
         })
 }
 
-fn cached_ephemeris() -> Option<Vec<Body>> {
-    let f = std::fs::File::open("ephemeris.yaml").ok()?;
-    serde_yaml::from_reader(f).ok()
+mod cache {
+    use super::*;
+
+    type Error = Box<dyn std::error::Error>;
+
+    pub(super) fn cached_ephemeris() -> Result<Vec<Body>, Error> {
+        let f = std::fs::File::open("ephemeris.yaml")?;
+        Ok(serde_yaml::from_reader(f)?)
+    }
+
+    pub(super) fn save_to_cache(ephemeris: &Vec<Body>) -> Result<(), Error> {
+        let f = std::fs::File::create("ephemeris.yaml")?;
+        serde_yaml::to_writer(f, ephemeris)?;
+        Ok(())
+    }
 }
 
 #[derive(Component)]
@@ -72,7 +84,10 @@ pub fn spawn_solar_system(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
-    let bodies = fetch_ephemeris();
+    let bodies = cache::cached_ephemeris().unwrap_or_else(|_| fetch_ephemeris());
+    let _ = cache::save_to_cache(&bodies);
+
+    //let bodies = fetch_ephemeris();
     info!("State of the world:");
 
     for body in bodies {

@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use uom::si::mass::gram;
 pub use uom::si::{f64::Mass, mass::kilogram};
 
@@ -8,10 +8,10 @@ use crate::algebra::Vector;
 const TIME_SCALE: f64 = 1000000000.;
 const G: f64 = 6.67408e-11f64;
 
-#[derive(Debug, Deserialize, Component)]
+#[derive(Debug, Serialize, Deserialize, Component)]
 pub struct Body {
     pub name: String,
-    #[serde(with = "mass_serializer")]
+    //#[serde(with = "mass_serializer")]
     pub mass: Mass,
     pub position: Vector,
     pub velocity: Vector,
