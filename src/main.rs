@@ -37,7 +37,7 @@ fn zoom_in_out(
 mod time {
     use std::time::Instant;
 
-    use chrono::{Utc, DateTime};
+    use chrono::{DateTime, Utc};
 
     use super::*;
 
@@ -50,29 +50,24 @@ mod time {
     }
 
     impl WorldTime {
-        // TODO: Initial time should come externally
         fn new() -> Self {
+            // TODO: Eventually initial time should come as a parameter.
+            let now = Utc::now();
             Self {
-                initial_time: Utc::now(),
-                time: Utc::now(),
+                initial_time: now,
+                time: now,
             }
         }
 
-        pub fn now(&self) -> DateTime<Utc>{
+        pub fn now(&self) -> DateTime<Utc> {
             self.time
         }
     }
 
     fn world_time(time: Res<Time>, mut world_time: ResMut<WorldTime>) {
-        eprintln!("Bevy time: {:?}", time.time_since_startup());
-        // TODO: The time is broken.
-        let world_duration_since_startup = (time.seconds_since_startup() * TIME_SCALE / 1000.);
-        world_time.time = 
-            world_time.initial_time
-                + chrono::Duration::seconds(world_duration_since_startup as i64)
-        ;
-
-        eprintln!("World time: {:?}", world_time.time);
+        let world_duration_since_startup = time.seconds_since_startup() * TIME_SCALE / 1000.;
+        world_time.time = world_time.initial_time
+            + chrono::Duration::seconds(world_duration_since_startup as i64);
     }
 
     pub struct WorldTimePlugin;
