@@ -34,6 +34,8 @@ fn zoom_in_out(
 }
 
 mod time {
+    use std::time::Instant;
+
     use super::*;
 
     // TODO: This shouldn't be public
@@ -51,6 +53,10 @@ mod time {
                 initial_time: std::time::Instant::now(),
                 time: None,
             }
+        }
+
+        fn now(&self) -> Instant {
+            self.time.unwrap()
         }
     }
 
