@@ -78,11 +78,7 @@ mod time {
     }
 }
 
-fn clock(
-    mut commands: Commands,
-    mut egui_context: ResMut<EguiContext>,
-    mut world_time: Res<time::WorldTime>,
-) {
+fn clock(mut egui_context: ResMut<EguiContext>, mut world_time: Res<time::WorldTime>) {
     egui::Window::new("Time").show(egui_context.ctx_mut(), |ui| {
         ui.label("clock");
     });
