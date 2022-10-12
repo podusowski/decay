@@ -70,28 +70,6 @@ pub fn newtonian_gravity(time: Res<Time>, mut query: Query<(&mut Body, &mut Tran
     }
 }
 
-/// While `uom` provides `serde` support, it only reads and writes the
-/// underlying unit-less value. For instance, if `uom::si::f64::Mass` is used,
-/// it assumes that value it reads holds kilograms (as kgs are base type for
-/// `uom::si::f64::Mass`.
-///
-/// See <https://github.com/iliekturtles/uom/issues/110>
-mod mass_serializer {
-    use serde::Deserialize;
-    use serde::Deserializer;
-    use uom::si::f64::Mass;
-    use uom::si::mass::gram;
-
-    pub fn deserialize<'de, D>(deserializer: D) -> Result<Mass, D::Error>
-    where
-        D: Deserializer<'de>,
-    {
-        let mass = f64::deserialize(deserializer)?;
-        // Encode unit in YAML.
-        Ok(Mass::new::<gram>(mass))
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
