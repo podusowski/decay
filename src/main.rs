@@ -35,11 +35,8 @@ fn zoom_in_out(
 }
 
 mod time {
-    use std::time::Instant;
-
-    use chrono::{DateTime, Utc};
-
     use super::*;
+    use chrono::{DateTime, Utc};
 
     // TODO: This shouldn't be public
     pub const TIME_SCALE: f64 = 1000000000.;
@@ -79,6 +76,7 @@ mod time {
     }
 }
 
+/// Shows window with the current world time.
 fn clock(mut egui_context: ResMut<EguiContext>, world_time: Res<time::WorldTime>) {
     egui::Window::new("Time").show(egui_context.ctx_mut(), |ui| {
         ui.label(world_time.now().format("%d/%m/%Y %H:%M").to_string());
