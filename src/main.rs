@@ -37,6 +37,23 @@ fn zoom_in_out(
     }
 }
 
+mod camera {
+    use super::*;
+
+    pub fn follow_selected_body(
+        mut selected_body: ResMut<Option<SelectedBody>>,
+        mut query: ParamSet<(
+            Query<&mut Transform, With<Camera3d>>,
+            Query<&Transform, With<Body>>,
+        )>,
+    ) {
+        if let Some(ref mut selected_body) = selected_body.deref_mut() {
+            // This unwrap will fail only if entity is deleted.
+            let body = query.p1().get(selected_body.entity).unwrap();
+        }
+    }
+}
+
 pub struct SelectedBody {
     entity: Entity,
     name: String,
@@ -50,7 +67,6 @@ fn bodies_ui(
     // TODO: There are allocations everywhere here!
 
     if let Some(ref mut selected_body) = selected_body.deref_mut() {
-
         // This unwrap will fail only if entity is deleted.
         let (_, body) = bodies.get(selected_body.entity).unwrap();
 
@@ -84,6 +100,7 @@ fn main() {
         .add_plugin(time::WorldTimePlugin)
         .add_system(clock)
         .add_startup_system(spawn_camera)
+        .add_system(camera::follow_selected_body)
         .add_system(zoom_in_out)
         .insert_resource(Option::<SelectedBody>::None)
         .add_startup_system(ephemeris::spawn_solar_system)
