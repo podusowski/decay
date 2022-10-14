@@ -69,7 +69,6 @@ mod camera {
 
 pub struct SelectedBody {
     entity: Entity,
-    name: String,
 }
 
 fn bodies_ui(
