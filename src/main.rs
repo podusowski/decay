@@ -82,27 +82,33 @@ fn bodies_ui(
         // This unwrap will fail only if entity is deleted.
         let (_, body) = bodies.get(selected_body.entity).unwrap();
 
-        egui::Window::new("Bodies").show(egui_context.ctx_mut(), |ui| {
-            egui::ComboBox::from_id_source("selected_body")
-                .selected_text(body.name.to_owned())
-                .show_ui(ui, |ui| {
-                    for (entity, body) in bodies.iter() {
-                        ui.selectable_value(
-                            &mut selected_body.entity,
-                            entity,
-                            body.name.to_owned(),
-                        );
-                    }
-                });
-        });
+        egui::Window::new("Bodies")
+            .collapsible(false)
+            .resizable(false)
+            .show(egui_context.ctx_mut(), |ui| {
+                egui::ComboBox::from_id_source("selected_body")
+                    .selected_text(body.name.to_owned())
+                    .show_ui(ui, |ui| {
+                        for (entity, body) in bodies.iter() {
+                            ui.selectable_value(
+                                &mut selected_body.entity,
+                                entity,
+                                body.name.to_owned(),
+                            );
+                        }
+                    });
+            });
     }
 }
 
 /// Shows window with the current world time.
 fn clock(mut egui_context: ResMut<EguiContext>, world_time: Res<time::WorldTime>) {
-    egui::Window::new("Time").show(egui_context.ctx_mut(), |ui| {
-        ui.label(world_time.now().format("%d/%m/%Y %H:%M").to_string());
-    });
+    egui::Window::new("Time")
+        .collapsible(false)
+        .resizable(false)
+        .show(egui_context.ctx_mut(), |ui| {
+            ui.label(world_time.now().format("%d/%m/%Y %H:%M").to_string());
+        });
 }
 
 fn main() {
