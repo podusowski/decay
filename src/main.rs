@@ -84,6 +84,10 @@ fn clock(mut egui_context: ResMut<EguiContext>, world_time: Res<time::WorldTime>
 
 fn main() {
     App::new()
+        .insert_resource(WindowDescriptor {
+            title: "Solar System".to_string(),
+            ..default()
+        })
         .add_plugins(DefaultPlugins)
         .add_plugin(EguiPlugin)
         .add_plugin(time::WorldTimePlugin)
