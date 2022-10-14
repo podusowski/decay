@@ -48,8 +48,19 @@ mod camera {
         )>,
     ) {
         if let Some(ref mut selected_body) = selected_body.deref_mut() {
-            // This unwrap will fail only if entity is deleted.
-            let body = query.p1().get(selected_body.entity).unwrap();
+            let body_translation = {
+                let p1 = query.p1();
+                // This unwrap will fail only if entity is deleted.
+                let body = p1.get(selected_body.entity).unwrap();
+                body.translation
+            };
+
+            let mut p0 = query.p0();
+            // Single camera is expected.
+            let ref mut camera_translation = p0.single_mut().translation;
+            let camera_z = camera_translation.z;
+            *camera_translation = body_translation;
+            camera_translation.z = camera_z;
         }
     }
 }
