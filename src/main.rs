@@ -41,6 +41,7 @@ mod camera {
     use super::*;
 
     /// Move camera so it's above selected body, but keep original Z element.
+    #[allow(clippy::type_complexity)]
     pub fn follow_selected_body(
         mut selected_body: ResMut<Option<SelectedBody>>,
         mut query: ParamSet<(
@@ -58,7 +59,7 @@ mod camera {
 
             let mut p0 = query.p0();
             // Single camera is expected.
-            let ref mut camera_translation = p0.single_mut().translation;
+            let camera_translation = &mut p0.single_mut().translation;
             let camera_z = camera_translation.z;
             *camera_translation = body_translation;
             camera_translation.z = camera_z;
