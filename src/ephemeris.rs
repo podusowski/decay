@@ -113,9 +113,12 @@ pub fn spawn_solar_system(
             .insert(Name(body.name.clone()))
             .id();
 
-        *selected_body = Some(SelectedBody {
-            entity: id,
-            name: body.name.clone(),
-        });
+        // Select Sun by default.
+        if body.name == "Sun" {
+            *selected_body = Some(SelectedBody {
+                entity: id,
+                name: body.name.clone(),
+            });
+        }
     }
 }
