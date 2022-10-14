@@ -10,4 +10,4 @@ On Ubuntu like systems:
     apt install build-essential libasound2-dev libudev-dev
 
 
-![](screenshots/2021-07-28.png)
+![](screenshots/2022-10-12.png)
