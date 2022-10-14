@@ -40,6 +40,7 @@ fn zoom_in_out(
 mod camera {
     use super::*;
 
+    /// Move camera so it's above selected body, but keep original Z element.
     pub fn follow_selected_body(
         mut selected_body: ResMut<Option<SelectedBody>>,
         mut query: ParamSet<(
