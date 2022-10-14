@@ -5,6 +5,7 @@ use crate::{
     algebra::Vector,
     knowledge::mass_of,
     physics::{self, Body},
+    SelectedBody,
 };
 
 async fn fetch_body(body: &rhorizons::MajorBody) -> Body {
@@ -84,6 +85,7 @@ pub fn spawn_solar_system(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
+    mut selected_body: ResMut<Option<SelectedBody>>,
 ) {
     let bodies = cache::read().unwrap_or_else(|_| fetch_ephemeris());
     let _ = cache::write(&bodies);
@@ -92,7 +94,7 @@ pub fn spawn_solar_system(
 
     for body in bodies {
         info!("{:?}", body);
-        commands
+        let id = commands
             .spawn()
             .insert_bundle(PbrBundle {
                 mesh: meshes.add(Mesh::from(shape::Icosphere {
@@ -108,6 +110,12 @@ pub fn spawn_solar_system(
                 mass: body.mass,
                 name: body.name.clone(),
             })
-            .insert(Name(body.name.clone()));
+            .insert(Name(body.name.clone()))
+            .id();
+
+        // Select Sun by default.
+        if body.name == "Sun" {
+            *selected_body = Some(SelectedBody { entity: id });
+        }
     }
 }
