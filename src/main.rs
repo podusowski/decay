@@ -50,9 +50,13 @@ fn bodies_ui(
     // TODO: There are allocations everywhere here!
 
     if let Some(ref mut selected_body) = selected_body.deref_mut() {
+
+        // This unwrap will fail only if entity is deleted.
+        let (_, body) = bodies.get(selected_body.entity).unwrap();
+
         egui::Window::new("Bodies").show(egui_context.ctx_mut(), |ui| {
             egui::ComboBox::from_id_source("selected_body")
-                .selected_text(selected_body.name.to_owned())
+                .selected_text(body.name.to_owned())
                 .show_ui(ui, |ui| {
                     for (entity, body) in bodies.iter() {
                         ui.selectable_value(
