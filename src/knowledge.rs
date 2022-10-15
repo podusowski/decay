@@ -31,7 +31,7 @@ const OBJECTS: &[Object] = &[
     Object {
         name: "Sun",
         mass: 1988500e24,
-        color: DEFAULT_COLOR,
+        color: Color::rgb(1., 0.5, 0.),
     },
     Object {
         name: "Mercury",
