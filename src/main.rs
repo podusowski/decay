@@ -10,35 +10,37 @@ use bevy::{input::mouse::MouseWheel, prelude::*};
 use bevy_egui::{EguiContext, EguiPlugin};
 use physics::Body;
 
-fn spawn_camera(mut commands: Commands) {
-    commands.spawn_bundle(Camera3dBundle {
-        transform: Transform::from_xyz(-2.0, -2.5, 5000000000000.0).looking_at(Vec3::ZERO, Vec3::Y),
-        ..default()
-    });
+mod camera {
+    use super::*;
 
-    commands.insert_resource(AmbientLight {
-        color: Color::WHITE,
-        brightness: 0.5,
-    });
-}
+    pub fn spawn_camera(mut commands: Commands) {
+        commands.spawn_bundle(Camera3dBundle {
+            transform: Transform::from_xyz(-2.0, -2.5, 5000000000000.0)
+                .looking_at(Vec3::ZERO, Vec3::Y),
+            ..default()
+        });
 
-fn zoom_in_out(
-    mut mouse_wheel: EventReader<MouseWheel>,
-    mut cameras: Query<&mut Transform, With<Camera3d>>,
-) {
-    let min_z = 1000000000000.;
-    for ev in mouse_wheel.iter() {
-        for mut transform in cameras.iter_mut() {
-            transform.translation += Vec3::new(0., 0., -1000000000000. * ev.y);
-            if transform.translation.z < min_z {
-                transform.translation.z = min_z;
+        commands.insert_resource(AmbientLight {
+            color: Color::WHITE,
+            brightness: 0.5,
+        });
+    }
+
+    /// Zoom in/out on mouse wheel movement.
+    pub fn zoom_in_out(
+        mut mouse_wheel: EventReader<MouseWheel>,
+        mut cameras: Query<&mut Transform, With<Camera3d>>,
+    ) {
+        let min_z = 1000000000000.;
+        for ev in mouse_wheel.iter() {
+            for mut transform in cameras.iter_mut() {
+                transform.translation += Vec3::new(0., 0., -1000000000000. * ev.y);
+                if transform.translation.z < min_z {
+                    transform.translation.z = min_z;
+                }
             }
         }
     }
-}
-
-mod camera {
-    use super::*;
 
     /// Move camera so it's above selected body, but keep original Z element.
     #[allow(clippy::type_complexity)]
@@ -120,16 +122,17 @@ fn main() {
         .add_plugins(DefaultPlugins)
         .add_plugin(EguiPlugin)
         .add_plugin(time::WorldTimePlugin)
-        .add_system(clock)
-        .add_startup_system(spawn_camera)
-        .add_system(camera::follow_selected_body)
-        .add_system(zoom_in_out)
-        .insert_resource(Option::<SelectedBody>::None)
-        .add_startup_system(ephemeris::spawn_solar_system)
-        // Body select
-        .add_system(bodies_ui)
-        // Others
+        // Camera and lights.
         .insert_resource(ClearColor(Color::rgb(0., 0., 0.)))
+        .add_startup_system(camera::spawn_camera)
+        .add_system(camera::follow_selected_body)
+        .add_system(camera::zoom_in_out)
+        .insert_resource(Option::<SelectedBody>::None)
+        // User interface.
+        .add_system(bodies_ui)
+        .add_system(clock)
+        // Bodies and movement.
+        .add_startup_system(ephemeris::spawn_solar_system)
         .add_system(physics::newtonian_gravity)
         .run();
 }
