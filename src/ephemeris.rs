@@ -79,9 +79,6 @@ mod cache {
     }
 }
 
-#[derive(Component)]
-struct Name(String);
-
 pub fn spawn_solar_system(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
@@ -116,7 +113,6 @@ pub fn spawn_solar_system(
                 mass: body.mass,
                 name: body.name.clone(),
             })
-            .insert(Name(body.name.clone()))
             .id();
 
         // Select Sun by default.

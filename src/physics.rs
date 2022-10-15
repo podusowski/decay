@@ -180,7 +180,7 @@ mod tests {
 
         // TODO: Check Transform component instead of Body::position!!
         assert_abs_diff_eq!(
-            G * crate::time::TIME_SCALE * 1000.,
+            G * crate::time::TIME_SCALE * 100.,
             app.world.get::<Body>(id1).unwrap().position.x,
             epsilon = 0.01
         );
