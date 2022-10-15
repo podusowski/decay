@@ -101,7 +101,7 @@ pub fn spawn_solar_system(
                     radius: 30000000000.0,
                     subdivisions: 50,
                 })),
-                material: materials.add(Color::rgb(0.5, 0.5, 0.5).into()),
+                material: materials.add(Color::rgb(0.28, 0.35, 0.4).into()),
                 ..default()
             })
             .insert(Body {
