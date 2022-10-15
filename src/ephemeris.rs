@@ -98,7 +98,10 @@ pub fn spawn_solar_system(
             .spawn()
             .insert_bundle(PbrBundle {
                 mesh: meshes.add(Mesh::from(shape::Icosphere {
-                    radius: 30000000000.0,
+                    radius: knowledge::about(&body.name)
+                        .expect("knowledge of this body")
+                        .radius
+                        .map_or(10000000000., |r| r * 45_000.),
                     subdivisions: 50,
                 })),
                 material: materials.add(
