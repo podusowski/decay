@@ -22,7 +22,7 @@ pub fn zoom_in_out(
     let min_z = 100000000000.;
     for ev in mouse_wheel.iter() {
         for mut transform in cameras.iter_mut() {
-            transform.translation += Vec3::new(0., 0., -1000000000000. * ev.y);
+            transform.translation += Vec3::new(0., 0., -100000000000. * ev.y);
             if transform.translation.z < min_z {
                 transform.translation.z = min_z;
             }

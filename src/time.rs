@@ -2,7 +2,7 @@ use bevy::{prelude::*, time::Time};
 use chrono::{DateTime, Utc};
 
 // TODO: This shouldn't be public
-pub const TIME_SCALE: f64 = 1000000000.;
+pub const TIME_SCALE: f64 = 100000000.;
 
 pub struct WorldTime {
     initial_time: chrono::DateTime<Utc>,
