@@ -21,6 +21,7 @@ async fn fetch_body(body: &rhorizons::MajorBody) -> Body {
         mass: physics::Mass::new::<physics::kilogram>(
             mass_of(&body.name).unwrap_or_else(|| panic!("no mass for '{}'", body.name)),
         ),
+        // These are expressed as km.
         position: Vector {
             x: vectors[0].position[0] as f64,
             y: vectors[0].position[1] as f64,
@@ -98,10 +99,7 @@ pub fn spawn_solar_system(
             .spawn()
             .insert_bundle(PbrBundle {
                 mesh: meshes.add(Mesh::from(shape::Icosphere {
-                    radius: knowledge::about(&body.name)
-                        .expect("knowledge of this body")
-                        .radius
-                        .map_or(10000000000., |r| r * 45_000.),
+                    radius: 10000000000.,
                     subdivisions: 50,
                 })),
                 material: materials.add(
