@@ -13,7 +13,7 @@ use camera::SelectedBody;
 use egui::{FontId, RichText};
 use physics::Body;
 
-fn bodies_ui(
+fn ui(
     mut egui_context: ResMut<EguiContext>,
     mut selected_body: ResMut<Option<camera::SelectedBody>>,
     bodies: Query<(Entity, &Body)>,
@@ -31,14 +31,12 @@ fn bodies_ui(
             .fixed_size([300., 500.])
             .title_bar(false)
             .show(egui_context.ctx_mut(), |ui| {
-
                 ui.label(
                     RichText::new(world_time.now().format("%d/%m/%Y %H:%M").to_string())
                         .font(FontId::proportional(30.)),
                 );
 
                 ui.separator();
-
                 ui.label("Select the body to look at and use the mouse wheel\nto zoom in and out:");
 
                 egui::ComboBox::from_id_source("selected_body")
@@ -54,16 +52,6 @@ fn bodies_ui(
                     });
             });
     }
-}
-
-/// Shows window with the current world time.
-fn clock(mut egui_context: ResMut<EguiContext>, world_time: Res<time::WorldTime>) {
-    egui::Window::new("Time")
-        .collapsible(false)
-        .resizable(false)
-        .show(egui_context.ctx_mut(), |ui| {
-            ui.label(world_time.now().format("%d/%m/%Y %H:%M").to_string());
-        });
 }
 
 fn main() {
@@ -82,8 +70,7 @@ fn main() {
         .add_system(camera::zoom_in_out)
         .insert_resource(Option::<SelectedBody>::None)
         // User interface.
-        .add_system(bodies_ui)
-        //.add_system(clock)
+        .add_system(ui)
         // Bodies and movement.
         .add_startup_system(ephemeris::spawn_solar_system)
         .add_system(physics::newtonian_gravity)
