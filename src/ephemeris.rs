@@ -3,7 +3,7 @@ use chrono::{Duration, Utc};
 
 use crate::{
     algebra::Vector,
-    knowledge::mass_of,
+    knowledge::{self, mass_of},
     physics::{self, Body},
     SelectedBody,
 };
@@ -101,7 +101,13 @@ pub fn spawn_solar_system(
                     radius: 30000000000.0,
                     subdivisions: 50,
                 })),
-                material: materials.add(Color::rgb(0.28, 0.35, 0.4).into()),
+                //material: materials.add(Color::rgb(0.28, 0.35, 0.4).into()),
+                material: materials.add(
+                    knowledge::about(&body.name)
+                        .expect("knowledge of this body")
+                        .color
+                        .into(),
+                ),
                 ..default()
             })
             .insert(Body {
